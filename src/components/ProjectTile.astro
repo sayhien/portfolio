@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/site';
+import esgThumb from '../assets/esg/thumbnail.png';
+
+interface Props {
+  project: Project;
+  index: number;
+}
+const { project: p, index } = Astro.props;
+const Tag = p.href ? 'a' : 'div';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const href = p.href ? (p.external ? p.href : base + p.href) : undefined;
+const linkProps = href ? { href, ...(p.external ? { rel: 'noopener' } : {}) } : {};
+const cta = p.href ? 'Read case study' : 'Case study coming soon';
+---
+<Tag class:list={['tile', { soon: !p.href }]} style={`order:${index}`} {...linkProps}>
+  <div class="art" style={`--tint:${p.tint}`}>
+    {p.thumb === 'esg' ? (
+      <Image
+        src={esgThumb}
+        alt="ESG reporting dashboard for Tomie Technologies shown on a laptop, with the status distribution and compliance confidence cards"
+        widths={[480, 720, 1000]}
+        sizes="(max-width: 900px) 100vw, 640px"
+        loading={index < 2 ? 'eager' : 'lazy'}
+      />
+    ) : (
+      <div class="ph" style={`aspect-ratio: 1 / ${p.ratio}`} aria-hidden="true">
+        <div class="sheet">
+          <span class="bar hi"></span><span class="bar"></span><span class="bar short"></span><span class="bar"></span>
+        </div>
+      </div>
+    )}
+  </div>
+  <div class="cap">
+    <h3>{p.title}</h3>
+    <p>{p.blurb}</p>
+    <ul class="tags" aria-label="Tags">
+      {p.tags.map((t) => <li>{t}</li>)}
+    </ul>
+    <span class="more">{cta}{p.href && <span aria-hidden="true"> &rarr;</span>}</span>
+  </div>
+</Tag>
+
+<style>
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .art {
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.35s ease;
+  }
+  .art :global(img) { width: 100%; }
+  a.tile:hover .art { transform: translateY(-4px); }
+  .ph {
+    width: 100%;
+    background: var(--tint);
+    position: relative;
+  }
+  .sheet {
+    position: absolute;
+    left: 14%; top: 16%;
+    width: 62%; height: 68%;
+    background: var(--paper-2);
+    border-radius: 6px;
+    box-shadow: 0 18px 40px rgba(27, 26, 23, 0.12);
+    padding: 7% 7%;
+    display: flex;
+    flex-direction: column;
+    gap: 9%;
+  }
+  .bar { display: block; height: 10px; border-radius: 5px; background: #e3ddcf; width: 80%; }
+  .bar.hi { background: var(--accent); opacity: 0.85; width: 55%; }
+  .bar.short { width: 40%; }
+
+  .cap { display: flex; flex-direction: column; gap: 10px; }
+  h3 { font-size: 30px; }
+  .cap p { color: var(--ink-2); font-size: 16px; line-height: 1.55; max-width: 580px; }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .tags li {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    color: var(--ink-2);
+    border: 1px solid #cbc3b1;
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+  .more { font-size: 15px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+  a.tile:hover .more { text-decoration: underline; text-underline-offset: 4px; }
+  .soon .more { color: var(--muted); font-weight: 500; }
+</style>

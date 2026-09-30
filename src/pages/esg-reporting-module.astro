@@ -1,0 +1,421 @@
+---
+import { Image } from 'astro:assets';
+import CaseStudy from '../layouts/CaseStudy.astro';
+import YouTube from '../components/YouTube.astro';
+
+import hero from '../assets/esg/hero.png';
+import ifrs from '../assets/esg/ifrs-logo.png';
+import gri from '../assets/esg/gri-logo.png';
+import journey from '../assets/esg/journey-map.png';
+import ia from '../assets/esg/information-architecture.png';
+import dashboard from '../assets/esg/dashboard.png';
+import helen from '../assets/esg/persona-helen.png';
+import laura from '../assets/esg/persona-laura.png';
+import sarah from '../assets/esg/persona-sarah.png';
+import oliver from '../assets/esg/persona-oliver.png';
+import sam from '../assets/esg/persona-sam.png';
+import cluck from '../assets/esg/persona-cluck.png';
+import raj from '../assets/esg/persona-raj.png';
+
+const sections = [
+  { id: 'introduction', title: 'Introduction' },
+  { id: 'problem', title: 'Problem Statement' },
+  { id: 'discovery', title: 'Discovery and Requirements Gathering' },
+  { id: 'personas', title: 'Personas' },
+  { id: 'journey-map', title: 'Journey Map' },
+  { id: 'information-architecture', title: 'Information Architecture' },
+  { id: 'dashboard', title: 'Dashboard' },
+  { id: 'user-assignment', title: 'User Assignment' },
+  { id: 'data-synchronisation', title: 'Data Synchronisation' },
+  { id: 'gri', title: 'Global Reporting Standards' },
+  { id: 'ifrs', title: 'International Financial Reporting Standards' },
+  { id: 'progress-tracking', title: 'Progress Tracking' },
+  { id: 'collaborative-review', title: 'Collaborative Review' },
+  { id: 'challenges', title: 'Challenges and Learnings' },
+];
+const n = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
+
+const personas = [
+  { img: helen, name: 'Helen', role: 'HR Manager', goals: ['Ensure compliance with labor laws', 'Promote diversity', 'Track employee well-being'] },
+  { img: laura, name: 'Laura', role: 'Compliance Officer', goals: ['Ensure regulatory compliance', 'Manage ESG risks'] },
+  { img: sarah, name: 'Sarah', role: 'Business Development Manager', goals: ['Understand ESG for market demands', 'Communicate achievements', 'Sales focuses on procurement practices and market presence'] },
+  { img: oliver, name: 'Oliver', role: 'Operations Manager', goals: ['Reduce energy and waste', 'Implement sustainable practices', 'Report environmental performance'] },
+  { img: sam, name: 'Sam', role: 'Supply Chain Analyst', goals: ['Assess supplier sustainability', 'Reduce supply chain environmental impact'] },
+  { img: cluck, name: 'Cluck', role: 'Financial Controller', goals: ['Integrate ESG into financial planning', 'Report on expenditures', 'Report on economic performance and tax governance'] },
+  { img: raj, name: 'Raj Patel', role: 'IT Specialist', goals: ['Integrate ESG data from multiple sources into the ERP system', 'Protect customer privacy', 'Act against breaches of customer privacy and data losses'] },
+];
+
+const painPoints = [
+  { pain: 'Lack of clear communication about roles and responsibilities.', fix: 'Created user assignment to control who does what.', to: 'user-assignment' },
+  { pain: 'Time consuming manual data collection processes.', fix: 'Created data synchronisation to automatically pull data from other modules.', to: 'data-synchronisation' },
+  { pain: 'Lack of communication between reviewers and data providers.', fix: 'Created chat for the manager to communicate flagged for review answers with the assigned user.', to: 'collaborative-review' },
+];
+
+const principles = [
+  { title: 'Progress Transparency', text: 'View task completion quickly to stay on top of progress.' },
+  { title: 'Risk Intelligence', text: 'Find issues early to keep standards running smoothly.' },
+  { title: 'Team Accountability', text: 'Know who owns what, and when it’s due.' },
+];
+
+const challenges = [
+  {
+    title: 'Complex Reporting Standards',
+    challenge: 'GRI and IFRS frameworks include hundreds of standards, with about 1,500 pages of documentation, multiple disclosures, and varied data input methods.',
+    solution: 'Prioritised core reporting workflows and developed a design library with autolayout components for rapid design iteration.',
+    result: 'Designs for the core workflows, such as synchronising data, filling out data for both standards, progress tracking and managerial review, were done.',
+  },
+  {
+    title: 'Limited Development Resources',
+    challenge: 'A small team of mostly junior engineers had to implement complex technical work such as data synchronisation.',
+    solution: 'Created reusable UI patterns across the app, and designed user flows for future hires to understand.',
+    result: 'Implementation is still pending as the designs are still in the backlog.',
+  },
+  {
+    title: 'Compressed Timeline',
+    challenge: '1.5 months to fulfil the business requirements.',
+    solution: 'Prioritised core reporting workflows and developed a design library with autolayout components for rapid design iteration.',
+    result: 'While those were done, more iterations would have been helpful to refine their usability.',
+  },
+  {
+    title: 'No User Testing',
+    challenge: 'No access to end users for testing.',
+    solution: 'Designed familiar patterns (e.g., forms, tables) for intuitive use, and used Grok AI to discuss various design ideas.',
+    result: 'Despite the constructive back and forth with AI, it would still have been better to have users test the designs. Another constraint was my short contract period, which meant I had to prioritise UIs.',
+  },
+];
+
+const framer = 'https://sayhien.framer.website';
+const next = [
+  { title: 'AI Chatbot Service', blurb: 'Designed a chatbot page into a clear journey where prospects can test and understand without needing sales.', href: `${framer}/ai-chatbot` },
+  { title: 'Swipe Remittance', blurb: 'Redesigned a high dropoff remittance flow into a simple, intuitive experience users actually want to complete.', href: `${framer}/swipe-remittance-app` },
+];
+---
+<CaseStudy
+  title="ESG Reporting Module, a UX case study by Loo Say Hien"
+  kicker="Case study, Tomie Technologies"
+  heading="ESG Reporting Reimagined: Building an Efficient MVP in Record Time"
+  lede="Embedded an ESG module into an established ERP SaaS platform to streamline data collection, minimise manual effort, and foster accountability."
+  meta={[
+    { label: 'Role', value: 'UX Designer, sole designer on the project' },
+    { label: 'Timeline', value: '1.5 months, Feb to Apr 2025' },
+    { label: 'Responsibilities', value: 'User research and user interface design' },
+    { label: 'Product', value: 'Tomie Technologies ERP, ESG module' },
+  ]}
+  sections={sections}
+  next={next}
+>
+  <Image
+    slot="hero"
+    src={hero}
+    alt="The GRI 2 General Disclosures reporting screen with a disclosure progress sidebar, input fields and requirement guidance, overlaid with the compliance confidence and status distribution cards"
+    widths={[640, 1000, 1360]}
+    sizes="(max-width: 1440px) 100vw, 1312px"
+    loading="eager"
+    class="hero-img"
+  />
+
+  <section id="introduction" class="sec">
+    <p class="sn">{n('introduction')}</p>
+    <h2>Introduction</h2>
+    <p class="big">
+      In a focused six week design sprint as the project’s only UX designer, I handled user research and interface design to embed an Environmental, Social, and Governance (ESG) module into an established ERP SaaS platform. The goal was to streamline data collection against international standards, minimise manual effort, and foster accountability to attract investors and stakeholders.
+    </p>
+  </section>
+
+  <section id="problem" class="sec">
+    <p class="sn">{n('problem')}</p>
+    <h2>Problem Statement</h2>
+    <p>
+      Companies face increasing pressure from stakeholders to provide transparent reporting on their environmental, social, and governance impacts. However, the complexity of ESG reporting standards, such as GRI (Global Reporting Initiative) and IFRS (International Financial Reporting Standards), coupled with the volume of data required from across the business, makes this process challenging and time consuming.
+    </p>
+    <div class="callout">
+      <h3>Existing solutions often…</h3>
+      <ul class="ticks">
+        <li>Require specialised knowledge of ESG frameworks</li>
+        <li>Lack intuitive interfaces for collaborative reporting</li>
+        <li>Provide limited visibility into reporting progress</li>
+        <li>Exist as standalone systems, disconnected from operational data</li>
+      </ul>
+    </div>
+    <p>
+      We needed an integrated solution that would simplify ESG reporting by connecting directly to existing ERP data and providing an intuitive interface for managing the reporting process.
+    </p>
+  </section>
+
+  <section id="discovery" class="sec">
+    <p class="sn">{n('discovery')}</p>
+    <h2>Discovery and Requirements Gathering</h2>
+    <p>
+      The initial phase involved getting the business requirements from the entrepreneur, and understanding the complex reporting frameworks (GRI and IFRS) and how they would integrate with the existing ERP system.
+    </p>
+    <div class="logos">
+      <figure><Image src={gri} alt="Global Reporting Initiative (GRI) logo" widths={[400]} sizes="400px" /></figure>
+      <figure><Image src={ifrs} alt="International Financial Reporting Standards (IFRS) logo" widths={[400]} sizes="400px" /></figure>
+    </div>
+    <h3 class="sub">Key requirements identified</h3>
+    <ol class="numbered">
+      <li>Support for both GRI and IFRS frameworks</li>
+      <li>Ability to synchronise data from other ERP modules</li>
+      <li>Task assignment with granular permission settings</li>
+      <li>Progress tracking and status management</li>
+      <li>Communication tools for collaborative reporting</li>
+    </ol>
+  </section>
+
+  <section id="personas" class="sec">
+    <p class="sn">{n('personas')}</p>
+    <h2>Personas</h2>
+    <p>
+      Due to time constraints, and as the sole designer, I used AI to generate these personas to guide the design process. The system needed to serve both managers overseeing the entire reporting process and subject matter experts contributing specific data.
+    </p>
+    <ul class="personas">
+      {personas.map((p) => (
+        <li class="persona">
+          <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 45vw, 200px" />
+          <div class="p-body">
+            <h3>{p.name}</h3>
+            <p class="p-role">{p.role}</p>
+            <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="journey-map" class="sec">
+    <p class="sn">{n('journey-map')}</p>
+    <h2>Journey Map</h2>
+    <p>
+      While I developed extensive personas and journey maps with AI to guide the ESG module design, I prioritised my boss’s requirements as the primary framework. Even so, the pain points surfaced by the AI deliverables were matched by the solutions in his business requirements.
+    </p>
+    <figure class="wide">
+      <a href={journey.src} target="_blank" rel="noopener" class="zoom">
+        <Image src={journey} alt="Unified journey map across all departments, showing eight stages from planning and initiation to submission, with actors, tools, meetings, pain points and opportunities for each stage" widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
+      </a>
+      <figcaption>Unified journey map across all departments, based on the present state. Open full size to read the detail.</figcaption>
+    </figure>
+    <h3 class="sub">Top pain points, and how the design answers them</h3>
+    <ol class="pairs">
+      {painPoints.map((p) => (
+        <li>
+          <div class="pain"><span class="lbl">Pain point</span><p>{p.pain}</p></div>
+          <div class="fix"><span class="lbl">Solution</span><p>{p.fix}</p><a href={`#${p.to}`}>See the design <span aria-hidden="true">&darr;</span></a></div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section id="information-architecture" class="sec">
+    <p class="sn">{n('information-architecture')}</p>
+    <h2>Information Architecture</h2>
+    <blockquote>Given the complexity of the reporting frameworks, creating a clear, logical structure was crucial to create a common reporting template.</blockquote>
+    <p>
+      The design unified GRI and IFRS by mapping their hierarchical layers, where “Standard” in GRI corresponds to “Disclosure” in IFRS, enabling a shared interface despite different terminology.
+    </p>
+    <figure class="dark">
+      <Image src={ia} alt="Hierarchy diagram. GRI goes from Standard (e.g., GRI 2 General Disclosures 2021) to Disclosure (e.g., 2-1 Organizational details) to Requirement (e.g., report its legal name). IFRS goes from Disclosure (e.g., Consumer Goods Sector) to Volume (e.g., Volume 1, Apparel, Accessories and Footwear) to Metrics (e.g., list of priority raw materials)." widths={[800, 1264]} sizes="(max-width: 1000px) 100vw, 920px" />
+    </figure>
+  </section>
+
+  <section id="dashboard" class="sec">
+    <p class="sn">{n('dashboard')}</p>
+    <h2>Dashboard</h2>
+    <p class="big">The Dashboard is the nerve center for ESG managers, built around three core principles.</p>
+    <ul class="principles">
+      {principles.map((p, i) => (
+        <li><span class="pi">{String(i + 1).padStart(2, '0')}</span><h3>{p.title}</h3><p>{p.text}</p></li>
+      ))}
+    </ul>
+    <figure class="framed">
+      <Image src={dashboard} alt="ESG dashboard for the Q2 2025 reporting cycle, with completed, in progress and not done counts, a status distribution donut, compliance confidence of 82 percent, upcoming deadlines, user workload and the GRI Standards Progress Tracker table" widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
+    </figure>
+  </section>
+
+  <section id="user-assignment" class="sec">
+    <p class="sn">{n('user-assignment')}</p>
+    <h2>User Assignment</h2>
+    <p>Managers assign specific reporting standards to team members with appropriate permission levels. The granular system supports:</p>
+    <ul class="ticks">
+      <li>Selecting specific standards, down to disclosures and requirements, for assignment</li>
+      <li>Assigning users by name or email</li>
+      <li>Setting permission levels</li>
+      <li>Viewing and managing existing assignments</li>
+    </ul>
+    <p>This established accountability and ownership for reporting tasks, while ensuring specialised knowledge is applied to relevant areas.</p>
+    <YouTube id="d7-WI0sSvRE" title="User assignment prototype workflow" />
+  </section>
+
+  <section id="data-synchronisation" class="sec">
+    <p class="sn">{n('data-synchronisation')}</p>
+    <h2>Data Synchronisation</h2>
+    <p>
+      Data synchronisation integrates information from other modules, such as HR and Finance, into the ESG module. This ensures ESG reporting reflects the latest data across departments, streamlining compliance with frameworks like GRI and IFRS.
+    </p>
+    <dl class="benefits">
+      <div><dt>Accuracy</dt><dd>Real time data from other modules ensures precise ESG metrics.</dd></div>
+      <div><dt>Efficiency</dt><dd>Automated data collection reduces manual workload.</dd></div>
+      <div><dt>Consistency</dt><dd>Aligns data across modules.</dd></div>
+      <div><dt>Time savings</dt><dd>Eliminates redundant data entry, allowing focus on analysis and reporting.</dd></div>
+    </dl>
+    <YouTube id="2UIcLZA6ojM" title="Data synchronisation prototype" />
+  </section>
+
+  <section id="gri" class="sec">
+    <p class="sn">{n('gri')}</p>
+    <h2>Global Reporting Standards</h2>
+    <p>
+      The system supports Global Reporting Initiative (GRI) standards, which address broad environmental, social, and governance impacts. The main reporting interface provides context and guidance for each standard’s specific requirements.
+    </p>
+    <ul class="ticks">
+      <li>Progress tracker</li>
+      <li>Content entry fields and tables</li>
+      <li>Clear display of requirements and guidance</li>
+    </ul>
+    <YouTube id="LXmsCW7xVis" title="GRI reporting interface prototype" />
+  </section>
+
+  <section id="ifrs" class="sec">
+    <p class="sn">{n('ifrs')}</p>
+    <h2>International Financial Reporting Standards</h2>
+    <p>
+      The system also supports International Financial Reporting Standards (IFRS), which address financial implications. The interface mirrors the GRI module, so users learn one pattern for both frameworks.
+    </p>
+    <ul class="ticks">
+      <li>Progress tracker</li>
+      <li>Content entry fields and tables</li>
+      <li>Clear display of requirements and guidance</li>
+    </ul>
+    <YouTube id="-1cucdJdtoA" title="IFRS reporting interface prototype" />
+  </section>
+
+  <section id="progress-tracking" class="sec">
+    <p class="sn">{n('progress-tracking')}</p>
+    <h2>Progress Tracking</h2>
+    <p>The status tracking system provides visibility into reporting progress for a standard. The interface highlights:</p>
+    <ul class="ticks">
+      <li>Completed disclosures</li>
+      <li>Disclosures with issues (a standard contains disclosures)</li>
+      <li>Requirements affected by issues (a disclosure contains requirements)</li>
+      <li>Statuses: not attempted, user’s current location, completed, multiple issues, empty fields, flagged for review, omission</li>
+      <li>Navigation to any disclosure</li>
+    </ul>
+    <YouTube id="-_-ZWn_tVnE" title="Progress tracking prototype" />
+  </section>
+
+  <section id="collaborative-review" class="sec">
+    <p class="sn">{n('collaborative-review')}</p>
+    <h2>Collaborative Review</h2>
+    <p>The system includes communication tools for collaborative reporting. The chat feature allows users to:</p>
+    <ul class="ticks">
+      <li>Flag items for further review</li>
+      <li>Discuss specific reporting items in context</li>
+      <li>Keep time stamped communications</li>
+      <li>Identify users for accountability</li>
+    </ul>
+    <YouTube id="s0F4ljXiGm0" title="Collaborative review prototype" />
+  </section>
+
+  <section id="challenges" class="sec">
+    <p class="sn">{n('challenges')}</p>
+    <h2>Challenges and Learnings</h2>
+    <ol class="challenges">
+      {challenges.map((c) => (
+        <li>
+          <h3>{c.title}</h3>
+          <dl>
+            <div><dt>Challenge</dt><dd>{c.challenge}</dd></div>
+            <div><dt>Solution</dt><dd>{c.solution}</dd></div>
+            <div><dt>Result</dt><dd>{c.result}</dd></div>
+          </dl>
+        </li>
+      ))}
+    </ol>
+  </section>
+</CaseStudy>
+
+<style>
+  :global(.hero-img) { width: 100%; }
+
+  .sec { padding: 72px 0; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
+  .sec:first-child { border-top: 0; padding-top: 0; }
+  .sn { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 14px; }
+  .sec h2 { font-size: clamp(32px, 3.4vw, 46px); margin-bottom: 24px; }
+  .sec > p { color: var(--ink-2); font-size: 18px; line-height: 1.7; max-width: 700px; }
+  .sec > p + p, .sec > p + ul, .sec > ul + p { margin-top: 20px; }
+  .sec > p.big { font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; color: var(--ink); max-width: 780px; letter-spacing: -0.01em; }
+  .sub { font-size: 24px; margin: 48px 0 20px; }
+
+  .ticks { list-style: none; margin: 20px 0 0; padding: 0; max-width: 700px; }
+  .ticks li { position: relative; padding: 10px 0 10px 30px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+  .ticks li::before { content: ''; position: absolute; left: 4px; top: 21px; width: 10px; height: 2px; background: var(--accent); }
+
+  .numbered { counter-reset: r; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .numbered li { counter-increment: r; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 20px 22px; font-size: 16px; line-height: 1.45; }
+  .numbered li::before { content: counter(r, decimal-leading-zero); display: block; font-family: var(--serif); font-size: 22px; color: var(--accent); margin-bottom: 8px; }
+
+  .callout { margin: 32px 0; padding: 28px 32px; background: var(--paper-2); border-radius: var(--radius); border: 1px solid var(--line); max-width: 760px; }
+  .callout h3 { font-size: 22px; }
+  .callout .ticks li:last-child { border-bottom: 0; }
+
+  .logos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 36px 0 0; }
+  .logos figure { margin: 0; background: #fff; border-radius: var(--radius); display: grid; place-items: center; padding: 28px; border: 1px solid var(--line); }
+  .logos :global(img) { max-height: 110px; width: auto; }
+
+  .personas { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 28px 20px; }
+  .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
+  .p-body { padding-top: 14px; }
+  .persona h3 { font-size: 22px; }
+  .p-role { font-size: 14px; color: var(--accent); font-weight: 600; margin: 2px 0 10px; }
+  .persona ul { margin: 0; padding-left: 18px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
+  .persona li + li { margin-top: 4px; }
+
+  figure { margin: 36px 0 0; }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
+  .wide { margin-right: calc(var(--gutter) * -0); }
+  .zoom { display: block; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #fff; cursor: zoom-in; }
+  .dark { background: #000; border-radius: var(--radius); padding: 24px; }
+  .framed :global(img) { border-radius: var(--radius); border: 1px solid var(--line); }
+
+  .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .pairs li { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .pairs .pain, .pairs .fix { padding: 22px 24px; }
+  .pairs .pain { background: var(--paper-3); }
+  .pairs .fix { background: var(--paper-2); }
+  .lbl { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .fix .lbl { color: var(--accent); }
+  .pairs p { font-size: 16px; line-height: 1.5; }
+  .fix a { display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--accent); }
+
+  blockquote { margin: 0 0 24px; font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent); letter-spacing: -0.01em; }
+
+  .principles { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .principles li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .pi { font-family: var(--serif); color: var(--accent); font-size: 20px; }
+  .principles h3 { font-size: 22px; margin: 10px 0 8px; }
+  .principles p { font-size: 15px; color: var(--ink-2); line-height: 1.5; }
+
+  .benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 28px 0 0; max-width: 760px; }
+  .benefits div { padding: 16px 0; border-top: 1px solid var(--line); }
+  .benefits dt { font-weight: 600; margin-bottom: 4px; }
+  .benefits dd { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+
+  .sec :global(.yt) { margin-top: 40px; }
+
+  .challenges { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 16px; }
+  .challenges li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 32px; }
+  .challenges h3 { font-size: 26px; margin-bottom: 18px; }
+  .challenges dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 0; }
+  .challenges dt { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .challenges div:nth-child(3) dt { color: var(--accent); }
+  .challenges dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+
+  @media (max-width: 1000px) {
+    .sec { scroll-margin-top: 72px; padding: 56px 0; }
+  }
+  @media (max-width: 700px) {
+    .logos, .pairs li, .principles, .benefits, .challenges dl { grid-template-columns: minmax(0, 1fr); }
+    .challenges li { padding: 22px; }
+    .personas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dark { padding: 12px; }
+  }
+</style>

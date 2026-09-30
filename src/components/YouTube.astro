@@ -1,0 +1,90 @@
+---
+// Lightweight YouTube embed: shows a poster first and only loads the
+// player when it scrolls into view, then autoplays muted on loop like a
+// GIF, the same way the prototype videos behaved on the Framer site.
+interface Props {
+  id: string;
+  title: string;
+}
+const { id, title } = Astro.props;
+const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`;
+const watch = `https://www.youtube.com/watch?v=${id}`;
+---
+<figure class="yt">
+  <div class="frame" data-src={src} data-title={title}>
+    <img
+      class="poster"
+      src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+      alt=""
+      loading="lazy"
+      onerror="this.remove()"
+    />
+    <button type="button" class="play" aria-label={`Play video: ${title}`}>
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
+    </button>
+  </div>
+  <figcaption>
+    {title}. <a href={watch} target="_blank" rel="noopener">Watch on YouTube</a>
+  </figcaption>
+</figure>
+
+<style>
+  .yt { margin: 0; }
+  .frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--night);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .frame :global(iframe), .poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+  }
+  .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+  .play:hover { background: #fff; }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
+  figcaption a { color: var(--ink-2); }
+</style>
+
+<script>
+  function load(frame: HTMLElement) {
+    if (frame.dataset.loaded) return;
+    frame.dataset.loaded = '1';
+    const f = document.createElement('iframe');
+    f.src = frame.dataset.src!;
+    f.title = frame.dataset.title!;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    frame.querySelector('.play')?.remove();
+    frame.appendChild(f);
+  }
+  const frames = document.querySelectorAll<HTMLElement>('.yt .frame');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  frames.forEach((fr) => fr.querySelector('.play')?.addEventListener('click', () => load(fr)));
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { load(e.target as HTMLElement); io.unobserve(e.target); } }),
+      { rootMargin: '200px' },
+    );
+    frames.forEach((fr) => io.observe(fr));
+  }
+</script>

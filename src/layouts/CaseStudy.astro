@@ -1,0 +1,204 @@
+---
+import Base from './Base.astro';
+
+export type Meta = { label: string; value: string };
+export type Section = { id: string; title: string };
+export type NextLink = { title: string; blurb: string; href: string };
+
+interface Props {
+  title: string;
+  kicker: string;
+  heading: string;
+  lede: string;
+  meta: Meta[];
+  sections: Section[];
+  next?: NextLink[];
+}
+const { title, kicker, heading, lede, meta, sections, next = [] } = Astro.props;
+const pad = (n: number) => String(n + 1).padStart(2, '0');
+---
+<Base title={title} description={lede}>
+  <article>
+    <header class="wrap cs-hero">
+      <p class="eyebrow">{kicker}</p>
+      <h1>{heading}</h1>
+      <p class="lede">{lede}</p>
+      <dl class="meta">
+        {meta.map((m) => (
+          <div>
+            <dt>{m.label}</dt>
+            <dd>{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+
+    <div class="wrap hero-media">
+      <slot name="hero" />
+    </div>
+
+    <div class="wrap cs-body">
+      <aside class="toc-wrap">
+        <details class="toc" open>
+          <summary>On this page</summary>
+          <nav aria-label="Case study sections">
+            <ol>
+              {sections.map((s, i) => (
+                <li><a href={`#${s.id}`}><span class="n">{pad(i)}</span><span>{s.title}</span></a></li>
+              ))}
+            </ol>
+          </nav>
+        </details>
+      </aside>
+      <div class="content">
+        <slot />
+      </div>
+    </div>
+
+    {next.length > 0 && (
+      <section class="wrap more" aria-labelledby="more-title">
+        <h2 id="more-title">More case studies</h2>
+        <div class="more-grid">
+          {next.map((n) => (
+            <a class="more-card" href={n.href} rel="noopener">
+              <h3>{n.title}</h3>
+              <p>{n.blurb}</p>
+              <span class="go">Read case study <span aria-hidden="true">&rarr;</span></span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .cs-hero { padding-top: 88px; padding-bottom: 56px; }
+  .cs-hero .eyebrow { margin-bottom: 24px; }
+  h1 { font-size: clamp(40px, 5.2vw, 76px); line-height: 1.02; max-width: 1040px; }
+  .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: var(--ink-2); max-width: 780px; margin-top: 28px; }
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+    margin: 48px 0 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  dt { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  dd { margin: 0; font-size: 16px; line-height: 1.45; }
+
+  .hero-media { margin-bottom: 96px; }
+
+  .cs-body {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    column-gap: 80px;
+    align-items: start;
+  }
+  .toc-wrap { position: sticky; top: 32px; }
+  .toc summary {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    list-style: none;
+    cursor: default;
+  }
+  .toc summary::-webkit-details-marker { display: none; }
+  .toc ol { list-style: none; margin: 0; padding: 0; }
+  .toc a {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0 8px 16px;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid var(--line);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .toc a:hover { color: var(--ink); }
+  .toc a[aria-current='true'] { color: var(--ink); border-left-color: var(--accent); font-weight: 500; }
+  .toc .n { font-size: 12px; color: #9a9384; padding-top: 2px; min-width: 20px; font-variant-numeric: tabular-nums; }
+  .toc a[aria-current='true'] .n { color: var(--accent); }
+
+  .content { min-width: 0; max-width: 920px; }
+
+  .more { margin-top: 120px; }
+  .more h2 { font-size: 40px; padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 32px; }
+  .more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+  .more-card {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 32px; border-radius: var(--radius);
+    background: var(--paper-2); border: 1px solid var(--line);
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.3s;
+  }
+  .more-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .more-card h3 { font-size: 28px; }
+  .more-card p { color: var(--ink-2); }
+  .go { color: var(--accent); font-weight: 600; font-size: 15px; }
+
+  @media (max-width: 1000px) {
+    .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cs-body { grid-template-columns: minmax(0, 1fr); }
+    .toc-wrap {
+      top: 0;
+      z-index: 20;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      margin: 0 calc(var(--gutter) * -1) 24px;
+      padding: 0 var(--gutter);
+    }
+    .toc summary {
+      cursor: pointer;
+      padding: 16px 0;
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .toc summary::after { content: '+'; font-size: 18px; letter-spacing: 0; }
+    .toc[open] summary::after { content: '\2212'; }
+    .toc nav { max-height: 60vh; overflow: auto; padding-bottom: 12px; }
+    .hero-media { margin-bottom: 56px; }
+    .more-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .meta { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  }
+</style>
+
+<script>
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a'));
+  const toc = document.querySelector<HTMLDetailsElement>('.toc');
+  const narrow = window.matchMedia('(max-width: 1000px)');
+  const syncOpen = () => { if (toc) toc.open = !narrow.matches; };
+  syncOpen();
+  narrow.addEventListener('change', syncOpen);
+
+  const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+  const setCurrent = (id: string) =>
+    links.forEach((a) => a.setAttribute('aria-current', String(a.hash.slice(1) === id)));
+
+  links.forEach((a) => a.addEventListener('click', () => {
+    setCurrent(a.hash.slice(1));
+    if (narrow.matches && toc) toc.open = false;
+  }));
+
+  const sections = Array.from(byId.keys())
+    .map((id) => document.getElementById(id))
+    .filter(Boolean) as HTMLElement[];
+  const onScroll = () => {
+    let current = sections[0]?.id;
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.3) current = s.id;
+    }
+    if (current) setCurrent(current);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

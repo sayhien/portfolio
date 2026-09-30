@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectTile from '../components/ProjectTile.astro';
+import { site, projects } from '../data/site';
+
+const left = projects.filter((_, i) => i % 2 === 0);
+const right = projects.filter((_, i) => i % 2 === 1);
+---
+<Base title={`${site.name}, UI/UX Designer`}>
+  <section class="wrap hero">
+    <div class="hero-main">
+      <p class="eyebrow">{site.role}</p>
+      <h1>Design for<br />dense data,<br />made clear.</h1>
+    </div>
+    <p class="hero-intro">{site.intro}</p>
+  </section>
+
+  <section class="wrap work" id="work" aria-labelledby="work-title">
+    <div class="work-head">
+      <h2 id="work-title">Selected work</h2>
+      <p>{projects.length} case studies</p>
+    </div>
+    <div class="masonry">
+      <div class="col">
+        {left.map((p) => <ProjectTile project={p} index={projects.indexOf(p)} />)}
+      </div>
+      <div class="col">
+        {right.map((p) => <ProjectTile project={p} index={projects.indexOf(p)} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    padding-top: 96px;
+    padding-bottom: 104px;
+  }
+  .hero-main { grid-column: 1 / span 8; }
+  .hero-main .eyebrow { margin-bottom: 28px; }
+  h1 { font-size: clamp(56px, 8.4vw, 124px); line-height: 0.95; letter-spacing: -0.03em; }
+  .hero-intro {
+    grid-column: 9 / span 4;
+    align-self: end;
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .work-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 40px;
+  }
+  .work-head h2 { font-size: 40px; }
+  .work-head p { font-size: 14px; color: var(--muted); }
+
+  .masonry {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 40px;
+    align-items: start;
+  }
+  .col { display: flex; flex-direction: column; gap: 72px; }
+  .col:nth-child(2) { padding-top: 96px; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: minmax(0, 1fr); padding-top: 48px; padding-bottom: 64px; row-gap: 28px; }
+    .hero-main, .hero-intro { grid-column: 1; }
+    .hero-intro { font-size: 17px; }
+    .masonry { display: flex; flex-direction: column; gap: 56px; }
+    .col { display: contents; }
+    .col:nth-child(2) { padding-top: 0; }
+    .work-head h2 { font-size: 32px; }
+  }
+</style>

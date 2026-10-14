@@ -31,7 +31,12 @@ const frameworks = [
   },
 ];
 
-const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
+// Neutral names for the three layers, used by the shared reporting template.
+const sharedTemplate = [
+  { name: 'Theme', description: 'A broad ESG area' },
+  { name: 'Topic', description: 'A specific subject' },
+  { name: 'Data point', description: 'One value to report' },
+];
 ---
 <figure class="ia">
   <table>
@@ -64,8 +69,12 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
     </tbody>
     <tfoot>
       <tr>
-        <th scope="row" class="shared-lbl">Shared template</th>
-        {sharedTemplate.map((part, index) => <td data-layer={layers[index]}><span class="shared">{part}</span></td>)}
+        <th scope="row" class="shared-lbl">Shared template<small>One structure for both</small></th>
+        {sharedTemplate.map((part, index) => (
+          <td data-layer={layers[index]}>
+            <div class="shared"><span class="shared-name">{part.name}</span><span class="shared-desc">{part.description}</span></div>
+          </td>
+        ))}
       </tr>
     </tfoot>
   </table>
@@ -112,7 +121,14 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
 
   tfoot th, tfoot td { padding-top: 48px; }
   .shared-lbl { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
-  .shared { display: inline-block; font-size: 14px; font-weight: 600; color: var(--ink); background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
+  .shared-lbl small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .shared { display: grid; gap: 4px; background: var(--accent-soft); border-radius: 8px; padding: 14px 16px; }
+  .shared-name { font-family: var(--serif); font-size: 19px; line-height: 1.2; color: var(--ink); }
+  .shared-desc { font-size: 13px; color: #8f2f08; }
+  tfoot td:not(:last-child)::after {
+    content: ''; position: absolute; right: 6px; top: 50%; margin-top: 12px; width: 18px; height: 10px;
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%23b83d0b' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
 
   figcaption { font-size: 14px; color: var(--muted); margin-top: 20px; }
 
@@ -129,7 +145,8 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
       top: auto; bottom: -4px; right: auto; left: 24px; transform: rotate(90deg);
     }
     .card { min-height: 0; }
-    tfoot tr { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 40px; }
+    tfoot tr { display: grid; gap: 10px; margin-top: 40px; }
+    tfoot td::after { display: none; }
     tfoot th, tfoot td { border: 0; padding: 0 !important; }
     tfoot th { width: 100%; }
     tfoot td::before { display: none; }

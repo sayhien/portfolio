@@ -4,6 +4,8 @@ import CaseStudy from '../layouts/CaseStudy.astro';
 import YouTube from '../components/YouTube.astro';
 import JourneyMap from '../components/JourneyMap.astro';
 import EsgHierarchy from '../components/EsgHierarchy.astro';
+import Icon from '../components/Icon.astro';
+import type { IconName } from '../components/Icon.astro';
 
 import hero from '../assets/esg/hero.png';
 import ifrs from '../assets/esg/ifrs-logo.png';
@@ -57,27 +59,44 @@ const principles = [
   { title: 'Team Accountability', text: 'Know who owns what, and when it’s due.' },
 ];
 
-const challenges = [
+type Challenge = {
+  title: string;
+  icon: IconName;
+  status: { label: string; tone: 'good' | 'warn' | 'info' | 'accent'; icon: IconName };
+  challenge: string;
+  solution: string;
+  result: string;
+};
+
+const challenges: Challenge[] = [
   {
     title: 'Complex Reporting Standards',
+    icon: 'docs',
+    status: { label: 'Delivered', tone: 'good', icon: 'check' },
     challenge: 'GRI and IFRS frameworks include hundreds of standards, with about 1,500 pages of documentation, multiple disclosures, and varied data input methods.',
     solution: 'Prioritised core reporting workflows and developed a design library with autolayout components for rapid design iteration.',
     result: 'Designs for the core workflows, such as synchronising data, filling out data for both standards, progress tracking and managerial review, were done.',
   },
   {
     title: 'Limited Development Resources',
+    icon: 'code',
+    status: { label: 'Build pending', tone: 'warn', icon: 'pending' },
     challenge: 'A small team of mostly junior engineers had to implement complex technical work such as data synchronisation.',
     solution: 'Created reusable UI patterns across the app, and designed user flows for future hires to understand.',
     result: 'Implementation is still pending as the designs are still in the backlog.',
   },
   {
     title: 'Compressed Timeline',
+    icon: 'clock',
+    status: { label: 'Delivered, more to refine', tone: 'info', icon: 'check' },
     challenge: '1.5 months to fulfil the business requirements.',
     solution: 'Prioritised core reporting workflows and developed a design library with autolayout components for rapid design iteration.',
     result: 'While those were done, more iterations would have been helpful to refine their usability.',
   },
   {
     title: 'No User Testing',
+    icon: 'flask',
+    status: { label: 'Key learning', tone: 'accent', icon: 'spark' },
     challenge: 'No access to end users for testing.',
     solution: 'Designed familiar patterns (e.g., forms, tables) for intuitive use, and used Grok AI to discuss various design ideas.',
     result: 'Despite the constructive back and forth with AI, it would still have been better to have users test the designs. Another constraint was my short contract period, which meant I had to prioritise UIs.',
@@ -314,11 +333,14 @@ const next = [
     <ol class="challenges">
       {challenges.map((c) => (
         <li>
-          <h3>{c.title}</h3>
-          <dl>
-            <div><dt>Challenge</dt><dd>{c.challenge}</dd></div>
-            <div><dt>Solution</dt><dd>{c.solution}</dd></div>
-            <div><dt>Result</dt><dd>{c.result}</dd></div>
+          <div class="ch-head">
+            <h3><span class="ch-icon"><Icon name={c.icon} size={22} /></span>{c.title}</h3>
+            <span class:list={['status', `tone-${c.status.tone}`]}><Icon name={c.status.icon} size={14} />{c.status.label}</span>
+          </div>
+          <dl class="flow">
+            <div><dt><Icon name="alert" size={14} />Challenge</dt><dd>{c.challenge}</dd></div>
+            <div><dt><Icon name="bulb" size={14} />Solution</dt><dd>{c.solution}</dd></div>
+            <div><dt><Icon name="check" size={14} />Result</dt><dd>{c.result}</dd></div>
           </dl>
         </li>
       ))}
@@ -392,18 +414,29 @@ const next = [
   .sec :global(.yt) { margin-top: 40px; }
 
   .challenges { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 16px; }
-  .challenges li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 32px; }
-  .challenges h3 { font-size: 26px; margin-bottom: 18px; }
-  .challenges dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 0; }
-  .challenges dt { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  .challenges div:nth-child(3) dt { color: var(--accent); }
-  .challenges dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+  .challenges li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px 28px; display: grid; gap: 20px; }
+  .ch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .challenges h3 { display: flex; align-items: center; gap: 14px; font-size: 24px; }
+  .ch-icon { width: 44px; height: 44px; flex: none; border-radius: 10px; background: var(--paper-3); display: grid; place-items: center; color: var(--ink); }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 5px 12px; }
+  .tone-good { background: #dfeadf; color: #2a5f3e; }
+  .tone-warn { background: #f5e8c8; color: #7a5400; }
+  .tone-info { background: #dde7f1; color: #24507d; }
+  .tone-accent { background: var(--accent-soft); color: #8f2f08; }
+  .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+  .flow > div { padding-right: 24px; }
+  .flow > div + div { padding-left: 24px; border-left: 1px dashed #cbc3b1; }
+  .flow dt { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .flow > div:last-child dt { color: var(--accent); }
+  .flow dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 
   @media (max-width: 1000px) {
     .sec { scroll-margin-top: 72px; padding: 56px 0; }
   }
   @media (max-width: 700px) {
-    .logos, .pairs li, .principles, .benefits, .challenges dl { grid-template-columns: minmax(0, 1fr); }
+    .logos, .pairs li, .principles, .benefits, .flow { grid-template-columns: minmax(0, 1fr); }
+    .flow { gap: 18px; }
+    .flow > div, .flow > div + div { padding: 0; border-left: 0; }
     .challenges li { padding: 22px; }
     .personas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }

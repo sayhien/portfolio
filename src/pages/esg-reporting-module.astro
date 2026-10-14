@@ -8,6 +8,8 @@ import Icon from '../components/Icon.astro';
 import EsgProblemList from '../components/EsgProblemList.astro';
 import EsgRequirements from '../components/EsgRequirements.astro';
 import EsgPainPoints from '../components/EsgPainPoints.astro';
+import EsgQuestions from '../components/EsgQuestions.astro';
+import type { Question } from '../components/EsgQuestions.astro';
 import type { PainPoint } from '../components/EsgPainPoints.astro';
 import { onFirstView, restartClass } from '../components/motion';
 import type { IconName } from '../components/Icon.astro';
@@ -58,10 +60,10 @@ const painPoints: PainPoint[] = [
   { pain: 'Lack of communication between reviewers and data providers.', fix: 'Created chat for the manager to communicate flagged for review answers with the assigned user.', to: 'collaborative-review', linkLabel: 'See collaborative review', widget: 'chat' },
 ];
 
-const principles = [
-  { title: 'Progress Transparency', text: 'View task completion quickly to stay on top of progress.' },
-  { title: 'Risk Intelligence', text: 'Find issues early to keep standards running smoothly.' },
-  { title: 'Team Accountability', text: 'Know who owns what, and when it’s due.' },
+const dashboardQuestions: Question[] = [
+  { question: 'How far along are we?', principle: 'Progress Transparency', text: 'View task completion quickly to stay on top of progress.' },
+  { question: 'What could go wrong?', principle: 'Risk Intelligence', text: 'Find issues early to keep standards running smoothly.' },
+  { question: 'Who owns this, and when?', principle: 'Team Accountability', text: 'Know who owns what, and when it’s due.' },
 ];
 
 type Challenge = {
@@ -215,11 +217,7 @@ const next = [
     <p class="sn">{n('dashboard')}</p>
     <h2>Dashboard</h2>
     <p class="big">The Dashboard is the nerve center for ESG managers, built around three core principles.</p>
-    <ul class="principles">
-      {principles.map((p, i) => (
-        <li><span class="pi">{String(i + 1).padStart(2, '0')}</span><h3>{p.title}</h3><p>{p.text}</p></li>
-      ))}
-    </ul>
+    <EsgQuestions items={dashboardQuestions} />
     <figure class="framed">
       <Image src={dashboard} alt="ESG dashboard for the Q2 2025 reporting cycle, with completed, in progress and not done counts, a status distribution donut, compliance confidence of 82 percent, upcoming deadlines, user workload and the GRI Standards Progress Tracker table" widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
     </figure>
@@ -375,11 +373,6 @@ const next = [
 
   blockquote { margin: 0 0 24px; font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent); letter-spacing: -0.01em; }
 
-  .principles { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-  .principles li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
-  .pi { font-family: var(--serif); color: var(--accent); font-size: 20px; }
-  .principles h3 { font-size: 22px; margin: 10px 0 8px; }
-  .principles p { font-size: 15px; color: var(--ink-2); line-height: 1.5; }
 
   .benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 28px 0 0; max-width: 760px; }
   .benefits div { padding: 16px 0; border-top: 1px solid var(--line); }
@@ -421,7 +414,7 @@ const next = [
     .sec { scroll-margin-top: 72px; padding: 56px 0; }
   }
   @media (max-width: 700px) {
-    .logos, .principles, .benefits, .flow { grid-template-columns: minmax(0, 1fr); }
+    .logos, .benefits, .flow { grid-template-columns: minmax(0, 1fr); }
     .flow { gap: 18px; }
     .flow > div, .flow > div + div { padding: 0; border-left: 0; }
     .challenges li { padding: 22px; }

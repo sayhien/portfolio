@@ -1,0 +1,95 @@
+---
+// Dashboard principles framed as the questions an ESG manager asks.
+// A large quote mark sits behind the first letters and rocks gently for
+// a few seconds, while the letters come into focus as if spoken.
+export type Question = { question: string; principle: string; text: string };
+interface Props {
+  items: Question[];
+}
+const { items } = Astro.props;
+---
+<ul class="qa" data-questions>
+  {items.map((item, row) => (
+    <li style={`--row:${row}`}>
+      <blockquote class="quote">
+        <span class="mark" aria-hidden="true">&ldquo;</span>
+        <p class="q">
+          <span class="visually-hidden">{item.question}</span>
+          <span class="letters" aria-hidden="true" data-letters>{item.question}</span>
+        </p>
+      </blockquote>
+      <div class="ans">
+        <h3>{item.principle}</h3>
+        <p>{item.text}</p>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .qa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 48px; }
+  .qa > li { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+
+  .quote { position: relative; margin: 0; padding: 0.2em 0 0 0.3em; font-size: clamp(30px, 3.6vw, 44px); isolation: isolate; }
+  .mark {
+    position: absolute; left: -0.06em; top: -0.1em; z-index: -1;
+    font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 5em; line-height: 1;
+    color: var(--accent); opacity: 0.2; transform-origin: 50% 75%; pointer-events: none;
+  }
+  .q { position: relative; font-family: var(--serif); font-weight: 400; font-size: 1em; line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); }
+  .letters :global(.word) { display: inline-block; white-space: nowrap; }
+  .letters :global(.ch) { display: inline-block; }
+
+  .ans { display: grid; gap: 6px; }
+  .ans h3 { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .ans p { color: var(--ink-2); font-size: 16px; line-height: 1.55; }
+
+  /* Plays once when the list scrolls in: the mark settles in and rocks
+     back and forth for about 3 seconds, then letters come into focus. */
+  .play .mark { animation: mark-in 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) backwards, rock 3s ease-in-out; animation-delay: calc(var(--row) * 0.9s); }
+  .play .letters :global(.ch) { animation: focus-in 0.5s ease-out backwards; animation-delay: calc(var(--row) * 0.9s + 0.3s + var(--i) * 35ms); }
+  @keyframes mark-in { from { opacity: 0; transform: translateY(0.2em) scale(0.85); } }
+  @keyframes rock {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(-9deg); }
+    32% { transform: rotate(7deg); }
+    50% { transform: rotate(-5deg); }
+    68% { transform: rotate(3deg); }
+    84% { transform: rotate(-1.5deg); }
+    100% { transform: rotate(0); }
+  }
+  @keyframes focus-in { from { opacity: 0; filter: blur(6px); } }
+
+  @media (max-width: 760px) {
+    .qa > li { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  }
+</style>
+
+<script>
+  import { onFirstView, restartClass } from './motion';
+
+  document.querySelectorAll<HTMLElement>('[data-questions]').forEach((list) => {
+    // Split each question into letters so they can fade in one by one.
+    // Screen readers use the visually hidden copy instead.
+    list.querySelectorAll<HTMLElement>('[data-letters]').forEach((holder) => {
+      const text = holder.textContent ?? '';
+      holder.textContent = '';
+      let index = 0;
+      // Group letters by word so lines only break between words.
+      text.split(' ').forEach((word, wordIndex) => {
+        if (wordIndex > 0) holder.append(' ');
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'word';
+        Array.from(word).forEach((char) => {
+          const span = document.createElement('span');
+          span.className = 'ch';
+          span.style.setProperty('--i', String(index++));
+          span.textContent = char;
+          wordSpan.appendChild(span);
+        });
+        holder.appendChild(wordSpan);
+      });
+    });
+    onFirstView(list, () => restartClass(list), 0.35);
+  });
+</script>

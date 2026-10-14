@@ -1,0 +1,147 @@
+---
+// Key requirements as a checklist that ticks itself when it scrolls in,
+// with a small looping scene beside each requirement.
+const requirements = [
+  'Support for both GRI and IFRS frameworks',
+  'Ability to synchronise data from other ERP modules',
+  'Task assignment with granular permission settings',
+  'Progress tracking and status management',
+  'Communication tools for collaborative reporting',
+];
+---
+<ul class="req" data-requirements>
+  {requirements.map((text, index) => (
+    <li style={`--n:${index}`}>
+      <span class="box" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
+      <span class="t">{text}</span>
+      <div class="vig" aria-hidden="true">
+        {index === 0 && (
+          <svg class="ill" viewBox="0 0 120 68">
+            <g class="s-gri"><rect class="vw" x="10" y="16" width="40" height="36" rx="5" /><text x="30" y="38" text-anchor="middle" class="lbl-info">GRI</text></g>
+            <g class="s-ifrs"><rect class="vw" x="70" y="16" width="40" height="36" rx="5" /><text x="90" y="38" text-anchor="middle" class="lbl-acc">IFRS</text></g>
+            <g class="s-tpl"><rect class="vgs" x="34" y="12" width="52" height="44" rx="6" /><text class="vtg" x="60" y="31" text-anchor="middle">One</text><text class="vtg" x="60" y="44" text-anchor="middle">template</text></g>
+          </svg>
+        )}
+        {index === 1 && (
+          <svg class="ill" viewBox="0 0 120 68">
+            <rect class="vf" x="6" y="6" width="30" height="14" rx="4" /><text class="vtx" x="21" y="16" text-anchor="middle">HR</text>
+            <rect class="vf" x="6" y="27" width="30" height="14" rx="4" /><text class="vtx" x="21" y="37" text-anchor="middle">FIN</text>
+            <rect class="vf" x="6" y="48" width="30" height="14" rx="4" /><text class="vtx" x="21" y="58" text-anchor="middle">SCM</text>
+            <path class="vdash" d="M36 13C60 13 60 34 84 34M36 34h48M36 55C60 55 60 34 84 34" />
+            <rect x="84" y="22" width="30" height="24" rx="5" class="vaf" /><text x="99" y="37" text-anchor="middle" class="lbl-white">ESG</text>
+            <circle r="3" class="vaf dot" style="offset-path: path('M36 13C60 13 60 34 84 34')" />
+            <circle r="3" class="vaf dot d2" style="offset-path: path('M36 34h48')" />
+            <circle r="3" class="vaf dot d3" style="offset-path: path('M36 55C60 55 60 34 84 34')" />
+          </svg>
+        )}
+        {index === 2 && (
+          <svg class="ill" viewBox="0 0 120 68">
+            <circle class="vf" cx="22" cy="24" r="9" /><path class="vf" d="M8 52a14 14 0 0 1 28 0Z" />
+            <g class="st st1"><rect x="44" y="24" width="66" height="20" rx="10" class="pill-info" /><text x="77" y="38" text-anchor="middle" class="pill-t info">Assigned</text></g>
+            <g class="st st2"><rect x="44" y="24" width="66" height="20" rx="10" class="pill-warn" /><text x="77" y="38" text-anchor="middle" class="pill-t warn">In review</text></g>
+            <g class="st st3"><rect x="44" y="24" width="66" height="20" rx="10" class="pill-good" /><text x="77" y="38" text-anchor="middle" class="pill-t good">Approved</text></g>
+          </svg>
+        )}
+        {index === 3 && (
+          <svg class="ill" viewBox="0 0 120 68">
+            <rect class="vf" x="10" y="28" width="100" height="12" rx="6" />
+            <rect class="bar" x="10" y="28" width="100" height="12" rx="6" />
+            <g class="done"><circle cx="100" cy="14" r="9" class="vgf" /><path class="tick" d="m96 14 3 3 5-6" /></g>
+            <text class="vtx" x="10" y="56">Disclosures completed</text>
+          </svg>
+        )}
+        {index === 4 && (
+          <svg class="ill" viewBox="0 0 120 68">
+            <g class="b1"><rect class="vf" x="8" y="6" width="58" height="16" rx="7" /></g>
+            <g class="b2"><rect x="52" y="26" width="60" height="16" rx="7" class="vme" /></g>
+            <g class="b3"><rect class="vf" x="8" y="46" width="44" height="16" rx="7" /></g>
+          </svg>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .req { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 760px; }
+  .req li { display: grid; grid-template-columns: 26px minmax(0, 1fr) 128px; gap: 18px; align-items: center; padding: 8px 0; }
+  .t { font-size: 17px; }
+  .vig { aspect-ratio: 16 / 9; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); padding: 6px; }
+  .box { width: 26px; height: 26px; border-radius: 7px; border: 1.6px solid #2f6b45; display: grid; place-items: center; background: #2f6b45; }
+  .box svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; }
+
+  /* Ticks play once when the list scrolls in */
+  .play .box { animation: fill-box 0.35s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.1s); }
+  .play .box svg { animation: draw 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.3s); }
+  .play .t { animation: ink 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.2s); }
+  .play .vig { animation: rise 0.5s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.15s); }
+  @keyframes fill-box { from { background: #fff; border-color: #cfc7b5; } }
+  @keyframes draw { from { stroke-dashoffset: 20; } }
+  @keyframes ink { from { color: var(--muted); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+
+  .ill { width: 100%; height: 100%; display: block; overflow: visible; }
+  .ill :global(*) { transform-box: fill-box; transform-origin: center; }
+  .vf { fill: var(--paper-3); stroke: #cfc7b5; stroke-width: 1.5; }
+  .vw { fill: #fff; stroke: #cfc7b5; stroke-width: 1.5; }
+  .vgs { fill: #dfeadf; stroke: #2f6b45; stroke-width: 1.5; }
+  .vgf { fill: #2f6b45; }
+  .vaf { fill: var(--accent); }
+  .vme { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+  .vdash { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .bar { fill: #2f6b45; transform-origin: left center; }
+  .tick { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .vtx { font-family: var(--sans); font-size: 8px; fill: var(--muted); }
+  .vtg { font-family: var(--sans); font-size: 10px; font-weight: 700; fill: #2f6b45; }
+  .lbl-info, .lbl-acc, .lbl-white { font-family: var(--sans); font-size: 10px; font-weight: 700; }
+  .lbl-info { fill: #2c5a8a; } .lbl-acc { fill: var(--accent); } .lbl-white { fill: #fff; font-size: 8px; }
+  .pill-info { fill: #dde7f1; } .pill-warn { fill: #f5e8c8; } .pill-good { fill: #dfeadf; }
+  .pill-t { font-family: var(--sans); font-size: 10px; font-weight: 700; }
+  .pill-t.info { fill: #2c5a8a; } .pill-t.warn { fill: #7a5400; } .pill-t.good { fill: #2f6b45; }
+
+  /* Resting state, also used for reduced motion */
+  .s-tpl, .done, .st2, .st3, .dot { opacity: 0; }
+
+  /* Gentle loops, only while on screen */
+  .is-live .s-gri { animation: slide-right 4s ease-in-out infinite; }
+  .is-live .s-ifrs { animation: slide-left 4s ease-in-out infinite; }
+  .is-live .s-tpl { animation: template-in 4s ease-in-out infinite; }
+  @keyframes slide-right { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(24px); opacity: 0; } 100% { transform: none; } }
+  @keyframes slide-left { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(-24px); opacity: 0; } 100% { transform: none; } }
+  @keyframes template-in { 0%, 35% { opacity: 0; transform: scale(0.8); } 50%, 82% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
+
+  .is-live .dot { animation: travel 2.4s linear infinite; }
+  .is-live .d2 { animation-delay: 0.8s; } .is-live .d3 { animation-delay: 1.6s; }
+  @keyframes travel { from { offset-distance: 0%; opacity: 1; } 90% { opacity: 1; } to { offset-distance: 100%; opacity: 0; } }
+
+  .is-live .st { animation: status 4.5s ease-in-out infinite; }
+  .is-live .st2 { animation-delay: 1.5s; } .is-live .st3 { animation-delay: 3s; }
+  @keyframes status { 0% { opacity: 0; transform: translateY(6px); } 6%, 30% { opacity: 1; transform: none; } 36%, 100% { opacity: 0; transform: translateY(-6px); } }
+
+  .is-live .bar { animation: grow 4s ease-in-out infinite; }
+  .is-live .done { animation: done-in 4s ease-in-out infinite; }
+  .bar { transform: scaleX(0.4); }
+  @keyframes grow { 0% { transform: scaleX(0.05); } 25% { transform: scaleX(0.4); } 50% { transform: scaleX(0.7); } 70%, 90% { transform: scaleX(1); } 100% { transform: scaleX(0.05); } }
+  @keyframes done-in { 0%, 66% { opacity: 0; transform: scale(0.4); } 72%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+  .is-live .b1 { animation: chat-1 4.5s ease-out infinite; }
+  .is-live .b2 { animation: chat-2 4.5s ease-out infinite; }
+  .is-live .b3 { animation: chat-3 4.5s ease-out infinite; }
+  @keyframes chat-1 { 0% { opacity: 0; transform: translateY(6px); } 8%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  @keyframes chat-2 { 0%, 28% { opacity: 0; transform: translateY(6px); } 36%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  @keyframes chat-3 { 0%, 56% { opacity: 0; transform: translateY(6px); } 64%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+  @media (max-width: 600px) {
+    .req li { grid-template-columns: 26px minmax(0, 1fr); row-gap: 10px; }
+    .vig { grid-column: 2; max-width: 180px; }
+    .t { font-size: 16px; }
+  }
+</style>
+
+<script>
+  import { onFirstView, restartClass, trackVisibility } from './motion';
+  document.querySelectorAll<HTMLElement>('[data-requirements]').forEach((list) => {
+    trackVisibility(list);
+    onFirstView(list, () => restartClass(list));
+  });
+</script>

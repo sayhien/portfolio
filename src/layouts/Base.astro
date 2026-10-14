@@ -69,6 +69,19 @@ const year = new Date().getFullYear();
         <p class="copyright">&copy; {year} {site.name}</p>
       </div>
     </footer>
+    <script>
+      // Ghost loading: shimmer until each image arrives, then fade it in.
+      document.querySelectorAll('img').forEach((img) => {
+        if (img.complete && img.naturalWidth > 0) return;
+        img.classList.add('is-loading');
+        const done = () => {
+          img.classList.remove('is-loading');
+          img.classList.add('is-loaded');
+        };
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', () => img.classList.remove('is-loading'), { once: true });
+      });
+    </script>
   </body>
 </html>
 

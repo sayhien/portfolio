@@ -95,3 +95,23 @@ p { margin: 0; }
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Motion: the page wide pause button freezes every CSS animation. */
+[data-motion='paused'] *,
+[data-motion='paused'] *::before,
+[data-motion='paused'] *::after { animation-play-state: paused !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Ghost loading: a soft shimmer fills an image's reserved space until it
+   arrives, then the image fades in. Space is reserved by width and height
+   attributes, so nothing jumps while loading. */
+img.is-loading {
+  background: linear-gradient(100deg, var(--paper-3) 30%, var(--paper-2) 50%, var(--paper-3) 70%) 0 0 / 300% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+img.is-loaded { animation: img-in 0.45s ease-out; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@keyframes img-in { from { opacity: 0; } }

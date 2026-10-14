@@ -1,5 +1,6 @@
 ---
 import Base from './Base.astro';
+import MotionToggle from '../components/MotionToggle.astro';
 
 export type Meta = { label: string; value: string };
 export type Section = { id: string; title: string };
@@ -74,6 +75,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
       </section>
     )}
   </article>
+  <MotionToggle />
 </Base>
 
 <style>

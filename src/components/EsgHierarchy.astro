@@ -81,7 +81,7 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
   }
   thead td { width: 176px; }
   tbody td, tbody th { padding: 10px 0; vertical-align: top; }
-  tbody tr + tr td, tbody tr + tr th { border-top: 1px dashed var(--line); padding-top: 22px; }
+  tbody tr + tr td, tbody tr + tr th { padding-top: 40px; }
   tbody tr:first-child td, tbody tr:first-child th { padding-bottom: 22px; }
 
   tbody th { text-align: left; font-weight: 400; }
@@ -110,7 +110,7 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
   }
   tbody tr + tr td:not(:last-child)::after { top: 64px; }
 
-  tfoot th, tfoot td { padding-top: 18px; border-top: 1px solid var(--ink); }
+  tfoot th, tfoot td { padding-top: 48px; }
   .shared-lbl { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
   .shared { display: inline-block; font-size: 14px; font-weight: 600; color: var(--ink); background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
 
@@ -121,7 +121,7 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
     table, thead, tbody, tfoot, tr, th, td { display: block; width: auto; }
     thead { display: none; }
     tbody tr { padding: 0 0 8px; }
-    tbody tr + tr { border-top: 1px dashed var(--line); padding-top: 20px; margin-top: 12px; }
+    tbody tr + tr { padding-top: 0; margin-top: 40px; }
     tbody tr + tr td, tbody tr + tr th { border-top: 0; padding-top: 10px; }
     td { padding: 10px 10px 18px 0 !important; }
     td::before { content: attr(data-layer); display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
@@ -129,7 +129,7 @@ const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
       top: auto; bottom: -4px; right: auto; left: 24px; transform: rotate(90deg);
     }
     .card { min-height: 0; }
-    tfoot tr { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid var(--ink); margin-top: 8px; padding-top: 16px; }
+    tfoot tr { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 40px; }
     tfoot th, tfoot td { border: 0; padding: 0 !important; }
     tfoot th { width: 100%; }
     tfoot td::before { display: none; }

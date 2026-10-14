@@ -40,7 +40,10 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     <div class="wrap cs-body">
       <aside class="toc-wrap">
         <details class="toc" open>
-          <summary>On this page</summary>
+          <summary>
+            <span class="toc-label">On this page</span>
+            <span class="toc-now" data-toc-now></span>
+          </summary>
           <nav aria-label="Case study sections">
             <ol>
               {sections.map((s, i) => (
@@ -49,6 +52,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
             </ol>
           </nav>
         </details>
+        <div class="toc-progress" aria-hidden="true"><span data-toc-progress></span></div>
       </aside>
       <div class="content">
         <slot />
@@ -121,6 +125,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   }
   .toc a:hover { color: var(--ink); }
   .toc a[aria-current='true'] { color: var(--ink); border-left-color: var(--accent); font-weight: 500; }
+  .toc-now, .toc-progress { display: none; }
   .toc .n { font-size: 12px; color: #9a9384; padding-top: 2px; min-width: 20px; font-variant-numeric: tabular-nums; }
   .toc a[aria-current='true'] .n { color: var(--accent); }
 
@@ -148,21 +153,34 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
       top: 0;
       z-index: 20;
       background: var(--paper);
-      border-bottom: 1px solid var(--line);
       margin: 0 calc(var(--gutter) * -1) 24px;
       padding: 0 var(--gutter);
     }
     .toc summary {
       cursor: pointer;
-      padding: 16px 0;
+      min-height: 56px;
+      padding: 10px 0;
       margin: 0;
-      display: flex;
-      justify-content: space-between;
-      color: var(--ink);
-      font-weight: 600;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-content: center;
+      column-gap: 16px;
     }
-    .toc summary::after { content: '+'; font-size: 18px; letter-spacing: 0; }
-    .toc[open] summary::after { content: '\2212'; }
+    .toc-label { grid-column: 1; font-size: 11px; color: var(--muted); }
+    .toc-now {
+      display: block; grid-column: 1;
+      font-family: var(--serif); font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .toc-now:empty { display: none; }
+    .toc summary::after {
+      content: ''; grid-column: 2; grid-row: 1 / span 2; align-self: center;
+      width: 9px; height: 9px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+      transform: translateY(-3px) rotate(45deg); transition: transform 0.2s;
+    }
+    .toc[open] summary::after { transform: translateY(2px) rotate(-135deg); }
+    .toc-progress { display: block; height: 2px; margin: 0 calc(var(--gutter) * -1); background: var(--line); }
+    .toc-progress span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
     .toc nav { max-height: 60vh; overflow: auto; padding-bottom: 12px; }
     .hero-media { margin-bottom: 56px; }
     .more-grid { grid-template-columns: minmax(0, 1fr); }
@@ -181,8 +199,18 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   narrow.addEventListener('change', syncOpen);
 
   const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
-  const setCurrent = (id: string) =>
+  const nowLabel = document.querySelector<HTMLElement>('[data-toc-now]');
+  const progress = document.querySelector<HTMLElement>('[data-toc-progress]');
+  const setCurrent = (id: string) => {
     links.forEach((a) => a.setAttribute('aria-current', String(a.hash.slice(1) === id)));
+    const active = byId.get(id);
+    if (nowLabel && active) nowLabel.textContent = active.textContent?.replace(/^(\d+)/, '$1 ') ?? '';
+  };
+  const updateProgress = () => {
+    if (!progress) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+  };
 
   links.forEach((a) => a.addEventListener('click', () => {
     setCurrent(a.hash.slice(1));
@@ -198,6 +226,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
       if (s.getBoundingClientRect().top <= window.innerHeight * 0.3) current = s.id;
     }
     if (current) setCurrent(current);
+    updateProgress();
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();

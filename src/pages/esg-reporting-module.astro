@@ -2,12 +2,12 @@
 import { Image } from 'astro:assets';
 import CaseStudy from '../layouts/CaseStudy.astro';
 import YouTube from '../components/YouTube.astro';
+import JourneyMap from '../components/JourneyMap.astro';
+import EsgHierarchy from '../components/EsgHierarchy.astro';
 
 import hero from '../assets/esg/hero.png';
 import ifrs from '../assets/esg/ifrs-logo.png';
 import gri from '../assets/esg/gri-logo.png';
-import journey from '../assets/esg/journey-map.png';
-import ia from '../assets/esg/information-architecture.png';
 import dashboard from '../assets/esg/dashboard.png';
 import helen from '../assets/esg/persona-helen.png';
 import laura from '../assets/esg/persona-laura.png';
@@ -188,12 +188,7 @@ const next = [
     <p>
       While I developed extensive personas and journey maps with AI to guide the ESG module design, I prioritised my boss’s requirements as the primary framework. Even so, the pain points surfaced by the AI deliverables were matched by the solutions in his business requirements.
     </p>
-    <figure class="wide">
-      <a href={journey.src} target="_blank" rel="noopener" class="zoom">
-        <Image src={journey} alt="Unified journey map across all departments, showing eight stages from planning and initiation to submission, with actors, tools, meetings, pain points and opportunities for each stage" widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
-      </a>
-      <figcaption>Unified journey map across all departments, based on the present state. Open full size to read the detail.</figcaption>
-    </figure>
+    <JourneyMap />
     <h3 class="sub">Top pain points, and how the design answers them</h3>
     <ol class="pairs">
       {painPoints.map((p) => (
@@ -212,9 +207,7 @@ const next = [
     <p>
       The design unified GRI and IFRS by mapping their hierarchical layers, where “Standard” in GRI corresponds to “Disclosure” in IFRS, enabling a shared interface despite different terminology.
     </p>
-    <figure class="dark">
-      <Image src={ia} alt="Hierarchy diagram. GRI goes from Standard (e.g., GRI 2 General Disclosures 2021) to Disclosure (e.g., 2-1 Organizational details) to Requirement (e.g., report its legal name). IFRS goes from Disclosure (e.g., Consumer Goods Sector) to Volume (e.g., Volume 1, Apparel, Accessories and Footwear) to Metrics (e.g., list of priority raw materials)." widths={[800, 1264]} sizes="(max-width: 1000px) 100vw, 920px" />
-    </figure>
+    <EsgHierarchy />
   </section>
 
   <section id="dashboard" class="sec">
@@ -371,9 +364,6 @@ const next = [
 
   figure { margin: 36px 0 0; }
   figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
-  .wide { margin-right: calc(var(--gutter) * -0); }
-  .zoom { display: block; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #fff; cursor: zoom-in; }
-  .dark { background: #000; border-radius: var(--radius); padding: 24px; }
   .framed :global(img) { border-radius: var(--radius); border: 1px solid var(--line); }
 
   .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
@@ -416,6 +406,5 @@ const next = [
     .logos, .pairs li, .principles, .benefits, .challenges dl { grid-template-columns: minmax(0, 1fr); }
     .challenges li { padding: 22px; }
     .personas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .dark { padding: 12px; }
   }
 </style>

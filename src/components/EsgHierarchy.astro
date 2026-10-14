@@ -1,0 +1,137 @@
+---
+// Information architecture for the ESG case study: GRI and IFRS share the
+// same three layer structure under different names, which is what made a
+// single reporting template possible.
+import { Image } from 'astro:assets';
+import griLogo from '../assets/esg/gri-logo.png';
+import ifrsLogo from '../assets/esg/ifrs-logo.png';
+
+const layers = ['Layer 1', 'Layer 2', 'Layer 3'];
+
+const frameworks = [
+  {
+    name: 'GRI',
+    fullName: 'Global Reporting Initiative',
+    logo: griLogo,
+    levels: [
+      { term: 'Standard', example: 'GRI 2: General Disclosures 2021' },
+      { term: 'Disclosure', example: '2-1 Organizational details' },
+      { term: 'Requirement', example: 'Report its legal name' },
+    ],
+  },
+  {
+    name: 'IFRS',
+    fullName: 'International Financial Reporting Standards',
+    logo: ifrsLogo,
+    levels: [
+      { term: 'Disclosure', example: 'Consumer Goods Sector' },
+      { term: 'Volume', example: 'Volume 1, Apparel, Accessories and Footwear' },
+      { term: 'Metrics', example: 'List of priority raw materials' },
+    ],
+  },
+];
+
+const sharedTemplate = ['Page title', 'Side navigation', 'Input fields'];
+---
+<figure class="ia">
+  <table>
+    <caption class="visually-hidden">How GRI and IFRS map onto the same three layers</caption>
+    <thead>
+      <tr>
+        <td></td>
+        {layers.map((layer) => <th scope="col">{layer}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {frameworks.map((framework) => (
+        <tr>
+          <th scope="row">
+            <div class="fw">
+              <span class="logo"><Image src={framework.logo} alt="" widths={[260]} sizes="130px" /></span>
+              <span class="fw-name">{framework.name}<small>{framework.fullName}</small></span>
+            </div>
+          </th>
+          {framework.levels.map((level, index) => (
+            <td data-layer={layers[index]}>
+              <div class="card">
+                <span class="term">{level.term}</span>
+                <span class="eg"><span class="eg-lbl">e.g.</span> {level.example}</span>
+              </div>
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th scope="row" class="shared-lbl">Shared template</th>
+        {sharedTemplate.map((part, index) => <td data-layer={layers[index]}><span class="shared">{part}</span></td>)}
+      </tr>
+    </tfoot>
+  </table>
+  <figcaption>Same depth, different labels. Mapping both frameworks to three layers let one reporting template serve GRI and IFRS.</figcaption>
+</figure>
+
+<style>
+  .ia { margin: 36px 0 0; padding: 28px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: separate; border-spacing: 0 0; table-layout: fixed; }
+  thead th {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 0 0 14px 4px;
+  }
+  thead td { width: 176px; }
+  tbody td, tbody th { padding: 10px 0; vertical-align: top; }
+  tbody tr + tr td, tbody tr + tr th { border-top: 1px dashed var(--line); padding-top: 22px; }
+  tbody tr:first-child td, tbody tr:first-child th { padding-bottom: 22px; }
+
+  tbody th { text-align: left; font-weight: 400; }
+  .fw { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-right: 24px; }
+  .logo { width: 132px; height: 64px; border-radius: 8px; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; padding: 6px 10px; }
+  .logo :global(img) { max-width: 100%; max-height: 100%; width: auto; height: auto; }
+  .fw-name { font-family: var(--serif); font-size: 20px; line-height: 1.1; color: var(--ink); }
+  .fw-name small { display: block; font-family: var(--sans); font-size: 12px; line-height: 1.35; color: var(--muted); margin-top: 4px; }
+
+  /* Stacked cards hint that each layer holds many items */
+  td { position: relative; padding-right: 36px !important; }
+  td:last-child { padding-right: 8px !important; }
+  .card {
+    display: flex; flex-direction: column; gap: 8px; min-height: 104px;
+    background: #fff; border: 1px solid #cfc7b5; border-radius: 8px; padding: 14px 16px;
+    box-shadow: 5px 5px 0 -1px #fff, 5px 5px 0 0 #cfc7b5, 10px 10px 0 -1px #fff, 10px 10px 0 0 #cfc7b5;
+  }
+  .term { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+  .eg { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+  .eg-lbl { color: var(--accent); font-weight: 600; }
+
+  /* Arrow from one layer to the next */
+  tbody td:not(:last-child)::after {
+    content: ''; position: absolute; right: 6px; top: 52px; width: 18px; height: 10px;
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%23b83d0b' stroke-width='1.5'/%3E%3C/svg%3E");
+  }
+  tbody tr + tr td:not(:last-child)::after { top: 64px; }
+
+  tfoot th, tfoot td { padding-top: 18px; border-top: 1px solid var(--ink); }
+  .shared-lbl { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .shared { display: inline-block; font-size: 14px; font-weight: 600; color: var(--ink); background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
+
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 20px; }
+
+  @media (max-width: 760px) {
+    .ia { padding: 20px; }
+    table, thead, tbody, tfoot, tr, th, td { display: block; width: auto; }
+    thead { display: none; }
+    tbody tr { padding: 0 0 8px; }
+    tbody tr + tr { border-top: 1px dashed var(--line); padding-top: 20px; margin-top: 12px; }
+    tbody tr + tr td, tbody tr + tr th { border-top: 0; padding-top: 10px; }
+    td { padding: 10px 10px 18px 0 !important; }
+    td::before { content: attr(data-layer); display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    tbody td:not(:last-child)::after, tbody tr + tr td:not(:last-child)::after {
+      top: auto; bottom: -4px; right: auto; left: 24px; transform: rotate(90deg);
+    }
+    .card { min-height: 0; }
+    tfoot tr { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid var(--ink); margin-top: 8px; padding-top: 16px; }
+    tfoot th, tfoot td { border: 0; padding: 0 !important; }
+    tfoot th { width: 100%; }
+    tfoot td::before { display: none; }
+  }
+</style>

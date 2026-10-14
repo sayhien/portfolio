@@ -1,10 +1,12 @@
 ---
 import Base from './Base.astro';
 import MotionToggle from '../components/MotionToggle.astro';
+import CaseIcon from '../components/CaseIcon.astro';
+import type { CaseIconKind } from '../components/CaseIcon.astro';
 
 export type Meta = { label: string; value: string };
 export type Section = { id: string; title: string };
-export type NextLink = { title: string; blurb: string; href: string };
+export type NextLink = { title: string; blurb: string; href: string; icon?: CaseIconKind };
 
 interface Props {
   title: string;
@@ -66,7 +68,10 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
         <div class="more-grid">
           {next.map((n) => (
             <a class="more-card" href={n.href} rel="noopener">
-              <h3>{n.title}</h3>
+              <div class="more-head">
+                {n.icon && <CaseIcon kind={n.icon} />}
+                <h3>{n.title}</h3>
+              </div>
               <p>{n.blurb}</p>
               <span class="go">Read case study <span aria-hidden="true">&rarr;</span></span>
             </a>
@@ -144,6 +149,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     transition: border-color 0.2s, transform 0.3s;
   }
   .more-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .more-head { display: flex; align-items: center; gap: 16px; }
   .more-card h3 { font-size: 28px; }
   .more-card p { color: var(--ink-2); }
   .go { color: var(--accent); font-weight: 600; font-size: 15px; }

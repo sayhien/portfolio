@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import CaseStudy from '../layouts/CaseStudy.astro';
+import type { NextLink } from '../layouts/CaseStudy.astro';
 import YouTube from '../components/YouTube.astro';
 import JourneyMap from '../components/JourneyMap.astro';
 import EsgHierarchy from '../components/EsgHierarchy.astro';
@@ -111,9 +112,9 @@ const challenges: Challenge[] = [
 ];
 
 const framer = 'https://sayhien.framer.website';
-const next = [
-  { title: 'AI Chatbot Service', blurb: 'Designed a chatbot page into a clear journey where prospects can test and understand without needing sales.', href: `${framer}/ai-chatbot` },
-  { title: 'Swipe Remittance', blurb: 'Redesigned a high dropoff remittance flow into a simple, intuitive experience users actually want to complete.', href: `${framer}/swipe-remittance-app` },
+const next: NextLink[] = [
+  { title: 'AI Chatbot Service', blurb: 'Designed a chatbot page into a clear journey where prospects can test and understand without needing sales.', href: `${framer}/ai-chatbot`, icon: 'chat' },
+  { title: 'Swipe Remittance', blurb: 'Redesigned a high dropoff remittance flow into a simple, intuitive experience users actually want to complete.', href: `${framer}/swipe-remittance-app`, icon: 'remit' },
 ];
 ---
 <CaseStudy
@@ -243,12 +244,12 @@ const next = [
     <p>
       Data synchronisation integrates information from other modules, such as HR and Finance, into the ESG module. This ensures ESG reporting reflects the latest data across departments, streamlining compliance with frameworks like GRI and IFRS.
     </p>
-    <dl class="benefits">
-      <div><dt>Accuracy</dt><dd>Real time data from other modules ensures precise ESG metrics.</dd></div>
-      <div><dt>Efficiency</dt><dd>Automated data collection reduces manual workload.</dd></div>
-      <div><dt>Consistency</dt><dd>Aligns data across modules.</dd></div>
-      <div><dt>Time savings</dt><dd>Eliminates redundant data entry, allowing focus on analysis and reporting.</dd></div>
-    </dl>
+    <ul class="ticks">
+      <li>Real time data from other modules ensures precise ESG metrics</li>
+      <li>Automated data collection reduces manual workload</li>
+      <li>Data stays aligned across modules</li>
+      <li>No redundant data entry, so teams can focus on analysis and reporting</li>
+    </ul>
     <YouTube id="2UIcLZA6ojM" title="Data synchronisation prototype" />
   </section>
 
@@ -374,10 +375,6 @@ const next = [
   blockquote { margin: 0 0 24px; font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent); letter-spacing: -0.01em; }
 
 
-  .benefits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; margin: 28px 0 0; max-width: 760px; }
-  .benefits div { padding: 16px 0; border-top: 1px solid var(--line); }
-  .benefits dt { font-weight: 600; margin-bottom: 4px; }
-  .benefits dd { margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.5; }
 
   .sec :global(.yt) { margin-top: 40px; }
 
@@ -386,7 +383,7 @@ const next = [
   .ch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
   .challenges h3 { display: flex; align-items: center; gap: 14px; font-size: 24px; }
   .ch-icon { width: 44px; height: 44px; flex: none; border-radius: 10px; background: var(--paper-3); display: grid; place-items: center; color: var(--ink); }
-  .challenges li { position: relative; padding-bottom: 84px; }
+  .challenges li { position: relative; padding-bottom: 84px; overflow: hidden; }
   .stamp {
     position: absolute; right: 28px; bottom: 22px; transform: rotate(-7deg);
     display: grid; justify-items: center; gap: 2px;
@@ -414,7 +411,7 @@ const next = [
     .sec { scroll-margin-top: 72px; padding: 56px 0; }
   }
   @media (max-width: 700px) {
-    .logos, .benefits, .flow { grid-template-columns: minmax(0, 1fr); }
+    .logos, .flow { grid-template-columns: minmax(0, 1fr); }
     .flow { gap: 18px; }
     .flow > div, .flow > div + div { padding: 0; border-left: 0; }
     .challenges li { padding: 22px; }

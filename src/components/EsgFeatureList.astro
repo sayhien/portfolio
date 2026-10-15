@@ -26,11 +26,11 @@ const { items } = Astro.props;
 <style>
   .features { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 14px; max-width: 700px; }
   .features li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; }
-  .tile { position: relative; width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: #8f2f08; display: grid; place-items: center; }
+  .tile { position: relative; width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
   .badge { position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; }
-  .badge circle { fill: #2f6b45; stroke: var(--paper); stroke-width: 2; }
-  .badge path { fill: none; stroke: #fff; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 12; }
-  .text { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+  .badge circle { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+  .badge path { fill: none; stroke: var(--on-accent); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 12; }
+  .text { color: var(--text-2); font-size: 16px; line-height: 1.5; }
 
   .play .tile { animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) backwards; animation-delay: calc(var(--n) * 0.12s); }
   .play .badge { animation: badge-in 0.3s ease-out backwards; animation-delay: calc(var(--n) * 0.12s + 0.35s); }

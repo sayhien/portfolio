@@ -40,14 +40,14 @@ const { kind } = Astro.props;
   .case-icon svg { width: 36px; height: 36px; overflow: visible; }
   .case-icon :global(*) { transform-box: fill-box; transform-origin: center; }
 
-  .bubble, .phone, .home, .sheet { fill: #fff; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; }
+  .bubble, .phone, .home, .sheet { fill: var(--surface); stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; }
   .dot { fill: var(--accent); animation: typing 1.4s ease-in-out infinite; }
   .d2 { animation-delay: 0.18s; } .d3 { animation-delay: 0.36s; }
   @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.45; } 30% { transform: translateY(-4px); opacity: 1; } }
 
   .track { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 2 4; stroke-linecap: round; }
   .coin { fill: var(--accent); animation: send 2.4s ease-in-out infinite; }
-  .coin-mark { stroke: #fff; stroke-width: 1.6; stroke-linecap: round; animation: send 2.4s ease-in-out infinite; }
+  .coin-mark { stroke: var(--on-accent); stroke-width: 1.6; stroke-linecap: round; animation: send 2.4s ease-in-out infinite; }
   .home { animation: receive 2.4s ease-in-out infinite; }
   @keyframes send { 0%, 10% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 70% { transform: translateX(16px); opacity: 1; } 80%, 100% { transform: translateX(16px); opacity: 0; } }
   @keyframes receive { 0%, 68% { transform: none; } 76% { transform: scale(1.12); } 86%, 100% { transform: none; } }

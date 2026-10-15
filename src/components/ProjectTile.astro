@@ -45,17 +45,18 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
   .tile {
     display: flex;
     flex-direction: column;
-    gap: 22px;
     text-decoration: none;
     color: inherit;
-  }
-  .art {
-    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
     overflow: hidden;
-    transition: transform 0.35s ease;
+    transition: border-color 0.25s, transform 0.35s ease;
   }
-  .art :global(img) { width: 100%; }
-  a.tile:hover .art { transform: translateY(-4px); }
+  a.tile:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .art { background: var(--tint); overflow: hidden; }
+  .art :global(img) { width: 100%; transition: transform 0.6s ease; }
+  a.tile:hover .art :global(img) { transform: scale(1.02); }
   .ph {
     width: 100%;
     background: var(--tint);
@@ -65,21 +66,22 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
     position: absolute;
     left: 14%; top: 16%;
     width: 62%; height: 68%;
-    background: var(--paper-2);
-    border-radius: 6px;
-    box-shadow: 0 18px 40px rgba(27, 26, 23, 0.12);
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--line-2);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
     padding: 7% 7%;
     display: flex;
     flex-direction: column;
     gap: 9%;
   }
-  .bar { display: block; height: 10px; border-radius: 5px; background: #e3ddcf; width: 80%; }
+  .bar { display: block; height: 10px; border-radius: 5px; background: var(--line); width: 80%; }
   .bar.hi { background: var(--accent); opacity: 0.85; width: 55%; }
   .bar.short { width: 40%; }
 
-  .cap { display: flex; flex-direction: column; gap: 10px; }
-  h3 { font-size: 30px; }
-  .cap p { color: var(--ink-2); font-size: 16px; line-height: 1.55; max-width: 580px; }
+  .cap { display: flex; flex-direction: column; gap: 10px; padding: 24px 26px 26px; border-top: 1px solid var(--line); }
+  h3 { font-size: 28px; }
+  .cap p { color: var(--text-2); font-size: 16px; line-height: 1.55; max-width: 580px; }
   .tags {
     display: flex;
     flex-wrap: wrap;
@@ -89,10 +91,11 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
     padding: 0;
   }
   .tags li {
-    font-size: 12px;
-    letter-spacing: 0.03em;
-    color: var(--ink-2);
-    border: 1px solid #cbc3b1;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-2);
+    border: 1px solid var(--line-2);
     border-radius: 999px;
     padding: 4px 12px;
   }

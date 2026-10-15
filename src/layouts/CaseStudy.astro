@@ -94,7 +94,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   .cs-hero { position: relative; z-index: 1; padding-top: 88px; padding-bottom: 56px; }
   .cs-hero .eyebrow { margin-bottom: 24px; }
   h1 { font-size: clamp(40px, 5.2vw, 76px); line-height: 1.02; max-width: 1040px; }
-  .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: var(--ink-2); max-width: 780px; margin-top: 28px; }
+  .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: var(--text-2); max-width: 780px; margin-top: 28px; }
   .meta {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -103,7 +103,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     padding-top: 28px;
     border-top: 1px solid var(--line);
   }
-  dt { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   dd { margin: 0; font-size: 16px; line-height: 1.45; }
 
   .hero-media { margin-bottom: 96px; }
@@ -116,7 +116,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   }
   .toc-wrap { position: sticky; top: 32px; }
   .toc summary {
-    font-size: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
@@ -137,10 +138,10 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     border-left: 2px solid var(--line);
     transition: color 0.2s, border-color 0.2s;
   }
-  .toc a:hover { color: var(--ink); }
-  .toc a[aria-current='true'] { color: var(--ink); border-left-color: var(--accent); font-weight: 500; }
+  .toc a:hover { color: var(--text); }
+  .toc a[aria-current='true'] { color: var(--text); border-left-color: var(--accent); font-weight: 500; }
   .toc-now, .toc-progress { display: none; }
-  .toc .n { font-size: 12px; color: #9a9384; padding-top: 2px; min-width: 20px; font-variant-numeric: tabular-nums; }
+  .toc .n { font-size: 12px; color: var(--muted); padding-top: 2px; min-width: 20px; font-variant-numeric: tabular-nums; }
   .toc a[aria-current='true'] .n { color: var(--accent); }
 
   .content { min-width: 0; max-width: 920px; }
@@ -151,14 +152,14 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   .more-card {
     display: flex; flex-direction: column; gap: 12px;
     padding: 32px; border-radius: var(--radius);
-    background: var(--paper-2); border: 1px solid var(--line);
+    background: var(--surface); border: 1px solid var(--line);
     text-decoration: none;
     transition: border-color 0.2s, transform 0.3s;
   }
   .more-card:hover { border-color: var(--accent); transform: translateY(-3px); }
   .more-head { display: flex; align-items: center; gap: 16px; }
   .more-card h3 { font-size: 28px; }
-  .more-card p { color: var(--ink-2); }
+  .more-card p { color: var(--text-2); }
   .go { color: var(--accent); font-weight: 600; font-size: 15px; }
 
   @media (max-width: 1000px) {
@@ -167,7 +168,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     .toc-wrap {
       top: 0;
       z-index: 20;
-      background: var(--paper);
+      background: var(--bg);
       margin: 0 calc(var(--gutter) * -1) 24px;
       padding: 0 var(--gutter);
     }
@@ -184,13 +185,13 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     .toc-label { grid-column: 1; font-size: 11px; color: var(--muted); }
     .toc-now {
       display: block; grid-column: 1;
-      font-family: var(--serif); font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ink);
+      font-family: var(--display); font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .toc-now:empty { display: none; }
     .toc summary::after {
       content: ''; grid-column: 2; grid-row: 1 / span 2; align-self: center;
-      width: 9px; height: 9px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+      width: 9px; height: 9px; border-right: 2px solid var(--text); border-bottom: 2px solid var(--text);
       transform: translateY(-3px) rotate(45deg); transition: transform 0.2s;
     }
     .toc[open] summary::after { transform: translateY(2px) rotate(-135deg); }

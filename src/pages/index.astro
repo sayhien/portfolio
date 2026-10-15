@@ -1,12 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProjectTile from '../components/ProjectTile.astro';
+import FlowField from '../components/FlowField.astro';
 import { site, projects } from '../data/site';
 
 const left = projects.filter((_, i) => i % 2 === 0);
 const right = projects.filter((_, i) => i % 2 === 1);
 ---
 <Base title={`${site.name}, UI/UX Designer`}>
+  <div class="hero-zone">
+  <FlowField mode="scatter" layout="background" />
   <section class="wrap hero">
     <div class="hero-main">
       <p class="eyebrow">{site.role}</p>
@@ -14,6 +17,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
     </div>
     <p class="hero-intro">{site.intro}</p>
   </section>
+  </div>
 
   <section class="wrap work" id="work" aria-labelledby="work-title">
     <div class="work-head">
@@ -32,7 +36,10 @@ const right = projects.filter((_, i) => i % 2 === 1);
 </Base>
 
 <style>
+  .hero-zone { position: relative; }
   .hero {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 32px;
@@ -47,7 +54,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
     align-self: end;
     font-size: 19px;
     line-height: 1.6;
-    color: var(--ink-2);
+    color: var(--text-2);
   }
 
   .work-head {
@@ -64,17 +71,17 @@ const right = projects.filter((_, i) => i % 2 === 1);
   .masonry {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 40px;
+    column-gap: 32px;
     align-items: start;
   }
-  .col { display: flex; flex-direction: column; gap: 72px; }
+  .col { display: flex; flex-direction: column; gap: 40px; }
   .col:nth-child(2) { padding-top: 96px; }
 
   @media (max-width: 900px) {
     .hero { grid-template-columns: minmax(0, 1fr); padding-top: 48px; padding-bottom: 64px; row-gap: 28px; }
     .hero-main, .hero-intro { grid-column: 1; }
     .hero-intro { font-size: 17px; }
-    .masonry { display: flex; flex-direction: column; gap: 56px; }
+    .masonry { display: flex; flex-direction: column; gap: 24px; }
     .col { display: contents; }
     .col:nth-child(2) { padding-top: 0; }
     .work-head h2 { font-size: 32px; }

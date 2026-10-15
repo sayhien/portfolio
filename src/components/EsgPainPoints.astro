@@ -55,53 +55,53 @@ const { items } = Astro.props;
 <style>
   .c1 { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
   .c1 > li { display: grid; grid-template-columns: minmax(0, 0.8fr) 52px minmax(0, 1.7fr); align-items: stretch; }
-  .pain { background: var(--paper-3); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; }
-  .lbl { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pain { background: var(--surface-2); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; }
+  .lbl { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
   .lbl svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .pain .lbl { color: var(--muted); }
-  .pain p, .txt p { font-size: 16px; line-height: 1.5; color: var(--ink-2); }
+  .pain p, .txt p { font-size: 16px; line-height: 1.5; color: var(--text-2); }
   .bridge { display: grid; place-items: center; position: relative; }
-  .bridge::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed #cfc7b5; }
+  .bridge::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed var(--line-2); }
   .bridge span { position: relative; width: 36px; height: 36px; border-radius: 999px; background: var(--accent); display: grid; place-items: center; }
-  .bridge svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .fix { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; align-items: center; }
+  .bridge svg { width: 18px; height: 18px; fill: none; stroke: var(--on-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fix { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; align-items: center; }
   .fix .lbl { color: var(--accent); }
   .txt { display: grid; gap: 8px; }
   .txt a { font-size: 14px; font-weight: 600; color: var(--accent); }
 
-  .widget { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 12px; display: grid; gap: 8px; color: var(--ink-2); min-width: 0; }
-  .wtitle { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .widget :global(.av) { width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: #fff; flex: none; }
+  .widget { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 12px; display: grid; gap: 8px; color: var(--text-2); min-width: 0; }
+  .wtitle { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .widget :global(.av) { width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--on-accent); flex: none; }
   .widget :global(.pill) { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; white-space: nowrap; letter-spacing: 0; text-transform: none; }
-  .widget :global(.p-good) { background: #dfeadf; color: #2a5f3e; }
-  .widget :global(.p-info) { background: #dde7f1; color: #24507d; }
-  .widget :global(.p-warn) { background: #f5e8c8; color: #7a5400; }
-  .widget :global(.p-acc) { background: var(--accent-soft); color: #8f2f08; }
+  .widget :global(.p-good) { background: var(--accent-soft); color: var(--accent); }
+  .widget :global(.p-info) { background: var(--info-soft); color: var(--info); }
+  .widget :global(.p-warn) { background: var(--warn-soft); color: var(--warn); }
+  .widget :global(.p-acc) { background: var(--accent-soft); color: var(--accent); }
   .widget :global(.arow) { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; }
-  .widget :global(.who) { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 500; color: var(--ink); }
+  .widget :global(.who) { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 500; color: var(--text); }
   .widget :global(.who small) { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
   .widget :global(.flip) { animation: flip 0.45s ease-out; }
   @keyframes flip { 50% { transform: rotateX(90deg); } }
 
   .depts { display: flex; flex-wrap: wrap; gap: 5px; }
-  .widget :global(.dept) { border: 1px solid #cfc7b5; border-radius: 999px; padding: 3px 9px; font-weight: 600; font-size: 11px; color: var(--muted); transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s; }
-  .widget :global(.dept.on) { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 0 4px var(--accent-soft); }
+  .widget :global(.dept) { border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 9px; font-weight: 600; font-size: 11px; color: var(--muted); transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s; }
+  .widget :global(.dept.on) { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 0 0 4px var(--accent-soft); }
   .sync-ic { display: inline-flex; color: var(--accent); }
   .sync-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .sync-ic:global(.spin) svg { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .fields { display: grid; gap: 5px; }
   .widget :global(.field) { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 8px; align-items: center; }
-  .widget :global(.field span) { font-size: 11px; color: var(--ink-2); }
-  .widget :global(.field b) { display: block; min-height: 24px; border: 1px solid #cfc7b5; border-radius: 6px; padding: 3px 8px; background: #fff; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); font-size: 12px; transition: border-color 0.3s, background 0.3s; }
+  .widget :global(.field span) { font-size: 11px; color: var(--text-2); }
+  .widget :global(.field b) { display: block; min-height: 24px; border: 1px solid var(--line-2); border-radius: 6px; padding: 3px 8px; background: var(--surface); font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); font-size: 12px; transition: border-color 0.3s, background 0.3s; }
   .widget :global(.field b.typing) { border-color: var(--accent); }
-  .widget :global(.field b.done) { background: #dfeadf; border-color: transparent; }
+  .widget :global(.field b.done) { background: var(--accent-soft); border-color: transparent; }
   .sample { font-size: 10px; color: var(--muted); }
 
   .chat { display: grid; gap: 6px; align-content: end; min-height: 196px; }
   .widget :global(.msg) { display: flex; gap: 6px; align-items: flex-end; max-width: 88%; animation: msg-in 0.3s ease-out; }
   .widget :global(.msg.me) { justify-self: end; flex-direction: row-reverse; }
-  .widget :global(.bub) { background: var(--paper-3); border-radius: 10px 10px 10px 3px; padding: 6px 9px; color: var(--ink); line-height: 1.35; }
+  .widget :global(.bub) { background: var(--surface-2); border-radius: 10px 10px 10px 3px; padding: 6px 9px; color: var(--text); line-height: 1.35; }
   .widget :global(.msg.me .bub) { background: var(--accent-soft); border-radius: 10px 10px 3px 10px; }
   .widget :global(.msg .av) { width: 20px; height: 20px; font-size: 8px; }
   .widget :global(.dots) { display: inline-flex; gap: 3px; padding: 3px 0; }
@@ -114,7 +114,7 @@ const { items } = Astro.props;
   @media (max-width: 1100px) {
     .c1 > li { grid-template-columns: minmax(0, 1fr); }
     .bridge { height: 44px; }
-    .bridge::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 2px dashed #cfc7b5; }
+    .bridge::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 2px dashed var(--line-2); }
     .bridge svg { transform: rotate(90deg); }
   }
   @media (max-width: 600px) {
@@ -131,9 +131,9 @@ const { items } = Astro.props;
   function setupAssign(widget: HTMLElement, state: State) {
     const statuses = [['Edit', 'p-info'], ['Review', 'p-good'], ['Read only', 'p-warn'], ['Approve', 'p-acc']];
     const people = [
-      { name: 'Emily Carter', role: 'Compliance', color: '#6d5bd0', status: 0 },
-      { name: 'Raj Patel', role: 'IT', color: '#2f8f6b', status: 1 },
-      { name: "Michael O'Connor", role: 'Sustainability', color: '#c0612b', status: 2 },
+      { name: 'Emily Carter', role: 'Compliance', color: '#b4a3ff', status: 0 },
+      { name: 'Raj Patel', role: 'IT', color: 'var(--accent)', status: 1 },
+      { name: "Michael O'Connor", role: 'Sustainability', color: '#f6a46b', status: 2 },
     ];
     const pills = people.map((person) => {
       const row = document.createElement('div');
@@ -234,8 +234,8 @@ const { items } = Astro.props;
       const row = document.createElement('div');
       row.className = message.me ? 'msg me' : 'msg';
       const avatar = message.me
-        ? '<span class="av" style="background:var(--ink)">EM</span>'
-        : '<span class="av" style="background:#2f8f6b">RP</span>';
+        ? '<span class="av" style="background:var(--text)">EM</span>'
+        : '<span class="av" style="background:var(--accent)">RP</span>';
       row.innerHTML = `${avatar}<span class="bub">${html}</span>`;
       chat.appendChild(row);
       while (chat.children.length > 4) chat.firstElementChild?.remove();

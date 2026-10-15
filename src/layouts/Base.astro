@@ -1,9 +1,9 @@
 ---
-import '@fontsource/fraunces/400.css';
-import '@fontsource/fraunces/500.css';
-import '@fontsource/instrument-sans/400.css';
-import '@fontsource/instrument-sans/500.css';
-import '@fontsource/instrument-sans/600.css';
+import '@fontsource/schibsted-grotesk/400.css';
+import '@fontsource/schibsted-grotesk/500.css';
+import '@fontsource/schibsted-grotesk/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 import { site } from '../data/site';
 
@@ -31,7 +31,7 @@ const year = new Date().getFullYear();
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a class="brand" href={home}>{site.name}</a>
+        <a class="brand" href={home}><span class="brand-dot" aria-hidden="true"></span>{site.name}</a>
         <nav aria-label="Primary">
           <ul>
             <li><a href={`${home}#work`}>Case Studies</a></li>
@@ -94,12 +94,16 @@ const year = new Date().getFullYear();
     gap: 24px;
   }
   .brand {
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: 22px;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 19px;
     letter-spacing: -0.02em;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
   }
+  .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
   nav ul {
     display: flex;
     gap: 32px;
@@ -109,12 +113,13 @@ const year = new Date().getFullYear();
   }
   nav a {
     font-size: 15px;
-    color: var(--ink-2);
+    color: var(--text-2);
     text-decoration: none;
     padding: 10px 0;
     border-bottom: 1px solid transparent;
   }
-  nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+  .site-header { position: relative; z-index: 2; }
 
   @media (max-width: 720px) {
     .site-header .bar { flex-direction: column; align-items: flex-start; gap: 4px; padding-top: 18px; padding-bottom: 10px; min-height: 0; }
@@ -130,7 +135,7 @@ const year = new Date().getFullYear();
     padding: 72px 0 56px;
   }
   .foot-title { font-size: clamp(40px, 5vw, 64px); margin: 16px 0 20px; }
-  .foot-copy { color: var(--ink-2); max-width: 460px; font-size: 18px; }
+  .foot-copy { color: var(--text-2); max-width: 460px; font-size: 18px; }
   .foot-links { list-style: none; margin: 0; padding: 0; align-self: end; }
   .foot-links li {
     display: flex;

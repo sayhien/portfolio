@@ -15,6 +15,8 @@ interface Props {
 const { image, alt, spots } = Astro.props;
 ---
 <figure class="tour" data-tour>
+  <div class="shot-frame">
+  <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="shot">
     <Image src={image} alt={alt} widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
     {spots.map((spot, index) => (
@@ -27,6 +29,7 @@ const { image, alt, spots } = Astro.props;
         data-index={index}
       >{index + 1}</button>
     ))}
+  </div>
   </div>
   <ol class="notes">
     {spots.map((spot, index) => (
@@ -42,19 +45,19 @@ const { image, alt, spots } = Astro.props;
 
 <style>
   .tour { margin: 40px 0 0; }
-  .shot { position: relative; border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; background: #fff; }
+  .shot { position: relative; }
   .shot :global(img) { width: 100%; }
   .dot {
     position: absolute; transform: translate(-50%, -50%);
-    width: 32px; height: 32px; border-radius: 999px; border: 2px solid #fff;
-    background: var(--accent); color: #fff; font: inherit; font-size: 13px; font-weight: 700;
+    width: 32px; height: 32px; border-radius: 999px; border: 2px solid var(--bg);
+    background: var(--accent); color: var(--on-accent); font: inherit; font-size: 13px; font-weight: 700;
     display: grid; place-items: center; cursor: pointer;
-    box-shadow: 0 4px 12px rgba(27, 26, 23, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s, background 0.2s;
   }
   .dot::after { content: ''; position: absolute; inset: -6px; border-radius: 999px; border: 2px solid var(--accent); opacity: 0; animation: ping 2.4s ease-out infinite; animation-delay: calc(var(--n) * 0.3s); }
   @keyframes ping { 0% { opacity: 0.7; transform: scale(0.7); } 70%, 100% { opacity: 0; transform: scale(1.5); } }
-  .dot:hover, .dot.active { transform: translate(-50%, -50%) scale(1.15); background: var(--ink); }
+  .dot:hover, .dot.active { transform: translate(-50%, -50%) scale(1.15); background: var(--text); }
   .dot.active::after { animation: none; }
 
   .notes { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
@@ -64,12 +67,12 @@ const { image, alt, spots } = Astro.props;
     padding: 12px 14px; border-radius: var(--radius); border: 1px solid transparent; background: none;
     transition: background 0.2s, border-color 0.2s;
   }
-  .note:hover { background: var(--paper-2); }
-  .note.active { background: var(--paper-2); border-color: var(--accent); }
-  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent-soft); color: #8f2f08; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-  .note.active .num { background: var(--accent); color: #fff; }
-  .note b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 2px; }
-  .note span:last-child { font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+  .note:hover { background: var(--surface); }
+  .note.active { background: var(--surface); border-color: var(--accent); }
+  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+  .note.active .num { background: var(--accent); color: var(--on-accent); }
+  .note b { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+  .note span:last-child { font-size: 14px; line-height: 1.5; color: var(--text-2); }
 
   @media (max-width: 700px) {
     .dot { width: 24px; height: 24px; font-size: 11px; border-width: 1.5px; }

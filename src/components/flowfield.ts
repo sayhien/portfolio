@@ -11,14 +11,14 @@ export type FlowMode = 'scatter' | 'flow' | 'loop';
 
 type Rgb = [number, number, number];
 const COLOURS: Record<string, Rgb> = {
-  dust: [150, 142, 120],
-  grey: [96, 92, 84],
-  rust: [184, 61, 11],
-  g0: [30, 96, 60],
-  g1: [46, 120, 70],
-  g2: [70, 146, 80],
-  g3: [100, 168, 90],
-  teal: [36, 110, 122],
+  dust: [120, 130, 146],
+  grey: [84, 94, 108],
+  bright: [236, 239, 243], // bright highlight dots
+  g0: [40, 150, 128],
+  g1: [72, 196, 156],
+  g2: [110, 231, 183],
+  g3: [170, 244, 214],
+  teal: [125, 180, 255],
 };
 const KINDS = Object.keys(COLOURS);
 const DEPTH = [
@@ -42,7 +42,7 @@ const WORLD_HEIGHT = 340;
 
 const SHAPES: Record<FlowMode, Shape> = {
   scatter: {
-    kind: ({ u }) => (u < 0.08 ? 'rust' : u < 0.16 ? 'g1' : u < 0.62 ? 'grey' : 'dust'),
+    kind: ({ u }) => (u < 0.1 ? 'bright' : u < 0.3 ? 'g2' : u < 0.65 ? 'dust' : 'grey'),
     pos: ({ u, v, w, i }, t, half) => {
       // Spread wide, slowly orbiting, each dot wobbling on its own
       const x = (u * 2 - 1) * half + Math.sin(t * 0.25 + i) * 30;
@@ -65,7 +65,7 @@ const SHAPES: Record<FlowMode, Shape> = {
     pitch: 0.18, yaw: 0, spin: 0, centreX: 0.5,
   },
   loop: {
-    kind: ({ u, v }) => (v < 0.14 ? 'rust' : ['g0', 'g1', 'g2', 'g3', 'teal'][Math.floor(u * 5)]),
+    kind: ({ u, v }) => (v < 0.14 ? 'bright' : ['g0', 'g1', 'g2', 'g3', 'teal'][Math.floor(u * 5)]),
     pos: ({ u, v, w }, t) => {
       const a = u * Math.PI * 2 + t * 0.4;
       const ringRadius = 150;

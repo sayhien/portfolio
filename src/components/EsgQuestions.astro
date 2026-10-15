@@ -33,16 +33,16 @@ const { items } = Astro.props;
   .quote { position: relative; margin: 0; padding: 0.2em 0 0 0.3em; font-size: clamp(30px, 3.6vw, 44px); isolation: isolate; }
   .mark {
     position: absolute; left: -0.06em; top: -0.1em; z-index: -1;
-    font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 5em; line-height: 1;
+    font-family: var(--display); font-style: italic; font-weight: 500; font-size: 5em; line-height: 1;
     color: var(--accent); opacity: 0.2; transform-origin: 50% 75%; pointer-events: none;
   }
-  .q { position: relative; font-family: var(--serif); font-weight: 400; font-size: 1em; line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); }
+  .q { position: relative; font-family: var(--display); font-weight: 400; font-size: 1em; line-height: 1.12; letter-spacing: -0.02em; color: var(--text); }
   .letters :global(.word) { display: inline-block; white-space: nowrap; }
   .letters :global(.ch) { display: inline-block; }
 
   .ans { display: grid; gap: 6px; }
-  .ans h3 { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
-  .ans p { color: var(--ink-2); font-size: 16px; line-height: 1.55; }
+  .ans h3 { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .ans p { color: var(--text-2); font-size: 16px; line-height: 1.55; }
 
   /* Plays once when the list scrolls in: the mark settles in and rocks
      back and forth for about 3 seconds, then letters come into focus. */

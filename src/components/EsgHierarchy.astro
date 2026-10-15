@@ -82,10 +82,10 @@ const sharedTemplate = [
 </figure>
 
 <style>
-  .ia { margin: 36px 0 0; padding: 28px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); }
+  .ia { margin: 36px 0 0; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
   table { width: 100%; border-collapse: separate; border-spacing: 0 0; table-layout: fixed; }
   thead th {
-    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
     text-align: left; padding: 0 0 14px 4px;
   }
   thead td { width: 176px; }
@@ -97,7 +97,7 @@ const sharedTemplate = [
   .fw { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-right: 24px; }
   .logo { width: 132px; height: 64px; border-radius: 8px; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; padding: 6px 10px; }
   .logo :global(img) { max-width: 100%; max-height: 100%; width: auto; height: auto; }
-  .fw-name { font-family: var(--serif); font-size: 20px; line-height: 1.1; color: var(--ink); }
+  .fw-name { font-family: var(--display); font-size: 20px; line-height: 1.1; color: var(--text); }
   .fw-name small { display: block; font-family: var(--sans); font-size: 12px; line-height: 1.35; color: var(--muted); margin-top: 4px; }
 
   /* Stacked cards hint that each layer holds many items */
@@ -105,29 +105,29 @@ const sharedTemplate = [
   td:last-child { padding-right: 8px !important; }
   .card {
     display: flex; flex-direction: column; gap: 8px; min-height: 104px;
-    background: #fff; border: 1px solid #cfc7b5; border-radius: 8px; padding: 14px 16px;
-    box-shadow: 5px 5px 0 -1px #fff, 5px 5px 0 0 #cfc7b5, 10px 10px 0 -1px #fff, 10px 10px 0 0 #cfc7b5;
+    background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 14px 16px;
+    box-shadow: 5px 5px 0 -1px var(--surface), 5px 5px 0 0 var(--line-2), 10px 10px 0 -1px var(--surface), 10px 10px 0 0 var(--line-2);
   }
-  .term { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
-  .eg { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+  .term { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); }
+  .eg { font-size: 14px; line-height: 1.45; color: var(--text-2); }
   .eg-lbl { color: var(--accent); font-weight: 600; }
 
   /* Arrow from one layer to the next */
   .fw-body td:not(:last-child)::after {
     content: ''; position: absolute; right: 6px; top: 52px; width: 18px; height: 10px;
-    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%23b83d0b' stroke-width='1.5'/%3E%3C/svg%3E");
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%236ee7b7' stroke-width='1.5'/%3E%3C/svg%3E");
   }
   .fw-body tr + tr td:not(:last-child)::after { top: 64px; }
 
   .shared-body th, .shared-body td { padding-top: 6px; padding-bottom: 44px; vertical-align: middle; }
-  .shared-lbl { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .shared-lbl { text-align: left; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
   .shared-lbl small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
   .shared { display: grid; gap: 4px; background: var(--accent-soft); border-radius: 8px; padding: 14px 16px; }
-  .shared-name { font-family: var(--serif); font-size: 19px; line-height: 1.2; color: var(--ink); }
-  .shared-desc { font-size: 13px; color: #8f2f08; }
+  .shared-name { font-family: var(--display); font-size: 19px; line-height: 1.2; color: var(--text); }
+  .shared-desc { font-size: 13px; color: var(--accent); }
   .shared-body td:not(:last-child)::after {
     content: ''; position: absolute; right: 6px; top: 50%; margin-top: -19px; width: 18px; height: 10px;
-    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%23b83d0b' stroke-width='1.5'/%3E%3C/svg%3E");
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16m-4-4 4 4-4 4' fill='none' stroke='%236ee7b7' stroke-width='1.5'/%3E%3C/svg%3E");
   }
 
   figcaption { font-size: 14px; color: var(--muted); margin-top: 20px; }
@@ -140,7 +140,7 @@ const sharedTemplate = [
     .fw-body tr + tr { padding-top: 0; margin-top: 40px; }
     .fw-body tr + tr td, .fw-body tr + tr th { border-top: 0; padding-top: 10px; }
     td { padding: 10px 10px 18px 0 !important; }
-    td::before { content: attr(data-layer); display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    td::before { content: attr(data-layer); display: block; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
     .fw-body td:not(:last-child)::after, .fw-body tr + tr td:not(:last-child)::after {
       top: auto; bottom: -4px; right: auto; left: 24px; transform: rotate(90deg);
     }

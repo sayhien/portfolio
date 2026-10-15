@@ -1,21 +1,34 @@
 :root {
-  --paper: #f3efe6;
-  --paper-2: #fbf9f4;
-  --paper-3: #e9e3d6;
-  --ink: #1b1a17;
-  --ink-2: #4a463d;
-  --muted: #6b675d;
-  --line: #d9d3c4;
-  --accent: #b83d0b;
-  --accent-soft: #f4dccd;
-  --night: #16161a;
+  /* Night Graphite */
+  color-scheme: dark;
+  --bg: #0f1216;
+  --surface: #171b21;
+  --surface-2: #1d222a;
+  --text: #eceff3;
+  --text-2: #a5aebb;
+  --muted: #8b95a3;
+  --line: #262c35;
+  --line-2: #2e3641;
+  --accent: #6ee7b7;
+  --accent-soft: rgba(110, 231, 183, 0.12);
+  --on-accent: #0b0e11;
+  --night: #0b0e11;
 
-  --serif: 'Fraunces', Georgia, serif;
-  --sans: 'Instrument Sans', system-ui, sans-serif;
+  /* Meaning colours, always paired with an icon or label */
+  --warn: #f5b85a;
+  --danger: #f87171;
+  --info: #7db4ff;
+  --info-soft: rgba(125, 180, 255, 0.14);
+  --warn-soft: rgba(245, 184, 90, 0.14);
+  --danger-soft: rgba(248, 113, 113, 0.14);
+
+  --display: 'Schibsted Grotesk', system-ui, sans-serif;
+  --sans: 'Schibsted Grotesk', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --gutter: 64px;
   --max: 1440px;
-  --radius: 8px;
+  --radius: 12px;
 }
 
 @media (max-width: 900px) {
@@ -32,8 +45,8 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   overflow-x: clip;
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--sans);
   font-size: 17px;
   line-height: 1.6;
@@ -46,9 +59,9 @@ img, video { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 
 h1, h2, h3, h4 {
-  font-family: var(--serif);
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   line-height: 1.1;
   margin: 0;
 }
@@ -68,9 +81,10 @@ p { margin: 0; }
 }
 
 .eyebrow {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
 }
@@ -81,8 +95,8 @@ p { margin: 0; }
   position: absolute;
   left: -9999px;
   top: 8px;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--on-accent);
   padding: 10px 16px;
   border-radius: 6px;
   z-index: 100;
@@ -110,7 +124,7 @@ p { margin: 0; }
    arrives, then the image fades in. Space is reserved by width and height
    attributes, so nothing jumps while loading. */
 img.is-loading {
-  background: linear-gradient(100deg, var(--paper-3) 30%, var(--paper-2) 50%, var(--paper-3) 70%) 0 0 / 300% 100%;
+  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface) 50%, var(--surface-2) 70%) 0 0 / 300% 100%;
   animation: shimmer 1.4s linear infinite;
 }
 img.is-loaded { animation: img-in 0.45s ease-out; }
@@ -125,3 +139,23 @@ img.is-loaded { animation: img-in 0.45s ease-out; }
   .feature-row { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .feature-row.flip > :first-child { order: 0; }
 }
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+/* Screenshot frame: light product screenshots sit in a dark browser frame
+   with a soft accent glow, so they look placed rather than pasted. */
+.shot-frame {
+  border-radius: var(--radius);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 0 30px 80px -30px rgba(110, 231, 183, 0.18), 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+.shot-frame-bar {
+  display: flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.shot-frame-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-2); }
+.shot-frame img { width: 100%; }

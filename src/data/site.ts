@@ -45,7 +45,7 @@ export const projects: Project[] = [
     thumb: chatbotThumb,
     thumbAlt: 'A friendly service robot chatting with a businessman, with a speech bubble between them',
     external: true,
-    tint: '#e4dcc8',
+    tint: '#12312b',
     ratio: 0.8,
   },
   {
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     href: 'esg-reporting-module/',
     thumb: esgThumb,
     thumbAlt: 'ESG reporting dashboard for Tomie Technologies shown on a laptop, with the status distribution and compliance confidence cards',
-    tint: '#9debec',
+    tint: '#122a2c',
     ratio: 0.69,
   },
   {
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     thumb: remittanceThumb,
     thumbAlt: 'A mother hugging her child beside two phones showing the Swipe app sending Singapore dollars to Philippine pesos',
     external: true,
-    tint: '#d5ddd0',
+    tint: '#1c2a3f',
     ratio: 0.62,
   },
   {
@@ -83,7 +83,7 @@ export const projects: Project[] = [
     thumb: healthcareThumb,
     thumbAlt: 'docdoc case management screen with a discovery report, doctor profiles and price scores, beside a smiling customer service agent',
     external: true,
-    tint: '#dcd3e0',
+    tint: '#122a2c',
     ratio: 0.8,
   },
   {
@@ -96,7 +96,7 @@ export const projects: Project[] = [
     thumb: libraryThumb,
     thumbAlt: 'docdoc design library showing tables, provider cards, label and value lists and section navigation',
     external: true,
-    tint: '#e9d6ca',
+    tint: '#2b2338',
     ratio: 0.72,
   },
   {
@@ -109,7 +109,7 @@ export const projects: Project[] = [
     thumb: breadcrumbThumb,
     thumbAlt: 'docdoc policy administration screen with a long breadcrumb trail shortened to Policy administration, then Edit restriction',
     external: true,
-    tint: '#e8d9c4',
+    tint: '#122a2c',
     ratio: 0.7,
   },
   {
@@ -117,7 +117,7 @@ export const projects: Project[] = [
     title: 'Four Leaves',
     blurb: 'A concept redesign of the Four Leaves bakery website.',
     tags: ['Concept redesign', 'Website'],
-    tint: '#d9e2d8',
+    tint: '#1c2b36',
     ratio: 0.62,
   },
   {
@@ -125,7 +125,7 @@ export const projects: Project[] = [
     title: 'Five Oars Coffee',
     blurb: 'A concept redesign of the Five Oars Coffee website.',
     tags: ['Concept redesign', 'Website'],
-    tint: '#d3dbe3',
+    tint: '#2b2338',
     ratio: 0.7,
   },
 ];

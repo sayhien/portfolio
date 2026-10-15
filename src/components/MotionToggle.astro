@@ -12,11 +12,11 @@
   .motion-toggle {
     position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 40;
     display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px;
-    font: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
-    background: var(--paper-2); border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
-    box-shadow: 0 8px 24px -12px rgba(27, 26, 23, 0.35);
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.35);
   }
-  .motion-toggle:hover { border-color: var(--ink); }
+  .motion-toggle:hover { border-color: var(--text); }
   @media (max-width: 700px) {
     .motion-toggle { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 44px; padding: 0; justify-content: center; }
     .motion-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

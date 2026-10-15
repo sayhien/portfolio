@@ -106,31 +106,31 @@ const { answer } = Astro.props;
   .problems { display: grid; gap: 20px; margin-top: 28px; max-width: 760px; }
   .plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
   .plist li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; align-items: center; }
-  .plist p { font-size: 17px; color: var(--ink-2); }
-  .vig { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); padding: 4px; }
-  .badge { position: absolute; right: -6px; top: -6px; width: 22px; height: 22px; border-radius: 999px; background: var(--accent); border: 2px solid var(--paper); display: grid; place-items: center; }
-  .badge svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 2.4; fill: none; stroke-linecap: round; }
+  .plist p { font-size: 17px; color: var(--text-2); }
+  .vig { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 4px; }
+  .badge { position: absolute; right: -6px; top: -6px; width: 22px; height: 22px; border-radius: 999px; background: var(--accent); border: 2px solid var(--bg); display: grid; place-items: center; }
+  .badge svg { width: 12px; height: 12px; stroke: var(--on-accent); stroke-width: 2.4; fill: none; stroke-linecap: round; }
   .ill { width: 100%; height: 100%; display: block; overflow: visible; }
   .ill :global(*) { transform-box: fill-box; transform-origin: center; }
 
-  .vf { fill: var(--paper-3); stroke: #cfc7b5; stroke-width: 1.5; }
-  .vw { fill: #fff; stroke: #cfc7b5; stroke-width: 1.5; }
-  .vbg { fill: #fff; }
+  .vf { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.5; }
+  .vw { fill: var(--surface); stroke: var(--line-2); stroke-width: 1.5; }
+  .vbg { fill: var(--surface); }
   .vs { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; }
   .va { fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; }
-  .vg { fill: none; stroke: #2f6b45; stroke-width: 2.6; stroke-linecap: round; }
-  .vgl { fill: none; stroke: #2f6b45; stroke-width: 2; stroke-linecap: round; }
-  .vgf { fill: #2f6b45; }
-  .vgs { fill: #dfeadf; stroke: #2f6b45; stroke-width: 1.5; }
+  .vg { fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; }
+  .vgl { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+  .vgf { fill: var(--accent); }
+  .vgs { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
   .vaf { fill: var(--accent); }
-  .vif { fill: #2c5a8a; }
-  .vstall { fill: #cfc7b5; }
-  .tick { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .vif { fill: var(--info); }
+  .vstall { fill: var(--line-2); }
+  .tick { fill: none; stroke: var(--on-accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   .vtx { font-family: var(--sans); font-size: 10px; fill: var(--muted); }
   .vtb { font-family: var(--sans); font-size: 11px; font-weight: 700; fill: var(--accent); }
-  .vtg { font-family: var(--sans); font-size: 10px; font-weight: 700; fill: #2f6b45; }
-  .vwhite { font-family: var(--sans); font-size: 8px; font-weight: 700; fill: #fff; }
-  .vq { font-family: var(--serif); font-size: 28px; font-weight: 600; fill: var(--accent); }
+  .vtg { font-family: var(--sans); font-size: 10px; font-weight: 700; fill: var(--accent); }
+  .vwhite { font-family: var(--sans); font-size: 8px; font-weight: 700; fill: var(--surface); }
+  .vq { font-family: var(--display); font-size: 28px; font-weight: 600; fill: var(--accent); }
 
   /* At rest (and for reduced motion) the problem state shows. */
   .fix { opacity: 0; }
@@ -144,9 +144,9 @@ const { answer } = Astro.props;
   @keyframes merge-left { 0%, 42% { transform: none; } 52%, 92% { transform: translateX(22px); } 100% { transform: none; } }
   @keyframes merge-right { 0%, 42% { transform: none; } 52%, 92% { transform: translateX(-22px); } 100% { transform: none; } }
 
-  .answer { display: flex; gap: 14px; align-items: center; background: #dfeadf; color: var(--ink); border-radius: var(--radius); padding: 16px 18px; font-weight: 600; line-height: 1.5; }
-  .answer-icon { width: 40px; height: 40px; border-radius: 999px; background: #2f6b45; display: grid; place-items: center; flex: none; }
-  .answer-icon svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .answer { display: flex; gap: 14px; align-items: center; background: var(--accent-soft); color: var(--text); border-radius: var(--radius); padding: 16px 18px; font-weight: 600; line-height: 1.5; }
+  .answer-icon { width: 40px; height: 40px; border-radius: 999px; background: var(--accent); display: grid; place-items: center; flex: none; }
+  .answer-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
   @media (max-width: 600px) {
     .plist li { grid-template-columns: 120px minmax(0, 1fr); gap: 14px; }

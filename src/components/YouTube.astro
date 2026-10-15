@@ -33,10 +33,10 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
 
 <style>
   .yt { margin: 0; }
-  .browser { border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 24px 48px -28px rgba(27, 26, 23, 0.45); }
-  .chrome { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--paper-3); border-bottom: 1px solid var(--line); }
-  .chrome span { width: 10px; height: 10px; border-radius: 999px; background: #cfc7b5; }
-  .chrome b { margin-left: 10px; flex: 1; min-width: 0; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--paper-2); border-radius: 6px; padding: 3px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .browser { border-radius: 12px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.45); }
+  .chrome { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .chrome span { width: 10px; height: 10px; border-radius: 999px; background: var(--line-2); }
+  .chrome b { margin-left: 10px; flex: 1; min-width: 0; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--surface); border-radius: 6px; padding: 3px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .frame {
     position: relative;
     aspect-ratio: 16 / 9;
@@ -60,8 +60,8 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
     height: 72px;
     border-radius: 50%;
     border: 0;
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--bg);
+    color: var(--text);
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -69,7 +69,7 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
   }
   .play:hover { background: #fff; }
   figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
-  figcaption a { color: var(--ink-2); }
+  figcaption a { color: var(--text-2); }
 </style>
 
 <script>

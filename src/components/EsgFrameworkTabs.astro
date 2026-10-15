@@ -39,12 +39,12 @@ const { frameworks, features } = Astro.props;
 </div>
 
 <style>
-  .switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--paper-3); margin: 8px 0 4px; }
-  .switch button { font: inherit; font-size: 15px; font-weight: 600; min-height: 44px; padding: 8px 22px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); cursor: pointer; transition: background 0.2s, color 0.2s; }
-  .switch button[aria-selected='true'] { background: var(--ink); color: var(--paper); }
+  .switch { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--surface-2); margin: 8px 0 4px; }
+  .switch button { font: inherit; font-size: 15px; font-weight: 600; min-height: 44px; padding: 8px 22px; border: 0; border-radius: 999px; background: none; color: var(--text-2); cursor: pointer; transition: background 0.2s, color 0.2s; }
+  .switch button[aria-selected='true'] { background: var(--accent); color: var(--on-accent); }
   .panel:not([hidden]) { animation: panel-in 0.35s ease-out; }
   @keyframes panel-in { from { opacity: 0; transform: translateY(6px); } }
-  .copy > p { color: var(--ink-2); font-size: 17px; line-height: 1.7; }
+  .copy > p { color: var(--text-2); font-size: 17px; line-height: 1.7; }
 </style>
 
 <script>

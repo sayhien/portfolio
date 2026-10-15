@@ -1,0 +1,64 @@
+---
+// Animated particle background. Use as:
+//   <FlowField mode="scatter" layout="background" />  fills its positioned parent
+//   <FlowField mode="flow" layout="band"> text </FlowField>  a full width band with content on top
+// The canvas is decorative; any content passed in stays real, readable text.
+import type { FlowMode } from './flowfield';
+
+interface Props {
+  mode: FlowMode;
+  layout?: 'background' | 'band';
+  class?: string;
+}
+const { mode, layout = 'band', class: className } = Astro.props;
+---
+<div class:list={['flowfield', `layout-${layout}`, `mode-${mode}`, className]} data-flowfield={mode}>
+  <canvas aria-hidden="true"></canvas>
+  {layout === 'band' && <div class="flow-content"><slot /></div>}
+</div>
+
+<style>
+  .flowfield { position: relative; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  .layout-background { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+
+  /* Fades keep text in front readable */
+  .mode-scatter canvas {
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.4) 38%, #000 70%), linear-gradient(to bottom, #000 62%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.4) 38%, #000 70%), linear-gradient(to bottom, #000 62%, transparent 100%);
+    mask-composite: intersect;
+  }
+  .mode-flow canvas {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  }
+  .mode-loop canvas {
+    -webkit-mask-image: linear-gradient(to right, transparent 25%, #000 60%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 25%, #000 60%, #000 92%, transparent 100%);
+  }
+
+  .layout-band { min-height: 440px; display: grid; align-items: center; }
+  .flow-content { position: relative; z-index: 1; }
+
+  @media (max-width: 760px) {
+    .layout-band { min-height: 380px; }
+    .mode-scatter canvas {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 50%, transparent 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.5) 50%, transparent 100%);
+    }
+    .mode-loop canvas {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 30%, #000 60%);
+      mask-image: linear-gradient(to bottom, transparent 30%, #000 60%);
+    }
+  }
+</style>
+
+<script>
+  import { startFlowField } from './flowfield';
+  import type { FlowMode } from './flowfield';
+  document.querySelectorAll<HTMLElement>('[data-flowfield]').forEach((host) => {
+    const canvas = host.querySelector('canvas');
+    if (canvas) startFlowField(host, canvas, host.dataset.flowfield as FlowMode);
+  });
+</script>

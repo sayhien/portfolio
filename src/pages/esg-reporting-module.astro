@@ -15,6 +15,7 @@ import type { Feature } from '../components/EsgFeatureList.astro';
 import EsgFrameworkTabs from '../components/EsgFrameworkTabs.astro';
 import type { Framework } from '../components/EsgFrameworkTabs.astro';
 import EsgDashboardTour from '../components/EsgDashboardTour.astro';
+import FlowField from '../components/FlowField.astro';
 import type { Hotspot } from '../components/EsgDashboardTour.astro';
 import type { Question } from '../components/EsgQuestions.astro';
 import type { PainPoint } from '../components/EsgPainPoints.astro';
@@ -187,6 +188,7 @@ const next: NextLink[] = [
   ]}
   sections={sections}
   next={next}
+  heroField="scatter"
 >
   <Image
     slot="hero"
@@ -272,6 +274,13 @@ const next: NextLink[] = [
     <EsgHierarchy />
   </section>
 
+  <FlowField mode="flow" class="chapter-band">
+    <div class="chapter">
+      <p class="chapter-eyebrow">From research to product</p>
+      <p class="chapter-line">Requirements set. Now the product takes shape.</p>
+    </div>
+  </FlowField>
+
   <section id="dashboard" class="sec">
     <p class="sn">{n('dashboard')}</p>
     <h2>Dashboard</h2>
@@ -351,9 +360,14 @@ const next: NextLink[] = [
     </div>
   </section>
 
-  <section id="challenges" class="sec">
-    <p class="sn">{n('challenges')}</p>
-    <h2>Challenges and Learnings</h2>
+  <section id="challenges" class="sec learn-sec">
+    <FlowField mode="loop" class="learn-band">
+      <div class="learn-head">
+        <p class="sn">{n('challenges')}</p>
+        <h2>Challenges and Learnings</h2>
+        <p class="learn-sub">What worked, what didn’t, and what goes back into the loop next time.</p>
+      </div>
+    </FlowField>
     <ol class="challenges" data-challenges>
       {challenges.map((c) => (
         <li>
@@ -433,6 +447,14 @@ const next: NextLink[] = [
   .st-grey { --tone: #8a8478; } .st-blue { --tone: #2c5a8a; } .st-green { --tone: #2f6b45; }
   .st-red { --tone: #b3261e; } .st-amber { --tone: #9a6a00; } .st-orange { --tone: var(--accent); }
 
+  :global(.chapter-band) { margin: 8px calc(var(--gutter) * -1) 8px -48px; }
+  .chapter { max-width: 640px; margin: 0 auto; padding: 48px 32px; text-align: center; background: radial-gradient(closest-side, var(--paper) 60%, rgba(243, 239, 230, 0)); }
+  .chapter-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .chapter-line { font-family: var(--serif); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.12; letter-spacing: -0.02em; color: var(--ink); text-wrap: balance; }
+  .learn-sec { padding-top: 0; }
+  :global(.learn-band) { margin: 0 calc(var(--gutter) * -1) 24px 0; min-height: 360px !important; }
+  .learn-head { max-width: 460px; padding: 56px 0; }
+  .learn-sub { font-size: 18px; line-height: 1.6; color: var(--ink-2); max-width: 420px; margin-top: 4px; }
   .challenges { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 16px; }
   .challenges li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px 28px; display: grid; gap: 20px; }
   .ch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
@@ -467,6 +489,10 @@ const next: NextLink[] = [
   }
   @media (max-width: 700px) {
     .logos, .flow, .personas { grid-template-columns: minmax(0, 1fr); }
+    :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); }
+    :global(.learn-band) { margin-left: calc(var(--gutter) * -1); padding-left: var(--gutter); }
+    :global(.learn-band) { min-height: 600px !important; align-items: start !important; }
+    .learn-head { padding: 40px 0; }
     .persona { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding: 14px; }
     .flow { gap: 18px; }
     .flow > div, .flow > div + div { padding: 0; border-left: 0; }

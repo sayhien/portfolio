@@ -116,3 +116,12 @@ img.is-loading {
 img.is-loaded { animation: img-in 0.45s ease-out; }
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @keyframes img-in { from { opacity: 0; } }
+
+/* Feature rows: copy beside a framed video, alternating sides. */
+.feature-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 40px; align-items: center; margin-top: 28px; }
+.feature-row.flip > :first-child { order: 2; }
+.feature-row > figure { margin: 0; }
+@media (max-width: 1000px) {
+  .feature-row { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .feature-row.flip > :first-child { order: 0; }
+}

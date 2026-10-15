@@ -10,6 +10,12 @@ import EsgProblemList from '../components/EsgProblemList.astro';
 import EsgRequirements from '../components/EsgRequirements.astro';
 import EsgPainPoints from '../components/EsgPainPoints.astro';
 import EsgQuestions from '../components/EsgQuestions.astro';
+import EsgFeatureList from '../components/EsgFeatureList.astro';
+import type { Feature } from '../components/EsgFeatureList.astro';
+import EsgFrameworkTabs from '../components/EsgFrameworkTabs.astro';
+import type { Framework } from '../components/EsgFrameworkTabs.astro';
+import EsgDashboardTour from '../components/EsgDashboardTour.astro';
+import type { Hotspot } from '../components/EsgDashboardTour.astro';
 import type { Question } from '../components/EsgQuestions.astro';
 import type { PainPoint } from '../components/EsgPainPoints.astro';
 import { onFirstView, restartClass } from '../components/motion';
@@ -37,8 +43,7 @@ const sections = [
   { id: 'dashboard', title: 'Dashboard' },
   { id: 'user-assignment', title: 'User Assignment' },
   { id: 'data-synchronisation', title: 'Data Synchronisation' },
-  { id: 'gri', title: 'Global Reporting Standards' },
-  { id: 'ifrs', title: 'International Financial Reporting Standards' },
+  { id: 'frameworks', title: 'GRI and IFRS Reporting' },
   { id: 'progress-tracking', title: 'Progress Tracking' },
   { id: 'collaborative-review', title: 'Collaborative Review' },
   { id: 'challenges', title: 'Challenges and Learnings' },
@@ -46,19 +51,71 @@ const sections = [
 const n = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
 
 const personas = [
-  { img: helen, name: 'Helen', role: 'HR Manager', goals: ['Ensure compliance with labor laws', 'Promote diversity', 'Track employee well-being'] },
-  { img: laura, name: 'Laura', role: 'Compliance Officer', goals: ['Ensure regulatory compliance', 'Manage ESG risks'] },
-  { img: sarah, name: 'Sarah', role: 'Business Development Manager', goals: ['Understand ESG for market demands', 'Communicate achievements', 'Sales focuses on procurement practices and market presence'] },
-  { img: oliver, name: 'Oliver', role: 'Operations Manager', goals: ['Reduce energy and waste', 'Implement sustainable practices', 'Report environmental performance'] },
-  { img: sam, name: 'Sam', role: 'Supply Chain Analyst', goals: ['Assess supplier sustainability', 'Reduce supply chain environmental impact'] },
-  { img: cluck, name: 'Cluck', role: 'Financial Controller', goals: ['Integrate ESG into financial planning', 'Report on expenditures', 'Report on economic performance and tax governance'] },
-  { img: raj, name: 'Raj Patel', role: 'IT Specialist', goals: ['Integrate ESG data from multiple sources into the ERP system', 'Protect customer privacy', 'Act against breaches of customer privacy and data losses'] },
+  { img: helen, name: 'Helen', quote: 'I need diversity and well-being numbers without chasing five spreadsheets.',  role: 'HR Manager', goals: ['Ensure compliance with labor laws', 'Promote diversity', 'Track employee well-being'] },
+  { img: laura, name: 'Laura', quote: 'Tell me early when something puts us out of compliance.',  role: 'Compliance Officer', goals: ['Ensure regulatory compliance', 'Manage ESG risks'] },
+  { img: sarah, name: 'Sarah', quote: 'Clients ask about our ESG record. I need proof I can share.',  role: 'Business Development Manager', goals: ['Understand ESG for market demands', 'Communicate achievements', 'Sales focuses on procurement practices and market presence'] },
+  { img: oliver, name: 'Oliver', quote: 'Energy and waste data lives on the factory floor, not in reports.',  role: 'Operations Manager', goals: ['Reduce energy and waste', 'Implement sustainable practices', 'Report environmental performance'] },
+  { img: sam, name: 'Sam', quote: 'I can’t vouch for suppliers I can’t measure.',  role: 'Supply Chain Analyst', goals: ['Assess supplier sustainability', 'Reduce supply chain environmental impact'] },
+  { img: cluck, name: 'Cluck', quote: 'ESG has to tie back to the numbers I already report.',  role: 'Financial Controller', goals: ['Integrate ESG into financial planning', 'Report on expenditures', 'Report on economic performance and tax governance'] },
+  { img: raj, name: 'Raj Patel', quote: 'Every new data source is another privacy risk to manage.',  role: 'IT Specialist', goals: ['Integrate ESG data from multiple sources into the ERP system', 'Protect customer privacy', 'Act against breaches of customer privacy and data losses'] },
 ];
 
 const painPoints: PainPoint[] = [
   { pain: 'Lack of clear communication about roles and responsibilities.', fix: 'Created user assignment to control who does what.', to: 'user-assignment', linkLabel: 'See user assignment', widget: 'assign' },
   { pain: 'Time consuming manual data collection processes.', fix: 'Created data synchronisation to automatically pull data from other modules.', to: 'data-synchronisation', linkLabel: 'See data synchronisation', widget: 'sync' },
   { pain: 'Lack of communication between reviewers and data providers.', fix: 'Created chat for the manager to communicate flagged for review answers with the assigned user.', to: 'collaborative-review', linkLabel: 'See collaborative review', widget: 'chat' },
+];
+
+const assignmentFeatures: Feature[] = [
+  { icon: 'layers', text: 'Selecting specific standards, down to disclosures and requirements, for assignment' },
+  { icon: 'userplus', text: 'Assigning users by name or email' },
+  { icon: 'key', text: 'Setting permission levels' },
+  { icon: 'listcog', text: 'Viewing and managing existing assignments' },
+];
+const syncFeatures: Feature[] = [
+  { icon: 'sync', text: 'Real time data from other modules ensures precise ESG metrics' },
+  { icon: 'bolt', text: 'Automated data collection reduces manual workload' },
+  { icon: 'link', text: 'Data stays aligned across modules' },
+  { icon: 'clock', text: 'No redundant data entry, so teams can focus on analysis and reporting' },
+];
+const frameworkFeatures: Feature[] = [
+  { icon: 'bars', text: 'Progress tracker' },
+  { icon: 'table', text: 'Content entry fields and tables' },
+  { icon: 'book', text: 'Clear display of requirements and guidance' },
+];
+const frameworks: Framework[] = [
+  { key: 'gri', label: 'GRI', intro: 'The Global Reporting Initiative (GRI) standards address broad environmental, social, and governance impacts. The main reporting interface provides context and guidance for each standard’s specific requirements.', videoId: 'LXmsCW7xVis', videoTitle: 'GRI reporting interface prototype' },
+  { key: 'ifrs', label: 'IFRS', intro: 'The International Financial Reporting Standards (IFRS) address financial implications. The interface mirrors the GRI module, so users learn one pattern for both frameworks.', videoId: '-1cucdJdtoA', videoTitle: 'IFRS reporting interface prototype' },
+];
+const trackingFeatures: Feature[] = [
+  { icon: 'checkcircle', text: 'Completed disclosures' },
+  { icon: 'alert', text: 'Disclosures with issues (a standard contains disclosures)' },
+  { icon: 'flag', text: 'Requirements affected by issues (a disclosure contains requirements)' },
+  { icon: 'compass', text: 'Navigation to any disclosure' },
+];
+const statuses = [
+  { label: 'Not attempted', tone: 'grey', shape: 'ring' },
+  { label: 'Current location', tone: 'blue', shape: 'target' },
+  { label: 'Completed', tone: 'green', shape: 'check' },
+  { label: 'Multiple issues', tone: 'red', shape: 'alert' },
+  { label: 'Empty fields', tone: 'amber', shape: 'dash' },
+  { label: 'Flagged for review', tone: 'orange', shape: 'flag' },
+  { label: 'Omission', tone: 'grey', shape: 'slash' },
+];
+const reviewFeatures: Feature[] = [
+  { icon: 'flag', text: 'Flag items for further review' },
+  { icon: 'chat', text: 'Discuss specific reporting items in context' },
+  { icon: 'clock', text: 'Keep time stamped communications' },
+  { icon: 'badge', text: 'Identify users for accountability' },
+];
+const dashboardSpots: Hotspot[] = [
+  { x: 1.6, y: 6.6, title: 'Reporting cycle', text: 'Deadline, standards in scope and overall progress for the quarter, at a glance.' },
+  { x: 28.4, y: 15.3, title: 'Status cards', text: 'Completed, in progress and not done counts, each with a filter to drill in.' },
+  { x: 82.8, y: 15.3, title: 'Status distribution', text: 'The same split as one donut, so the balance is clear in a second.' },
+  { x: 1.6, y: 37.1, title: 'Compliance confidence', text: 'A readiness score built from completion rate, data quality and review status.' },
+  { x: 33.9, y: 37.1, title: 'Upcoming deadlines', text: 'The next due standards, with urgent dates in red.' },
+  { x: 66.2, y: 37.1, title: 'User workload', text: 'Who is overloaded or overdue, with a shortcut to reassign tasks.' },
+  { x: 1.6, y: 53.2, title: 'Progress tracker', text: 'Every standard with its status, owner and permissions. Synchronise data and Assign user start here.' },
 ];
 
 const dashboardQuestions: Question[] = [
@@ -165,10 +222,10 @@ const next: NextLink[] = [
     <p>
       The initial phase involved getting the business requirements from the entrepreneur, and understanding the complex reporting frameworks (GRI and IFRS) and how they would integrate with the existing ERP system.
     </p>
-    <div class="logos">
-      <figure><Image src={gri} alt="Global Reporting Initiative (GRI) logo" widths={[400]} sizes="400px" /></figure>
-      <figure><Image src={ifrs} alt="International Financial Reporting Standards (IFRS) logo" widths={[400]} sizes="400px" /></figure>
-    </div>
+    <ul class="logos">
+      <li><Image src={gri} alt="" widths={[240]} sizes="120px" /><p><b>GRI</b> covers broad environmental, social and governance impacts.</p></li>
+      <li><Image src={ifrs} alt="" widths={[240]} sizes="120px" /><p><b>IFRS</b> covers the financial side of sustainability.</p></li>
+    </ul>
     <h3 class="sub">Key requirements identified</h3>
     <EsgRequirements />
   </section>
@@ -182,10 +239,11 @@ const next: NextLink[] = [
     <ul class="personas">
       {personas.map((p) => (
         <li class="persona">
-          <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 45vw, 200px" />
+          <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 96px, 160px" />
           <div class="p-body">
             <h3>{p.name}</h3>
             <p class="p-role">{p.role}</p>
+            <p class="p-quote">“{p.quote}”</p>
             <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>
           </div>
         </li>
@@ -219,23 +277,22 @@ const next: NextLink[] = [
     <h2>Dashboard</h2>
     <p class="big">The Dashboard is the nerve center for ESG managers, built around three core principles.</p>
     <EsgQuestions items={dashboardQuestions} />
-    <figure class="framed">
-      <Image src={dashboard} alt="ESG dashboard for the Q2 2025 reporting cycle, with completed, in progress and not done counts, a status distribution donut, compliance confidence of 82 percent, upcoming deadlines, user workload and the GRI Standards Progress Tracker table" widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
-    </figure>
+    <EsgDashboardTour
+      image={dashboard}
+      alt="ESG dashboard for the Q2 2025 reporting cycle, with completed, in progress and not done counts, a status distribution donut, compliance confidence of 82 percent, upcoming deadlines, user workload and the GRI Standards Progress Tracker table"
+      spots={dashboardSpots}
+    />
+    <p class="hint">Tap a number to see what each part of the dashboard does.</p>
   </section>
 
   <section id="user-assignment" class="sec">
     <p class="sn">{n('user-assignment')}</p>
     <h2>User Assignment</h2>
-    <p>Managers assign specific reporting standards to team members with appropriate permission levels. The granular system supports:</p>
-    <ul class="ticks">
-      <li>Selecting specific standards, down to disclosures and requirements, for assignment</li>
-      <li>Assigning users by name or email</li>
-      <li>Setting permission levels</li>
-      <li>Viewing and managing existing assignments</li>
-    </ul>
-    <p>This established accountability and ownership for reporting tasks, while ensuring specialised knowledge is applied to relevant areas.</p>
-    <YouTube id="d7-WI0sSvRE" title="User assignment prototype workflow" />
+    <p>Managers assign specific reporting standards to team members with appropriate permission levels. This established accountability and ownership for reporting tasks, while ensuring specialised knowledge is applied to relevant areas.</p>
+    <div class="feature-row">
+      <div><EsgFeatureList items={assignmentFeatures} /></div>
+      <YouTube id="d7-WI0sSvRE" title="User assignment prototype workflow" />
+    </div>
   </section>
 
   <section id="data-synchronisation" class="sec">
@@ -244,68 +301,54 @@ const next: NextLink[] = [
     <p>
       Data synchronisation integrates information from other modules, such as HR and Finance, into the ESG module. This ensures ESG reporting reflects the latest data across departments, streamlining compliance with frameworks like GRI and IFRS.
     </p>
-    <ul class="ticks">
-      <li>Real time data from other modules ensures precise ESG metrics</li>
-      <li>Automated data collection reduces manual workload</li>
-      <li>Data stays aligned across modules</li>
-      <li>No redundant data entry, so teams can focus on analysis and reporting</li>
-    </ul>
-    <YouTube id="2UIcLZA6ojM" title="Data synchronisation prototype" />
+    <div class="feature-row flip">
+      <div><EsgFeatureList items={syncFeatures} /></div>
+      <YouTube id="2UIcLZA6ojM" title="Data synchronisation prototype" />
+    </div>
   </section>
 
-  <section id="gri" class="sec">
-    <p class="sn">{n('gri')}</p>
-    <h2>Global Reporting Standards</h2>
-    <p>
-      The system supports Global Reporting Initiative (GRI) standards, which address broad environmental, social, and governance impacts. The main reporting interface provides context and guidance for each standard’s specific requirements.
-    </p>
-    <ul class="ticks">
-      <li>Progress tracker</li>
-      <li>Content entry fields and tables</li>
-      <li>Clear display of requirements and guidance</li>
-    </ul>
-    <YouTube id="LXmsCW7xVis" title="GRI reporting interface prototype" />
-  </section>
-
-  <section id="ifrs" class="sec">
-    <p class="sn">{n('ifrs')}</p>
-    <h2>International Financial Reporting Standards</h2>
-    <p>
-      The system also supports International Financial Reporting Standards (IFRS), which address financial implications. The interface mirrors the GRI module, so users learn one pattern for both frameworks.
-    </p>
-    <ul class="ticks">
-      <li>Progress tracker</li>
-      <li>Content entry fields and tables</li>
-      <li>Clear display of requirements and guidance</li>
-    </ul>
-    <YouTube id="-1cucdJdtoA" title="IFRS reporting interface prototype" />
+  <section id="frameworks" class="sec">
+    <p class="sn">{n('frameworks')}</p>
+    <h2>GRI and IFRS Reporting</h2>
+    <p>The system supports both frameworks through one reporting interface. Switch between them to see each prototype.</p>
+    <EsgFrameworkTabs frameworks={frameworks} features={frameworkFeatures} />
   </section>
 
   <section id="progress-tracking" class="sec">
     <p class="sn">{n('progress-tracking')}</p>
     <h2>Progress Tracking</h2>
     <p>The status tracking system provides visibility into reporting progress for a standard. The interface highlights:</p>
-    <ul class="ticks">
-      <li>Completed disclosures</li>
-      <li>Disclosures with issues (a standard contains disclosures)</li>
-      <li>Requirements affected by issues (a disclosure contains requirements)</li>
-      <li>Statuses: not attempted, user’s current location, completed, multiple issues, empty fields, flagged for review, omission</li>
-      <li>Navigation to any disclosure</li>
+    <div class="feature-row flip">
+      <div><EsgFeatureList items={trackingFeatures} /></div>
+      <YouTube id="-_-ZWn_tVnE" title="Progress tracking prototype" />
+    </div>
+    <h3 class="sub">Seven statuses, one glance</h3>
+    <ul class="status-legend">
+      {statuses.map((st) => (
+        <li class={`st st-${st.tone}`}>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            {st.shape === 'ring' && <circle cx="8" cy="8" r="5.5" />}
+            {st.shape === 'target' && <><circle cx="8" cy="8" r="5.5" /><circle cx="8" cy="8" r="2" class="fill" /></>}
+            {st.shape === 'check' && <><circle cx="8" cy="8" r="6.5" class="fill" /><path d="m5 8.3 2 2 4-4.3" class="on-fill" /></>}
+            {st.shape === 'alert' && <><circle cx="8" cy="8" r="6.5" class="fill" /><path d="M8 4.8v3.6M8 11v.1" class="on-fill" /></>}
+            {st.shape === 'dash' && <><circle cx="8" cy="8" r="5.5" stroke-dasharray="2.5 2" /></>}
+            {st.shape === 'flag' && <path d="M4 14V2.5M4 3h7l-1.5 2.5L11 8H4" />}
+            {st.shape === 'slash' && <><circle cx="8" cy="8" r="5.5" /><path d="m4.2 11.8 7.6-7.6" /></>}
+          </svg>
+          {st.label}
+        </li>
+      ))}
     </ul>
-    <YouTube id="-_-ZWn_tVnE" title="Progress tracking prototype" />
   </section>
 
   <section id="collaborative-review" class="sec">
     <p class="sn">{n('collaborative-review')}</p>
     <h2>Collaborative Review</h2>
     <p>The system includes communication tools for collaborative reporting. The chat feature allows users to:</p>
-    <ul class="ticks">
-      <li>Flag items for further review</li>
-      <li>Discuss specific reporting items in context</li>
-      <li>Keep time stamped communications</li>
-      <li>Identify users for accountability</li>
-    </ul>
-    <YouTube id="s0F4ljXiGm0" title="Collaborative review prototype" />
+    <div class="feature-row">
+      <div><EsgFeatureList items={reviewFeatures} /></div>
+      <YouTube id="s0F4ljXiGm0" title="Collaborative review prototype" />
+    </div>
   </section>
 
   <section id="challenges" class="sec">
@@ -345,38 +388,50 @@ const next: NextLink[] = [
   .sn { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 14px; }
   .sec h2 { font-size: clamp(32px, 3.4vw, 46px); margin-bottom: 24px; }
   .sec > p { color: var(--ink-2); font-size: 18px; line-height: 1.7; max-width: 700px; }
-  .sec > p + p, .sec > p + ul, .sec > ul + p { margin-top: 20px; }
+  .sec > p + p { margin-top: 20px; }
   .sec > p.big { font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; color: var(--ink); max-width: 780px; letter-spacing: -0.01em; }
   .sub { font-size: 24px; margin: 48px 0 20px; }
 
-  .ticks { list-style: none; margin: 20px 0 0; padding: 0; max-width: 700px; }
-  .ticks li { position: relative; padding: 10px 0 10px 30px; border-bottom: 1px solid var(--line); color: var(--ink-2); }
-  .ticks li::before { content: ''; position: absolute; left: 4px; top: 21px; width: 10px; height: 2px; background: var(--accent); }
 
 
 
-  .logos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 36px 0 0; }
-  .logos figure { margin: 0; background: #fff; border-radius: var(--radius); display: grid; place-items: center; padding: 28px; border: 1px solid var(--line); }
-  .logos :global(img) { max-height: 110px; width: auto; }
 
-  .personas { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 28px 20px; }
-  .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
-  .p-body { padding-top: 14px; }
-  .persona h3 { font-size: 22px; }
-  .p-role { font-size: 14px; color: var(--accent); font-weight: 600; margin: 2px 0 10px; }
-  .persona ul { margin: 0; padding-left: 18px; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
-  .persona li + li { margin-top: 4px; }
 
   figure { margin: 36px 0 0; }
   figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
-  .framed :global(img) { border-radius: var(--radius); border: 1px solid var(--line); }
 
 
   blockquote { margin: 0 0 24px; font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent); letter-spacing: -0.01em; }
 
 
 
-  .sec :global(.yt) { margin-top: 40px; }
+
+  .logos { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .logos li { display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
+  .logos :global(img) { width: 96px; height: auto; flex: none; }
+  .logos p { font-size: 15px; line-height: 1.45; color: var(--ink-2); }
+  .logos b { color: var(--ink); }
+
+  .personas { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 20px; align-items: start; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; transition: border-color 0.2s, transform 0.3s; }
+  .persona:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+  .p-body { display: grid; gap: 6px; }
+  .persona h3 { font-size: 22px; }
+  .p-role { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+  .p-quote { font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--ink); margin: 4px 0 6px; padding-left: 12px; border-left: 2px solid var(--accent-soft); }
+  .persona ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+  .persona li + li { margin-top: 3px; }
+
+  .hint { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .status-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .st { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; }
+  .st svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; color: var(--tone); }
+  .st .fill { fill: var(--tone); stroke: none; }
+  .st .on-fill { stroke: #fff; stroke-width: 1.8; }
+  .st-grey { --tone: #8a8478; } .st-blue { --tone: #2c5a8a; } .st-green { --tone: #2f6b45; }
+  .st-red { --tone: #b3261e; } .st-amber { --tone: #9a6a00; } .st-orange { --tone: var(--accent); }
 
   .challenges { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 16px; }
   .challenges li { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 28px 28px; display: grid; gap: 20px; }
@@ -411,10 +466,10 @@ const next: NextLink[] = [
     .sec { scroll-margin-top: 72px; padding: 56px 0; }
   }
   @media (max-width: 700px) {
-    .logos, .flow { grid-template-columns: minmax(0, 1fr); }
+    .logos, .flow, .personas { grid-template-columns: minmax(0, 1fr); }
+    .persona { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; padding: 14px; }
     .flow { gap: 18px; }
     .flow > div, .flow > div + div { padding: 0; border-left: 0; }
     .challenges li { padding: 22px; }
-    .personas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
+    }
 </style>

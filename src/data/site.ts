@@ -1,3 +1,11 @@
+import type { ImageMetadata } from 'astro';
+import esgThumb from '../assets/esg/thumbnail.png';
+import chatbotThumb from '../assets/project-ai-chatbot.png';
+import remittanceThumb from '../assets/project-remittance.png';
+import healthcareThumb from '../assets/project-healthcare-report.png';
+import libraryThumb from '../assets/project-design-library.png';
+import breadcrumbThumb from '../assets/project-breadcrumb.png';
+
 export const site = {
   name: 'Loo Say Hien',
   role: 'UI/UX Designer, Singapore',
@@ -20,7 +28,8 @@ export type Project = {
   tags: string[];
   href?: string;
   external?: boolean;
-  thumb?: 'esg';
+  thumb?: ImageMetadata;
+  thumbAlt?: string;
   tint: string;
   ratio: number; // placeholder height / width
 };
@@ -33,6 +42,8 @@ export const projects: Project[] = [
       'I designed an AI Chatbot service page for SimplifyNext which resolves common UX problems found in the service pages of their competitors. The new page guides prospects through a clear, self-qualifying journey with interactive demo, social proof, and tailored content.',
     tags: ['UX consulting', 'Research', 'UI design'],
     href: `${framer}/ai-chatbot`,
+    thumb: chatbotThumb,
+    thumbAlt: 'A friendly service robot chatting with a businessman, with a speech bubble between them',
     external: true,
     tint: '#e4dcc8',
     ratio: 0.8,
@@ -44,7 +55,8 @@ export const projects: Project[] = [
       'An ESG (Environmental, Social, and Governance) module designed as part of Tomie Technologies ERP product, integrated with modules like HR, Finance, and Supply Chain.',
     tags: ['Enterprise SaaS', 'Research', 'UI design'],
     href: 'esg-reporting-module/',
-    thumb: 'esg',
+    thumb: esgThumb,
+    thumbAlt: 'ESG reporting dashboard for Tomie Technologies shown on a laptop, with the status distribution and compliance confidence cards',
     tint: '#9debec',
     ratio: 0.69,
   },
@@ -55,6 +67,8 @@ export const projects: Project[] = [
       'Swipe is an app for the foreign workforce to send money back home. This study looks at how the usability of key features like signing up, topping up, and sending money can be improved.',
     tags: ['Fintech', 'Research', 'Facilitation'],
     href: `${framer}/swipe-remittance-app`,
+    thumb: remittanceThumb,
+    thumbAlt: 'A mother hugging her child beside two phones showing the Swipe app sending Singapore dollars to Philippine pesos',
     external: true,
     tint: '#d5ddd0',
     ratio: 0.62,
@@ -66,6 +80,8 @@ export const projects: Project[] = [
       'The report generation flow of the customer relationship management (CRM) system was redesigned for the consumer sales team to help consumers with their medical enquiries.',
     tags: ['Healthcare', 'Research', 'UI design'],
     href: `${framer}/docdoc-healthcare-report`,
+    thumb: healthcareThumb,
+    thumbAlt: 'docdoc case management screen with a discovery report, doctor profiles and price scores, beside a smiling customer service agent',
     external: true,
     tint: '#dcd3e0',
     ratio: 0.8,
@@ -77,6 +93,8 @@ export const projects: Project[] = [
       'A look at how we aligned our UI components with complex company specifications and Angular Material.',
     tags: ['Design system', 'Figma', 'Angular Material'],
     href: `${framer}/docdoc-library`,
+    thumb: libraryThumb,
+    thumbAlt: 'docdoc design library showing tables, provider cards, label and value lists and section navigation',
     external: true,
     tint: '#e9d6ca',
     ratio: 0.72,
@@ -88,6 +106,8 @@ export const projects: Project[] = [
       'Deep hierarchical layers of functions across an enterprise app left our own staff asking, "Where am I?"',
     tags: ['Healthcare', 'Research', 'UI design'],
     href: `${framer}/docdoc-breadcrumb`,
+    thumb: breadcrumbThumb,
+    thumbAlt: 'docdoc policy administration screen with a long breadcrumb trail shortened to Policy administration, then Edit restriction',
     external: true,
     tint: '#e8d9c4',
     ratio: 0.7,

@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import type { Project } from '../data/site';
-import esgThumb from '../assets/esg/thumbnail.png';
 
 interface Props {
   project: Project;
@@ -16,10 +15,10 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
 ---
 <Tag class:list={['tile', { soon: !p.href }]} style={`order:${index}`} {...linkProps}>
   <div class="art" style={`--tint:${p.tint}`}>
-    {p.thumb === 'esg' ? (
+    {p.thumb ? (
       <Image
-        src={esgThumb}
-        alt="ESG reporting dashboard for Tomie Technologies shown on a laptop, with the status distribution and compliance confidence cards"
+        src={p.thumb}
+        alt={p.thumbAlt ?? ''}
         widths={[480, 720, 1000]}
         sizes="(max-width: 900px) 100vw, 640px"
         loading={index < 2 ? 'eager' : 'lazy'}

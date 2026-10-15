@@ -6,19 +6,18 @@
 import { Image } from 'astro:assets';
 import { journeyStages } from '../data/esg-journey';
 import Icon from './Icon.astro';
-import type { IconName } from './Icon.astro';
 
 const pad = (index: number) => String(index + 1).padStart(2, '0');
 
 // Row labels shared by the sticky column (desktop) and each card (mobile).
-const rows: { key: string; label: string; icon: IconName }[] = [
-  { key: 'stage', label: 'Stage', icon: 'flag' },
-  { key: 'desc', label: 'Description', icon: 'text' },
-  { key: 'actors', label: 'Actors', icon: 'person' },
-  { key: 'tools', label: 'Tools', icon: 'tool' },
-  { key: 'meetings', label: 'Meetings', icon: 'calendar' },
-  { key: 'pain', label: 'Pain points', icon: 'alert' },
-  { key: 'opportunities', label: 'Opportunities', icon: 'bulb' },
+const rows: { key: string; label: string }[] = [
+  { key: 'stage', label: 'Stage' },
+  { key: 'desc', label: 'Description' },
+  { key: 'actors', label: 'Actors' },
+  { key: 'tools', label: 'Tools' },
+  { key: 'meetings', label: 'Meetings' },
+  { key: 'pain', label: 'Pain points' },
+  { key: 'opportunities', label: 'Opportunities' },
 ];
 const labelOf = (key: string) => rows.find((row) => row.key === key)!;
 const splitList = (value: string) => value.split(', ');
@@ -53,7 +52,6 @@ const splitList = (value: string) => value.split(', ');
       <div class="jm-labels" aria-hidden="true">
         {rows.map((row) => (
           <div class:list={['lab', `lab-${row.key}`]}>
-            <span class="lab-ic"><Icon name={row.icon} size={16} /></span>
             {row.label}
           </div>
         ))}
@@ -70,25 +68,25 @@ const splitList = (value: string) => value.split(', ');
             <p>{stage.description}</p>
           </div>
           <div class="cell">
-            <h4 class="row-label"><Icon name="person" size={14} />Actors</h4>
+            <h4 class="row-label">Actors</h4>
             <ul class="chips">{splitList(stage.actors).map((actor) => <li><Icon name="person" size={14} />{actor}</li>)}</ul>
           </div>
           <div class="cell">
-            <h4 class="row-label"><Icon name="tool" size={14} />Tools</h4>
+            <h4 class="row-label">Tools</h4>
             <ul class="chips tools">{splitList(stage.tools).map((tool) => <li>{tool}</li>)}</ul>
           </div>
           <div class="cell">
-            <h4 class="row-label"><Icon name="calendar" size={14} />Meetings</h4>
+            <h4 class="row-label">Meetings</h4>
             {stage.meetings === 'None'
               ? <p class="none">No meeting</p>
               : <p class="meet"><Icon name="calendar" size={16} />{stage.meetings}</p>}
           </div>
           <div class="cell pain">
-            <h4 class="row-label"><Icon name="alert" size={14} />{labelOf('pain').label}</h4>
+            <h4 class="row-label">{labelOf('pain').label}</h4>
             <ul class="marks">{stage.painPoints.map((item) => <li><Icon name="alert" size={15} />{item}</li>)}</ul>
           </div>
           <div class="cell opp">
-            <h4 class="row-label"><Icon name="bulb" size={14} />{labelOf('opportunities').label}</h4>
+            <h4 class="row-label">{labelOf('opportunities').label}</h4>
             <ul class="marks">{stage.opportunities.map((item) => <li><Icon name="rise" size={15} />{item}</li>)}</ul>
           </div>
         </article>
@@ -154,9 +152,6 @@ const splitList = (value: string) => value.split(', ');
     font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
     min-width: 0; overflow-wrap: anywhere;
   }
-  .lab-ic { width: 26px; height: 26px; flex: none; border-radius: 7px; display: grid; place-items: center; background: var(--paper-3); color: var(--ink); margin-top: -4px; }
-  .lab-pain .lab-ic { background: #fff; color: var(--pain-ink); }
-  .lab-opportunities .lab-ic { background: #fff; color: var(--opp-ink); }
   .lab-stage { border-top: 0; align-items: center; }
   .lab-pain { color: var(--pain-ink); background: var(--pain); }
   .lab-opportunities { color: var(--opp-ink); background: var(--opp); }

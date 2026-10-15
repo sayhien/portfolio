@@ -11,6 +11,8 @@ const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop
 const watch = `https://www.youtube.com/watch?v=${id}`;
 ---
 <figure class="yt">
+  <div class="browser">
+  <div class="chrome" aria-hidden="true"><span></span><span></span><span></span><b>{title}</b></div>
   <div class="frame" data-src={src} data-title={title}>
     <img
       class="poster"
@@ -23,6 +25,7 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
       <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
     </button>
   </div>
+  </div>
   <figcaption>
     {title}. <a href={watch} target="_blank" rel="noopener">Watch on YouTube</a>
   </figcaption>
@@ -30,11 +33,14 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
 
 <style>
   .yt { margin: 0; }
+  .browser { border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid var(--line); box-shadow: 0 24px 48px -28px rgba(27, 26, 23, 0.45); }
+  .chrome { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--paper-3); border-bottom: 1px solid var(--line); }
+  .chrome span { width: 10px; height: 10px; border-radius: 999px; background: #cfc7b5; }
+  .chrome b { margin-left: 10px; flex: 1; min-width: 0; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--paper-2); border-radius: 6px; padding: 3px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .frame {
     position: relative;
     aspect-ratio: 16 / 9;
     background: var(--night);
-    border-radius: var(--radius);
     overflow: hidden;
   }
   .frame :global(iframe), .poster {
@@ -46,7 +52,7 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
     object-fit: cover;
   }
   .play {
-    position: absolute;
+    position: absolute; z-index: 1;
     left: 50%;
     top: 50%;
     translate: -50% -50%;

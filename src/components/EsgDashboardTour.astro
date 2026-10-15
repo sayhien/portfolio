@@ -1,0 +1,99 @@
+---
+// Dashboard screenshot with numbered hotspots. Each hotspot is a button
+// linked to a written note below the image, so the tour works by mouse,
+// touch, keyboard and screen reader, and on small screens where the dots
+// are too close to read the notes inside the image.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+export type Hotspot = { x: number; y: number; title: string; text: string };
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  spots: Hotspot[];
+}
+const { image, alt, spots } = Astro.props;
+---
+<figure class="tour" data-tour>
+  <div class="shot">
+    <Image src={image} alt={alt} widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
+    {spots.map((spot, index) => (
+      <button
+        type="button"
+        class="dot"
+        style={`left:${spot.x}%;top:${spot.y}%;--n:${index}`}
+        aria-label={`${index + 1}. ${spot.title}`}
+        aria-controls={`tour-note-${index}`}
+        data-index={index}
+      >{index + 1}</button>
+    ))}
+  </div>
+  <ol class="notes">
+    {spots.map((spot, index) => (
+      <li id={`tour-note-${index}`} data-index={index}>
+        <button type="button" class="note" data-index={index}>
+          <span class="num" aria-hidden="true">{index + 1}</span>
+          <span><b>{spot.title}</b>{spot.text}</span>
+        </button>
+      </li>
+    ))}
+  </ol>
+</figure>
+
+<style>
+  .tour { margin: 40px 0 0; }
+  .shot { position: relative; border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; background: #fff; }
+  .shot :global(img) { width: 100%; }
+  .dot {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 32px; height: 32px; border-radius: 999px; border: 2px solid #fff;
+    background: var(--accent); color: #fff; font: inherit; font-size: 13px; font-weight: 700;
+    display: grid; place-items: center; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(27, 26, 23, 0.3);
+    transition: transform 0.2s, background 0.2s;
+  }
+  .dot::after { content: ''; position: absolute; inset: -6px; border-radius: 999px; border: 2px solid var(--accent); opacity: 0; animation: ping 2.4s ease-out infinite; animation-delay: calc(var(--n) * 0.3s); }
+  @keyframes ping { 0% { opacity: 0.7; transform: scale(0.7); } 70%, 100% { opacity: 0; transform: scale(1.5); } }
+  .dot:hover, .dot.active { transform: translate(-50%, -50%) scale(1.15); background: var(--ink); }
+  .dot.active::after { animation: none; }
+
+  .notes { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
+  .note {
+    width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
+    display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start;
+    padding: 12px 14px; border-radius: var(--radius); border: 1px solid transparent; background: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .note:hover { background: var(--paper-2); }
+  .note.active { background: var(--paper-2); border-color: var(--accent); }
+  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent-soft); color: #8f2f08; font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+  .note.active .num { background: var(--accent); color: #fff; }
+  .note b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 2px; }
+  .note span:last-child { font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+
+  @media (max-width: 700px) {
+    .dot { width: 24px; height: 24px; font-size: 11px; border-width: 1.5px; }
+    .notes { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  // Selecting a dot highlights its note, and the reverse.
+  document.querySelectorAll<HTMLElement>('[data-tour]').forEach((tour) => {
+    const dots = Array.from(tour.querySelectorAll<HTMLButtonElement>('.dot'));
+    const notes = Array.from(tour.querySelectorAll<HTMLButtonElement>('.note'));
+    const select = (index: number, fromDot: boolean) => {
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      notes.forEach((note, i) => {
+        note.classList.toggle('active', i === index);
+        note.setAttribute('aria-pressed', String(i === index));
+      });
+      if (fromDot && window.matchMedia('(max-width: 700px)').matches) {
+        notes[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    };
+    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i, true)));
+    notes.forEach((note, i) => note.addEventListener('click', () => select(i, false)));
+    select(0, false);
+  });
+</script>

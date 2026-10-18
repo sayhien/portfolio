@@ -188,7 +188,7 @@ const next: NextLink[] = [
   ]}
   sections={sections}
   next={next}
-  heroField="scatter"
+  heroField={{ mode: 'converge', video: 'river' }}
 >
   <Image
     slot="hero"
@@ -274,7 +274,7 @@ const next: NextLink[] = [
     <EsgHierarchy />
   </section>
 
-  <FlowField mode="flow" class="chapter-band">
+  <FlowField mode="braid" video="grass" class="chapter-band">
     <div class="chapter">
       <p class="chapter-eyebrow">From research to product</p>
       <p class="chapter-line">Requirements set. Now the product takes shape.</p>
@@ -361,7 +361,7 @@ const next: NextLink[] = [
   </section>
 
   <section id="challenges" class="sec learn-sec">
-    <FlowField mode="loop" class="learn-band">
+    <FlowField mode="cycle" video="forest" class="learn-band">
       <div class="learn-head">
         <p class="sn">{n('challenges')}</p>
         <h2>Challenges and Learnings</h2>
@@ -448,11 +448,11 @@ const next: NextLink[] = [
   .st-red { --tone: var(--danger); } .st-amber { --tone: var(--warn); } .st-orange { --tone: var(--accent); }
 
   :global(.chapter-band) { margin: 8px calc(var(--gutter) * -1) 8px -48px; }
-  .chapter { max-width: 640px; margin: 0 auto; padding: 48px 32px; text-align: center; background: radial-gradient(closest-side, var(--bg) 60%, rgba(15, 18, 22, 0)); }
+  .chapter { max-width: 640px; margin: 0 auto; padding: 48px 32px; text-align: center; background: radial-gradient(closest-side, rgba(15, 18, 22, 0.8) 45%, rgba(15, 18, 22, 0)); }
   .chapter-eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
   .chapter-line { font-family: var(--display); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.12; letter-spacing: -0.02em; color: var(--text); text-wrap: balance; }
   .learn-sec { padding-top: 0; }
-  :global(.learn-band) { margin: 0 calc(var(--gutter) * -1) 24px 0; min-height: 360px !important; }
+  :global(.learn-band) { margin: 0 calc(var(--gutter) * -1) 24px 0; min-height: 500px !important; }
   .learn-head { max-width: 460px; padding: 56px 0; }
   .learn-sub { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 420px; margin-top: 4px; }
   .challenges { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 16px; }
@@ -489,7 +489,8 @@ const next: NextLink[] = [
   }
   @media (max-width: 700px) {
     .logos, .flow, .personas { grid-template-columns: minmax(0, 1fr); }
-    :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); }
+    :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); min-height: 560px !important; align-items: start !important; }
+    .chapter { padding-top: 56px; }
     :global(.learn-band) { margin-left: calc(var(--gutter) * -1); padding-left: var(--gutter); }
     :global(.learn-band) { min-height: 600px !important; align-items: start !important; }
     .learn-head { padding: 40px 0; }

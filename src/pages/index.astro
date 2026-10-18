@@ -1,15 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import ProjectTile from '../components/ProjectTile.astro';
-import FlowField from '../components/FlowField.astro';
 import { site, projects } from '../data/site';
 
 const left = projects.filter((_, i) => i % 2 === 0);
 const right = projects.filter((_, i) => i % 2 === 1);
 ---
 <Base title={`${site.name}, UI/UX Designer`}>
-  <div class="hero-zone">
-  <FlowField mode="scatter" layout="background" />
   <section class="wrap hero">
     <div class="hero-main">
       <p class="eyebrow">{site.role}</p>
@@ -17,7 +14,6 @@ const right = projects.filter((_, i) => i % 2 === 1);
     </div>
     <p class="hero-intro">{site.intro}</p>
   </section>
-  </div>
 
   <section class="wrap work" id="work" aria-labelledby="work-title">
     <div class="work-head">
@@ -36,7 +32,6 @@ const right = projects.filter((_, i) => i % 2 === 1);
 </Base>
 
 <style>
-  .hero-zone { position: relative; }
   .hero {
     position: relative;
     z-index: 1;

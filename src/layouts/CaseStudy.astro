@@ -3,7 +3,7 @@ import Base from './Base.astro';
 import MotionToggle from '../components/MotionToggle.astro';
 import CaseIcon from '../components/CaseIcon.astro';
 import FlowField from '../components/FlowField.astro';
-import type { FlowMode } from '../components/flowfield';
+import type { FlowMode, Footage } from '../components/flowfield';
 import type { CaseIconKind } from '../components/CaseIcon.astro';
 
 export type Meta = { label: string; value: string };
@@ -18,7 +18,7 @@ interface Props {
   meta: Meta[];
   sections: Section[];
   next?: NextLink[];
-  heroField?: FlowMode;
+  heroField?: { mode: FlowMode; video?: Footage };
 }
 const { title, kicker, heading, lede, meta, sections, next = [], heroField } = Astro.props;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
@@ -26,7 +26,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 <Base title={title} description={lede}>
   <article>
     <div class="hero-zone">
-    {heroField && <FlowField mode={heroField} layout="background" />}
+    {heroField && <FlowField mode={heroField.mode} video={heroField.video} layout="background" />}
     <header class="wrap cs-hero">
       <p class="eyebrow">{kicker}</p>
       <h1>{heading}</h1>
@@ -91,7 +91,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 
 <style>
   .hero-zone { position: relative; }
-  .cs-hero { position: relative; z-index: 1; padding-top: 88px; padding-bottom: 56px; }
+  .cs-hero { position: relative; z-index: 1; padding-top: 120px; padding-bottom: 120px; }
+  @media (max-width: 760px) { .cs-hero { padding-top: 64px; padding-bottom: 300px; } }
   .cs-hero .eyebrow { margin-bottom: 24px; }
   h1 { font-size: clamp(40px, 5.2vw, 76px); line-height: 1.02; max-width: 1040px; }
   .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: var(--text-2); max-width: 780px; margin-top: 28px; }

@@ -2,8 +2,8 @@
 import Base from './Base.astro';
 import MotionToggle from '../components/MotionToggle.astro';
 import CaseIcon from '../components/CaseIcon.astro';
-import FlowField from '../components/FlowField.astro';
-import type { FlowMode, Footage } from '../components/flowfield';
+import EarthScene from '../components/EarthScene.astro';
+import type { EarthMode } from '../components/earth-scenes';
 import type { CaseIconKind } from '../components/CaseIcon.astro';
 
 export type Meta = { label: string; value: string };
@@ -18,15 +18,15 @@ interface Props {
   meta: Meta[];
   sections: Section[];
   next?: NextLink[];
-  heroField?: { mode: FlowMode; video?: Footage };
+  heroScene?: EarthMode;
 }
-const { title, kicker, heading, lede, meta, sections, next = [], heroField } = Astro.props;
+const { title, kicker, heading, lede, meta, sections, next = [], heroScene } = Astro.props;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
 <Base title={title} description={lede}>
   <article>
     <div class="hero-zone">
-    {heroField && <FlowField mode={heroField.mode} video={heroField.video} layout="background" />}
+    {heroScene && <EarthScene mode={heroScene} layout="background" />}
     <header class="wrap cs-hero">
       <p class="eyebrow">{kicker}</p>
       <h1>{heading}</h1>

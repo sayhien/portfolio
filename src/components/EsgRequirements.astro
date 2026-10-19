@@ -1,5 +1,5 @@
 ---
-// Key requirements as a checklist that ticks itself when it scrolls in,
+// Key requirements as a numbered list that inks in when it scrolls in,
 // with a small looping scene beside each requirement.
 const requirements = [
   'Support for both GRI and IFRS frameworks',
@@ -12,7 +12,7 @@ const requirements = [
 <ul class="req" data-requirements>
   {requirements.map((text, index) => (
     <li style={`--n:${index}`}>
-      <span class="box" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
+      <span class="box" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
       <span class="t">{text}</span>
       <div class="vig" aria-hidden="true">
         {index === 0 && (
@@ -67,16 +67,12 @@ const requirements = [
   .req li { display: grid; grid-template-columns: 26px minmax(0, 1fr) 128px; gap: 18px; align-items: center; padding: 8px 0; }
   .t { font-size: 17px; }
   .vig { aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 6px; }
-  .box { width: 26px; height: 26px; border-radius: 7px; border: 1.6px solid var(--accent); display: grid; place-items: center; background: var(--accent); }
-  .box svg { width: 16px; height: 16px; fill: none; stroke: var(--on-accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; }
+  .box { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
 
   /* Ticks play once when the list scrolls in */
-  .play .box { animation: fill-box 0.35s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.1s); }
-  .play .box svg { animation: draw 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.3s); }
+  .play .box { animation: ink 0.35s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.1s); }
   .play .t { animation: ink 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.2s); }
   .play .vig { animation: rise 0.5s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.15s); }
-  @keyframes fill-box { from { background: var(--surface); border-color: var(--line-2); } }
-  @keyframes draw { from { stroke-dashoffset: 20; } }
   @keyframes ink { from { color: var(--muted); } }
   @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 

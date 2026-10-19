@@ -6,6 +6,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 import { site } from '../data/site';
+import BeeGarden from '../components/BeeGarden.astro';
 
 interface Props {
   title: string;
@@ -66,6 +67,7 @@ const year = new Date().getFullYear();
             <li><span>Resume</span><a href={site.resume} target="_blank" rel="noopener">View resume</a></li>
           </ul>
         </div>
+        <BeeGarden />
         <p class="copyright">&copy; {year} {site.name}</p>
       </div>
     </footer>
@@ -148,7 +150,7 @@ const year = new Date().getFullYear();
   .foot-links span { color: var(--muted); font-size: 14px; }
   .foot-links a { text-decoration: none; font-weight: 500; }
   .foot-links a:hover { color: var(--accent); }
-  .copyright { font-size: 14px; color: var(--muted); padding-bottom: 40px; }
+  .copyright { font-size: 14px; color: var(--muted); padding: 20px 0 40px; }
   @media (max-width: 900px) {
     .foot-grid { grid-template-columns: minmax(0, 1fr); }
   }

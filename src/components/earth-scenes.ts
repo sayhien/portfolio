@@ -66,13 +66,13 @@ float hidden(vec3 p, vec3 C, float R){
 }
 `;
 
-// Every particle gathers from a loose cloud into place over the first few seconds
+// Every particle gathers from a loose cloud into place within about three and a half seconds
 const MAIN = `
 void main(){
   vec3 col; float a;
   vec3 p = scene(aSeed, aIdx, uT, col, a);
   vec3 start = sph(aSeed.zw)*(700. + aSeed.x*700.);
-  float e = clamp((uT - aSeed.w*2.2)/3.2, 0., 1.); e = e*e*(3.-2.*e);
+  float e = clamp((uT - aSeed.w*1.47)/2.13, 0., 1.); e = e*e*(3.-2.*e);
   p = mix(start, p, e);
   a *= mix(.25, 1., e);
   vec4 vp = uView*vec4(p, 1.);
@@ -179,8 +179,8 @@ vec3 scene(vec4 s, float idx, float t, out vec3 col, out float a){
 
 export const SCENES: Record<EarthMode, EarthSceneDef> = {
   globe: {
-    count: 140000,
-    surface: 110000,
+    count: 96000,
+    surface: 80000,
     camera: (t, narrow) => ({
       eye: [Math.sin(t * 0.02) * 160, 80, 1500],
       target: [0, 0, 0],
@@ -191,8 +191,8 @@ export const SCENES: Record<EarthMode, EarthSceneDef> = {
     glsl: GLOBE,
   },
   arcs: {
-    count: 84000,
-    surface: 48000,
+    count: 62000,
+    surface: 38000,
     camera: (t) => ({ eye: [Math.sin(t * 0.02) * 120, 110, 900], target: [0, -50, -420], fov: 46, shift: [0, 0] }),
     glsl: ARCS,
   },

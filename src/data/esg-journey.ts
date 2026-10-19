@@ -1,6 +1,7 @@
 // Unified journey map for the ESG case study, transcribed from the
 // original journey map image so it can be rendered as readable HTML.
 import type { ImageMetadata } from 'astro';
+import type { IconName } from '../components/Icon.astro';
 import stage1 from '../assets/esg/journey/stage-1.png';
 import stage2 from '../assets/esg/journey/stage-2.png';
 import stage3 from '../assets/esg/journey/stage-3.png';
@@ -17,6 +18,8 @@ export type JourneyStage = {
   actors: string;
   tools: string;
   meetings: string;
+  /** Icon shown on the meeting tag; stages without a meeting leave it out. */
+  meetingIcon?: IconName;
   painPoints: string[];
   opportunities: string[];
 };
@@ -26,9 +29,10 @@ export const journeyStages: JourneyStage[] = [
     name: 'Planning and Initiation',
     description: 'Start reporting cycle, notify departments, set goals.',
     image: stage1,
-    actors: 'ESG Manager',
-    tools: 'Email, in-app alerts, scheduling',
+    actors: 'ESG Manager, Department heads, Senior management',
+    tools: 'Email, In-app alerts, Scheduling',
     meetings: 'Kick-off meeting for goal setting',
+    meetingIcon: 'flag',
     painPoints: [
       'Lack of clear communication about roles and responsibilities',
       'Departments not understanding their specific GRI reporting requirements',
@@ -44,9 +48,10 @@ export const journeyStages: JourneyStage[] = [
     name: 'Data Collection',
     description: 'Departments collect data per GRI responsibilities.',
     image: stage2,
-    actors: 'Department heads',
-    tools: 'Surveys, assessments, external data',
+    actors: 'Department heads, Department staff',
+    tools: 'Surveys, Assessments, External data',
     meetings: 'Departmental data collection meeting',
+    meetingIcon: 'users',
     painPoints: [
       'Suppliers not providing timely or accurate data',
       'Difficulty in collecting data from multiple sites or regions',
@@ -64,7 +69,7 @@ export const journeyStages: JourneyStage[] = [
     description: 'Enter data into ESG module, guided by GRI forms.',
     image: stage3,
     actors: 'Department staff',
-    tools: 'ERP ESG module, input forms',
+    tools: 'ERP ESG module, Input forms',
     meetings: 'None',
     painPoints: [
       'Complex or unclear input forms, data entry errors',
@@ -83,8 +88,9 @@ export const journeyStages: JourneyStage[] = [
     description: 'Review and validate data, resolve discrepancies.',
     image: stage4,
     actors: 'Department staff, ESG Manager',
-    tools: 'Validation tools, collaboration',
+    tools: 'Validation tools, Collaboration',
     meetings: 'Cross department validation meeting',
+    meetingIcon: 'shield',
     painPoints: [
       'Discrepancies in data between departments',
       'Missing data or incomplete fields',
@@ -121,9 +127,10 @@ export const journeyStages: JourneyStage[] = [
     name: 'Review and Approval',
     description: 'Departments and senior management review, address issues.',
     image: stage6,
-    actors: 'Department heads, senior management',
-    tools: 'Document review, meeting tools',
+    actors: 'Department heads, Senior management',
+    tools: 'Document review, Meeting tools',
     meetings: 'Final review and approval meeting',
+    meetingIcon: 'badge',
     painPoints: [
       'Delays in the approval process due to unclear workflows',
       'Confusion over who is responsible for what',
@@ -141,7 +148,7 @@ export const journeyStages: JourneyStage[] = [
     description: 'Add narratives, format report per GRI, final checks.',
     image: stage7,
     actors: 'ESG Manager',
-    tools: 'Report generation, formatting tools',
+    tools: 'Report generation, Formatting tools',
     meetings: 'None',
     painPoints: [
       'Time consuming to write narratives and explanations',
@@ -160,7 +167,7 @@ export const journeyStages: JourneyStage[] = [
     description: 'Publish or submit report, archive for future reference.',
     image: stage8,
     actors: 'ESG Manager',
-    tools: 'Website, regulatory portals',
+    tools: 'Website, Regulatory portals',
     meetings: 'None',
     painPoints: [
       'Manual submission processes leading to delays',

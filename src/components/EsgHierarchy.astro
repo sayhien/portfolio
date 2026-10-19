@@ -35,7 +35,7 @@ const frameworks = [
 const sharedTemplate = [
   { name: 'Theme', description: 'A broad ESG area' },
   { name: 'Topic', description: 'A specific subject' },
-  { name: 'Data point', description: 'One value to report' },
+  { name: 'Data point', description: 'Value(s) to report' },
 ];
 ---
 <figure class="ia">
@@ -70,7 +70,7 @@ const sharedTemplate = [
             <td data-layer={layers[index]}>
               <div class="card">
                 <span class="term">{level.term}</span>
-                <span class="eg"><span class="eg-lbl">e.g.</span> {level.example}</span>
+                <span class="eg"><span class="eg-lbl">For example</span>{level.example}</span>
               </div>
             </td>
           ))}
@@ -108,9 +108,9 @@ const sharedTemplate = [
     background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 14px 16px;
     box-shadow: 5px 5px 0 -1px var(--surface), 5px 5px 0 0 var(--line-2), 10px 10px 0 -1px var(--surface), 10px 10px 0 0 var(--line-2);
   }
-  .term { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); }
-  .eg { font-size: 14px; line-height: 1.45; color: var(--text-2); }
-  .eg-lbl { color: var(--accent); font-weight: 600; }
+  .term { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .eg { display: grid; gap: 2px; font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--text); }
+  .eg-lbl { font-size: 12px; font-weight: 500; color: var(--accent); }
 
   /* Arrow from one layer to the next */
   .fw-body td:not(:last-child)::after {

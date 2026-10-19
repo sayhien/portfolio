@@ -11,7 +11,6 @@ const { answer } = Astro.props;
   <ul class="plist">
     <li>
       <div class="vig" aria-hidden="true">
-        <span class="badge"><svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" /></svg></span>
         <svg class="ill" viewBox="0 0 160 120">
           <g class="prob">
             <rect class="vf" x="44" y="72" width="72" height="13" rx="3" />
@@ -25,8 +24,6 @@ const { answer } = Astro.props;
             <rect class="vf" x="50" y="38" width="42" height="6" rx="3" />
             <rect class="vw" x="50" y="50" width="60" height="10" rx="3" />
             <rect class="vw" x="50" y="66" width="60" height="10" rx="3" />
-            <circle class="vgf" cx="118" cy="28" r="10" />
-            <path class="tick" d="m113 28 3.5 3.5 6-7" />
             <text class="vtg" x="80" y="104" text-anchor="middle">Guided form</text>
           </g>
         </svg>
@@ -35,7 +32,6 @@ const { answer } = Astro.props;
     </li>
     <li>
       <div class="vig" aria-hidden="true">
-        <span class="badge"><svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" /></svg></span>
         <svg class="ill" viewBox="0 0 160 120">
           <circle class="vf" cx="34" cy="48" r="12" /><path class="vf" d="M14 88a20 20 0 0 1 40 0Z" />
           <circle class="vf" cx="126" cy="48" r="12" /><path class="vf" d="M106 88a20 20 0 0 1 40 0Z" />
@@ -56,7 +52,6 @@ const { answer } = Astro.props;
     </li>
     <li>
       <div class="vig" aria-hidden="true">
-        <span class="badge"><svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" /></svg></span>
         <svg class="ill" viewBox="0 0 160 120">
           <g class="prob">
             <rect class="vf" x="20" y="58" width="120" height="14" rx="7" />
@@ -78,7 +73,6 @@ const { answer } = Astro.props;
     </li>
     <li>
       <div class="vig" aria-hidden="true">
-        <span class="badge"><svg viewBox="0 0 12 12"><path d="M3.5 3.5l5 5M8.5 3.5l-5 5" /></svg></span>
         <svg class="ill" viewBox="0 0 160 120">
           <g class="boxl"><rect class="vf" x="14" y="38" width="50" height="40" rx="6" /><text class="vtx" x="39" y="62" text-anchor="middle">ERP</text></g>
           <g class="boxr"><rect class="vf" x="96" y="38" width="50" height="40" rx="6" /><text class="vtx" x="121" y="62" text-anchor="middle">ESG tool</text></g>
@@ -96,10 +90,7 @@ const { answer } = Astro.props;
       <p>Exist as standalone systems, disconnected from operational data</p>
     </li>
   </ul>
-  <p class="answer">
-    <span class="answer-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg></span>
-    {answer}
-  </p>
+  <p class="answer">{answer}</p>
 </div>
 
 <style>
@@ -108,8 +99,6 @@ const { answer } = Astro.props;
   .plist li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; align-items: center; }
   .plist p { font-size: 17px; color: var(--text-2); }
   .vig { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 4px; }
-  .badge { position: absolute; right: -6px; top: -6px; width: 22px; height: 22px; border-radius: 999px; background: var(--accent); border: 2px solid var(--bg); display: grid; place-items: center; }
-  .badge svg { width: 12px; height: 12px; stroke: var(--on-accent); stroke-width: 2.4; fill: none; stroke-linecap: round; }
   .ill { width: 100%; height: 100%; display: block; overflow: visible; }
   .ill :global(*) { transform-box: fill-box; transform-origin: center; }
 
@@ -125,7 +114,6 @@ const { answer } = Astro.props;
   .vaf { fill: var(--accent); }
   .vif { fill: var(--info); }
   .vstall { fill: var(--line-2); }
-  .tick { fill: none; stroke: var(--on-accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   .vtx { font-family: var(--sans); font-size: 10px; fill: var(--muted); }
   .vtb { font-family: var(--sans); font-size: 11px; font-weight: 700; fill: var(--accent); }
   .vtg { font-family: var(--sans); font-size: 10px; font-weight: 700; fill: var(--accent); }
@@ -144,9 +132,7 @@ const { answer } = Astro.props;
   @keyframes merge-left { 0%, 42% { transform: none; } 52%, 92% { transform: translateX(22px); } 100% { transform: none; } }
   @keyframes merge-right { 0%, 42% { transform: none; } 52%, 92% { transform: translateX(-22px); } 100% { transform: none; } }
 
-  .answer { display: flex; gap: 14px; align-items: center; background: var(--accent-soft); color: var(--text); border-radius: var(--radius); padding: 16px 18px; font-weight: 600; line-height: 1.5; }
-  .answer-icon { width: 40px; height: 40px; border-radius: 999px; background: var(--accent); display: grid; place-items: center; flex: none; }
-  .answer-icon svg { width: 22px; height: 22px; fill: none; stroke: var(--on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .answer { background: var(--accent-soft); border-left: 3px solid var(--accent); color: var(--text); border-radius: var(--radius); padding: 16px 20px; font-weight: 600; line-height: 1.5; }
 
   @media (max-width: 600px) {
     .plist li { grid-template-columns: 120px minmax(0, 1fr); gap: 14px; }

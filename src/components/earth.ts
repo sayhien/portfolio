@@ -1,7 +1,8 @@
 // WebGL renderer for the particle earth scenes in earth-scenes.ts.
 // A scene draws only while it is on screen and the page is not paused.
 // Reduced motion shows one finished still frame. The cursor has no effect.
-import { isPaused, prefersReducedMotion } from './motion';
+import { prefersReducedMotion } from './motion';
+import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
 import { FRAGMENT, SCENES, vertexSource } from './earth-scenes';
 import type { Camera, EarthMode } from './earth-scenes';
 import { LAND_HEIGHT, LAND_MASK, LAND_WIDTH } from '../data/land-mask';
@@ -9,7 +10,9 @@ import { LAND_HEIGHT, LAND_MASK, LAND_WIDTH } from '../data/land-mask';
 export type { EarthMode };
 
 const STILL_TIME = 40; // seconds in, once every particle has settled
-const MAX_DPR = 2;
+const MAX_DPR = 1.5;
+const SLOW_FRAME = 0.024; // seconds; slower than about 40 frames a second
+const SAMPLE_FRAMES = 90;
 const NARROW_QUERY = '(max-width: 760px)';
 const PHONE_SCALE = 0.55; // fewer particles on small screens
 
@@ -49,34 +52,6 @@ function lookAt(eye: number[], target: number[]): Float32Array {
   return new Float32Array([x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, eye), -dot(y, eye), -dot(z, eye), 1]);
 }
 
-function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
-  const shader = gl.createShader(type);
-  if (!shader) throw new Error('Could not create shader');
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader) || 'Shader failed');
-  return shader;
-}
-
-function createProgram(gl: WebGLRenderingContext, mode: EarthMode): WebGLProgram {
-  const program = gl.createProgram();
-  if (!program) throw new Error('Could not create program');
-  gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, vertexSource(mode)));
-  gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, FRAGMENT));
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'Link failed');
-  return program;
-}
-
-function uploadAttribute(gl: WebGLRenderingContext, program: WebGLProgram, name: string, data: Float32Array, size: number) {
-  const location = gl.getAttribLocation(program, name);
-  if (location < 0) return; // unused by this scene
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(location);
-  gl.vertexAttribPointer(location, size, gl.FLOAT, false, 0, 0);
-}
-
 function uploadParticles(gl: WebGLRenderingContext, program: WebGLProgram, count: number, surface: number) {
   const seeds = new Float32Array(count * 4);
   for (let i = 0; i < seeds.length; i++) seeds[i] = Math.random();
@@ -108,7 +83,7 @@ export function startEarth(host: HTMLElement, canvas: HTMLCanvasElement, mode: E
 
   let program: WebGLProgram;
   try {
-    program = createProgram(gl, mode);
+    program = buildProgram(gl, vertexSource(mode), FRAGMENT);
   } catch (error) {
     console.warn(`Earth scene "${mode}" could not start`, error);
     return false;
@@ -129,7 +104,7 @@ export function startEarth(host: HTMLElement, canvas: HTMLCanvasElement, mode: E
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE); // additive light
 
-  const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+  let dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
   const resize = () => {
     canvas.width = Math.round(host.clientWidth * dpr);
     canvas.height = Math.round(host.clientHeight * dpr);
@@ -156,23 +131,29 @@ export function startEarth(host: HTMLElement, canvas: HTMLCanvasElement, mode: E
   }
   new ResizeObserver(resize).observe(host);
 
-  let time = 0, last = 0, visible = false, frame = 0, lost = false;
-  const loop = (now: number) => {
-    frame = 0;
-    if (!visible || isPaused() || lost) return;
-    time += Math.min(0.05, (now - (last || now)) / 1000);
-    last = now;
-    draw(time);
-    frame = requestAnimationFrame(loop);
+  // Slow devices step down: first a lower resolution, then half the frame rate.
+  let quality = 0, sampled = 0, sampleTime = 0, skip = false;
+  const adapt = (dt: number) => {
+    if (quality >= 2 || dt <= 0) return;
+    sampled++; sampleTime += dt;
+    if (sampled < SAMPLE_FRAMES) return;
+    const slow = sampleTime / sampled > SLOW_FRAME;
+    sampled = 0; sampleTime = 0;
+    if (!slow) { quality = 2; return; }
+    quality++;
+    if (quality === 1 && dpr > 1) { dpr = 1; resize(); }
+    else { quality = 2; skip = true; }
   };
-  const sync = () => {
-    if (visible && !isPaused() && !lost && !frame) { last = 0; frame = requestAnimationFrame(loop); }
-  };
-  new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { rootMargin: '100px' }).observe(host);
-  new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-motion'] });
+
+  let time = 0, odd = false;
+  const stop = animateWhileVisible(host, (dt) => {
+    time += dt;
+    odd = !odd;
+    if (!skip || odd) { draw(time); adapt(skip ? dt * 2 : dt); }
+  });
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();
-    lost = true;
+    stop();
     console.warn(`Earth scene "${mode}" lost its graphics context and stopped`);
   });
   return true;

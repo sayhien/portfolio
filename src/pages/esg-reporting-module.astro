@@ -110,12 +110,12 @@ const reviewFeatures: Feature[] = [
   { icon: 'badge', text: 'Identify users for accountability' },
 ];
 const dashboardSpots: Hotspot[] = [
-  { x: 1.6, y: 6.6, title: 'Reporting cycle', text: 'Deadline, standards in scope and overall progress for the quarter, at a glance.' },
+  { x: 1.6, y: 6.6, place: 'below', title: 'Reporting cycle', text: 'Deadline, standards in scope and overall progress for the quarter, at a glance.' },
   { x: 28.4, y: 15.3, title: 'Status cards', text: 'Completed, in progress and not done counts, each with a filter to drill in.' },
-  { x: 82.8, y: 15.3, title: 'Status distribution', text: 'The same split as one donut, so the balance is clear in a second.' },
+  { x: 82.8, y: 15.3, align: 'end', title: 'Status distribution', text: 'The same split as one donut, so the balance is clear in a second.' },
   { x: 1.6, y: 37.1, title: 'Compliance confidence', text: 'A readiness score built from completion rate, data quality and review status.' },
   { x: 33.9, y: 37.1, title: 'Upcoming deadlines', text: 'The next due standards, with urgent dates in red.' },
-  { x: 66.2, y: 37.1, title: 'User workload', text: 'Who is overloaded or overdue, with a shortcut to reassign tasks.' },
+  { x: 66.2, y: 37.1, align: 'end', title: 'User workload', text: 'Who is overloaded or overdue, with a shortcut to reassign tasks.' },
   { x: 1.6, y: 53.2, title: 'Progress tracker', text: 'Every standard with its status, owner and permissions. Synchronise data and Assign user start here.' },
 ];
 
@@ -190,15 +190,23 @@ const next: NextLink[] = [
   next={next}
   heroScene="globe"
 >
-  <Image
-    slot="hero"
-    src={hero}
-    alt="The GRI 2 General Disclosures reporting screen with a disclosure progress sidebar, input fields and requirement guidance, overlaid with the compliance confidence and status distribution cards"
-    widths={[640, 1000, 1360]}
-    sizes="(max-width: 1440px) 100vw, 1312px"
-    loading="eager"
-    class="hero-img"
-  />
+  <figure slot="hero" class="hero-fig">
+    <Image
+      src={hero}
+      alt="The GRI 2 General Disclosures reporting screen with a disclosure progress sidebar, input fields and requirement guidance, overlaid with the compliance confidence and status distribution cards"
+      widths={[640, 1000, 1360]}
+      sizes="(max-width: 1440px) 100vw, 1312px"
+      loading="eager"
+      class="hero-img"
+    />
+    <figcaption class="hero-cap">
+      <p class="hero-cap-title">Where sustainability data goes in</p>
+      <p>Each field asks for one piece of data, laid out the way the GRI or IFRS standard asks for it. Small answers do not stay small. They add up with every other answer into the numbers managers act on, such as status, progress and compliance confidence.</p>
+      <ol class="rollup" aria-label="How one answer rolls up">
+        <li>One answer</li><li>Requirement</li><li>Disclosure</li><li>Standard</li><li class="rollup-end">Status and confidence</li>
+      </ol>
+    </figcaption>
+  </figure>
 
   <section id="introduction" class="sec">
     <p class="sn">{n('introduction')}</p>
@@ -291,7 +299,7 @@ const next: NextLink[] = [
       alt="ESG dashboard for the Q2 2025 reporting cycle, with completed, in progress and not done counts, a status distribution donut, compliance confidence of 82 percent, upcoming deadlines, user workload and the GRI Standards Progress Tracker table"
       spots={dashboardSpots}
     />
-    <p class="hint">Tap a number to see what each part of the dashboard does.</p>
+    <p class="hint">Select a number to see what each part of the dashboard does.</p>
   </section>
 
   <section id="user-assignment" class="sec">
@@ -375,7 +383,7 @@ const next: NextLink[] = [
           <dl class="flow">
             <div><dt><Icon name="alert" size={14} />Challenge</dt><dd>{c.challenge}</dd></div>
             <div><dt><Icon name="bulb" size={14} />Solution</dt><dd>{c.solution}</dd></div>
-            <div><dt><Icon name="check" size={14} />Result</dt><dd>{c.result}</dd></div>
+            <div><dt><Icon name="target" size={14} />Result</dt><dd>{c.result}</dd></div>
           </dl>
           <p class:list={['stamp', `tone-${c.status.tone}`]}>
             <span class="visually-hidden">Status: </span>{c.status.label}{c.status.note && <small>{c.status.note}</small>}
@@ -393,7 +401,19 @@ const next: NextLink[] = [
 </script>
 
 <style>
+  .hero-fig { margin: 0; }
   :global(.hero-img) { width: 100%; }
+  .hero-cap { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 12px 48px; margin-top: 28px; align-items: start; }
+  .hero-cap-title { font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+  .hero-cap p:not(.hero-cap-title) { font-size: 17px; line-height: 1.6; color: var(--text-2); grid-column: 2; grid-row: 1 / span 2; }
+  .rollup { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .rollup li { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .rollup li + li::before { content: '→' / ''; color: var(--accent); }
+  .rollup-end { color: var(--accent) !important; font-weight: 500; }
+  @media (max-width: 800px) {
+    .hero-cap { grid-template-columns: minmax(0, 1fr); }
+    .hero-cap p:not(.hero-cap-title) { grid-column: 1; grid-row: auto; }
+  }
 
   .sec { padding: 72px 0; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
   .sec:first-child { border-top: 0; padding-top: 0; }
@@ -425,8 +445,7 @@ const next: NextLink[] = [
   .logos b { color: var(--text); }
 
   .personas { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 20px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; transition: border-color 0.2s, transform 0.3s; }
-  .persona:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 20px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
   .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
   .p-body { display: grid; gap: 6px; }
   .persona h3 { font-size: 22px; }

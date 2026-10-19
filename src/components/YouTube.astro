@@ -2,6 +2,7 @@
 // Lightweight YouTube embed: shows a poster first and only loads the
 // player when it scrolls into view, then autoplays muted on loop like a
 // GIF, the same way the prototype videos behaved on the Framer site.
+// Players far off screen are closed again to keep scrolling smooth.
 interface Props {
   id: string;
   title: string;
@@ -68,29 +69,39 @@ const watch = `https://www.youtube.com/watch?v=${id}`;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   }
   .play:hover { background: #fff; }
+  .play[hidden] { display: none; }
   figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
   figcaption a { color: var(--text-2); }
 </style>
 
 <script>
+  // Players load when they scroll near, and close again once far off screen,
+  // so only one or two YouTube players are ever running at once.
   function load(frame: HTMLElement) {
-    if (frame.dataset.loaded) return;
-    frame.dataset.loaded = '1';
-    const f = document.createElement('iframe');
-    f.src = frame.dataset.src!;
-    f.title = frame.dataset.title!;
-    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-    frame.querySelector('.play')?.remove();
-    frame.appendChild(f);
+    if (frame.querySelector('iframe')) return;
+    const iframe = document.createElement('iframe');
+    iframe.src = frame.dataset.src!;
+    iframe.title = frame.dataset.title!;
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    frame.querySelector<HTMLElement>('.play')?.setAttribute('hidden', '');
+    frame.appendChild(iframe);
+  }
+  function unload(frame: HTMLElement) {
+    frame.querySelector('iframe')?.remove();
+    frame.querySelector<HTMLElement>('.play')?.removeAttribute('hidden');
   }
   const frames = document.querySelectorAll<HTMLElement>('.yt .frame');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  frames.forEach((fr) => fr.querySelector('.play')?.addEventListener('click', () => load(fr)));
+  frames.forEach((frame) => frame.querySelector('.play')?.addEventListener('click', () => load(frame)));
   if (!reduce && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { load(e.target as HTMLElement); io.unobserve(e.target); } }),
-      { rootMargin: '200px' },
+    const near = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => { if (entry.isIntersecting) load(entry.target as HTMLElement); }),
+      { rootMargin: '150px' },
     );
-    frames.forEach((fr) => io.observe(fr));
+    const far = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => { if (!entry.isIntersecting) unload(entry.target as HTMLElement); }),
+      { rootMargin: '800px' },
+    );
+    frames.forEach((frame) => { near.observe(frame); far.observe(frame); });
   }
 </script>

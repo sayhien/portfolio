@@ -79,7 +79,7 @@ const splitList = (value: string) => value.split(', ');
             <h4 class="row-label">Meetings</h4>
             {stage.meetings === 'None'
               ? <p class="none">No meeting</p>
-              : <p class="meet"><Icon name="calendar" size={16} />{stage.meetings}</p>}
+              : <ul class="chips meet"><li><Icon name={stage.meetingIcon ?? 'calendar'} size={14} />{stage.meetings}</li></ul>}
           </div>
           <div class="cell pain">
             <h4 class="row-label">{labelOf('pain').label}</h4>
@@ -176,8 +176,8 @@ const splitList = (value: string) => value.split(', ');
   .desc p { color: var(--text); }
 
   .none { color: var(--muted); font-style: italic; }
-  .meet { display: flex; gap: 8px; align-items: flex-start; }
-  .meet :global(svg) { flex: none; margin-top: 3px; color: var(--accent); }
+  .meet li { border-radius: 10px; }
+  .meet :global(svg) { flex: none; }
   .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
   .chips li { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.3; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px 4px 8px; color: var(--text); }
   .chips :global(svg) { color: var(--accent); }

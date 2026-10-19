@@ -1,7 +1,6 @@
 ---
-// Feature list: each point gets its own meaningful icon, with a small
-// green check badge that marks it as a capability. Icons pop in and the
-// checks draw themselves once the list scrolls into view.
+// Feature list: each point gets its own meaningful icon.
+// Icons pop in once the list scrolls into view.
 import Icon from './Icon.astro';
 import type { IconName } from './Icon.astro';
 
@@ -16,7 +15,6 @@ const { items } = Astro.props;
     <li style={`--n:${index}`}>
       <span class="tile" aria-hidden="true">
         <Icon name={item.icon} size={20} />
-        <svg class="badge" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" /><path d="m5.5 9.3 2.3 2.3 4.4-4.8" /></svg>
       </span>
       <span class="text">{item.text}</span>
     </li>
@@ -27,18 +25,11 @@ const { items } = Astro.props;
   .features { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 14px; max-width: 700px; }
   .features li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; }
   .tile { position: relative; width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
-  .badge { position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; }
-  .badge circle { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
-  .badge path { fill: none; stroke: var(--on-accent); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 12; }
-  .text { color: var(--text-2); font-size: 16px; line-height: 1.5; }
+  .text { color: var(--text); font-size: 16px; line-height: 1.5; }
 
   .play .tile { animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) backwards; animation-delay: calc(var(--n) * 0.12s); }
-  .play .badge { animation: badge-in 0.3s ease-out backwards; animation-delay: calc(var(--n) * 0.12s + 0.35s); }
-  .play .badge path { animation: draw 0.3s ease-out backwards; animation-delay: calc(var(--n) * 0.12s + 0.5s); }
   .play .text { animation: slide 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.12s + 0.08s); }
   @keyframes pop { from { transform: scale(0.3) rotate(-20deg); opacity: 0; } }
-  @keyframes badge-in { from { transform: scale(0); } }
-  @keyframes draw { from { stroke-dashoffset: 12; } }
   @keyframes slide { from { opacity: 0; transform: translateX(-8px); } }
 </style>
 

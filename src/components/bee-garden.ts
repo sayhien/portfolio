@@ -2,7 +2,8 @@
 // first painted on a fine grid (hills, swaying grass, round flowers,
 // fireflies), then each grid cell scatters a few specks: bright cells keep
 // them all, dark cells none, so the moonlight builds up from density like a
-// stipple drawing. The bee and hearts are made of specks too. Tapping the bee (or the "say hello" button) makes it chirp,
+// stipple drawing. The bee and hearts are made of specks too. By day the sun
+// shines in a blue sky; by night the moon, stars and fireflies come out. Tapping the bee (or the "say hello" button) makes it chirp,
 // fly a loop and float up hearts.
 import { prefersReducedMotion } from './motion';
 import { animateWhileVisible } from './webgl-helpers';
@@ -11,8 +12,9 @@ import { Bee, TAU, type Flower, type Hill, type Land, type Meadow, clamp, flower
 const STILL_TIME = 7; // seconds in, for the reduced motion still picture
 const RENDERS_PER_SECOND = 30; // specks are placed by hand, so 30 a second keeps phones cool
 
-// Night Graphite with mint hills, yellow and orange flowers, a black and white bee.
-const PALETTE = {
+// Night: graphite sky, mint hills, the moon and fireflies.
+const NIGHT = {
+  day: false,
   ground: '#0f1216',
   sky: ['#0f1216', '#10161a', '#121b1d', '#142121', '#172826', '#1b302c'],
   hills: [
@@ -29,7 +31,32 @@ const PALETTE = {
   star: '#eceff3', starDim: '#3a4c47', moon: '#f6f3ea', moonShade: '#ffd9a0',
   bee: { wing: 'rgba(255, 255, 255, 0.88)', body: '#ffc94a', stripe: '#0b0e11', eye: '#ffffff' },
   heart: '#ff8a3d', fly: '#ffe2b0', flyGlow: '#8a5a3a', trail: '#ffc46b',
+  halo: '246, 243, 234', haloSize: 110,
 };
+type Scene = typeof NIGHT;
+
+// Day: a blue sky, greener hills and a warm shining sun, same flowers and bee.
+const DAY: Scene = {
+  ...NIGHT,
+  day: true,
+  sky: ['#1b3a55', '#22496a', '#2b5c7e', '#356f8e', '#43829a', '#5595a3'],
+  hills: [
+    { base: '#2f6b4e', light: '#5fae86', dark: '#24543d' },
+    { base: '#3b845c', light: '#7fd0a3', dark: '#2d6a49' },
+    { base: '#4a9c69', light: '#a8f0c6', dark: '#3a7f55' },
+  ],
+  grass: ['#3f8f5f', '#56ab76', '#79c995', '#b5f0c8'],
+  stem: '#1f4d36', bud: '#7fd0a3',
+  moon: '#ffe08a', moonShade: '#ffb347',
+  halo: '255, 206, 110', haloSize: 170,
+};
+
+// Daytime by the visitor's own clock: 7 in the morning to 7 in the evening.
+const sceneNow = (): Scene => {
+  const hour = new Date().getHours();
+  return hour >= 7 && hour < 19 ? DAY : NIGHT;
+};
+let PALETTE: Scene = sceneNow(); // the scene being drawn; checked again every minute
 
 const HILLS: Hill[] = [
   { base: 0.64, bumps: [[0.12, 0.11, 0.12], [0.44, 0.06, 0.1], [0.8, 0.14, 0.15]] },
@@ -106,8 +133,8 @@ function paintBackdrop(grid: Grid, land: Land, narrow: boolean) {
     const v = clamp(y / horizon, 0, 1) * (sky.length - 1), i = Math.floor(v);
     for (let x = 0; x < lw; x++) put(x, y, v - i > bayer(x, y) ? sky[Math.min(i + 1, sky.length - 1)] : sky[i]);
   }
-  for (let s = 0; s < lw * 0.18; s++) put(Math.floor(rand() * lw), Math.floor(rand() * horizon * 0.8), rand() < 0.25 ? PALETTE.star : PALETTE.starDim);
-  const mx = Math.round(lw * 0.82), my = Math.round(lh * 0.28), mr = Math.round((narrow ? 5 : 6) * (4 / P) * 1.25);
+  if (!PALETTE.day) for (let s = 0; s < lw * 0.18; s++) put(Math.floor(rand() * lw), Math.floor(rand() * horizon * 0.8), rand() < 0.25 ? PALETTE.star : PALETTE.starDim);
+  const mx = Math.round(lw * 0.82), my = Math.round(lh * 0.28), mr = Math.round((narrow ? 5 : 6) * (4 / P) * (PALETTE.day ? 1.5 : 1.25));
   for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) {
     if (Math.hypot(x, y) <= mr - 0.4) put(mx + x, my + y, (x + y) / (mr * 2) + 0.5 > bayer(x, y) + 0.45 ? PALETTE.moonShade : PALETTE.moon);
   }
@@ -115,7 +142,7 @@ function paintBackdrop(grid: Grid, land: Land, narrow: boolean) {
   ctx.putImageData(image, 0, 0);
 }
 
-function paintHill(put: (x: number, y: number, hex: string) => void, grid: Grid, at: (x: number) => number, colors: typeof PALETTE.hills[number], rand: () => number) {
+function paintHill(put: (x: number, y: number, hex: string) => void, grid: Grid, at: (x: number) => number, colors: Scene['hills'][number], rand: () => number) {
   const { P, lw, lh } = grid;
   for (let x = 0; x < lw; x++) {
     const ridge = Math.round(at(x * P + P / 2) / P);
@@ -280,6 +307,7 @@ class Garden implements Meadow {
   private trail: Mote[] = [];
   private hearts: Mote[] = [];
   private sinceRender = Infinity;
+  private sinceSceneCheck = 0;
 
   constructor(private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D) {
     this.setup();
@@ -290,6 +318,7 @@ class Garden implements Meadow {
     const W = this.canvas.clientWidth, H = this.canvas.clientHeight;
     if (!W || !H) return false;
     this.W = W; this.H = H; this.narrow = W < 700;
+    PALETTE = sceneNow();
     const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
     this.land = makeLand(HILLS, 0.5, W, H);
     this.flowers = makeFlowers(this.land, W, H, this.narrow, seeded(14));
@@ -346,6 +375,8 @@ class Garden implements Meadow {
     this.trail = this.trail.filter((p) => p.age < p.life);
     this.hearts = this.hearts.filter((h) => h.age < h.life);
     this.sinceRender += dt;
+    this.sinceSceneCheck += dt;
+    if (this.sinceSceneCheck > 60) { this.sinceSceneCheck = 0; if (sceneNow() !== PALETTE) this.setup(); }
     if (this.sinceRender >= 1 / RENDERS_PER_SECOND - 0.001) { this.sinceRender = 0; this.render(); }
   }
 
@@ -371,7 +402,7 @@ class Garden implements Meadow {
     frame.clearRect(0, 0, grid.lw, grid.lh);
     frame.drawImage(grid.base, 0, 0);
     frame.drawImage(grid.grass, 0, 0);
-    this.paintFireflies(frame);
+    if (PALETTE.day) this.paintSunRays(frame); else this.paintFireflies(frame);
     // The bee and hearts go on the grid too, so they turn into specks like the rest.
     frame.setTransform(1 / grid.P, 0, 0, 1 / grid.P, 0, 0);
     this.paintBee(frame);
@@ -382,14 +413,32 @@ class Garden implements Meadow {
     this.paintMoonHalo();
   }
 
-  /** A soft halo of moonlight, laid over the specks. */
+  /** Slowly turning rays around the sun, drawn on the grid so they become specks. */
+  private paintSunRays(frame: CanvasRenderingContext2D) {
+    const { lw, lh } = this.grid, x = lw * 0.82, y = lh * 0.28, t = this.time;
+    frame.save();
+    frame.strokeStyle = PALETTE.moonShade; frame.lineCap = 'round';
+    for (let i = 0; i < 12; i++) {
+      const angle = (i * TAU) / 12 + t * 0.08, pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + i * 1.3);
+      const inner = 26 + pulse * 3, outer = inner + 8 + pulse * 10;
+      frame.globalAlpha = 0.45 + pulse * 0.4; frame.lineWidth = i % 2 ? 1 : 1.8;
+      frame.beginPath();
+      frame.moveTo(x + Math.cos(angle) * inner, y + Math.sin(angle) * inner);
+      frame.lineTo(x + Math.cos(angle) * outer, y + Math.sin(angle) * outer);
+      frame.stroke();
+    }
+    frame.restore();
+  }
+
+  /** A soft halo of moonlight or sunlight, laid over the specks. */
   private paintMoonHalo() {
     const ctx = this.ctx, x = this.grid.lw * 0.82 * this.grid.P, y = this.grid.lh * 0.28 * this.grid.P;
-    const halo = ctx.createRadialGradient(x, y, 4, x, y, 110);
-    halo.addColorStop(0, 'rgba(246, 243, 234, 0.16)');
-    halo.addColorStop(1, 'rgba(246, 243, 234, 0)');
+    const { halo: rgb, haloSize: size } = PALETTE;
+    const halo = ctx.createRadialGradient(x, y, 4, x, y, size);
+    halo.addColorStop(0, `rgba(${rgb}, ${PALETTE.day ? 0.24 : 0.16})`);
+    halo.addColorStop(1, `rgba(${rgb}, 0)`);
     ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = halo; ctx.fillRect(x - 110, y - 110, 220, 220);
+    ctx.fillStyle = halo; ctx.fillRect(x - size, y - size, size * 2, size * 2);
     ctx.globalCompositeOperation = 'source-over';
   }
 

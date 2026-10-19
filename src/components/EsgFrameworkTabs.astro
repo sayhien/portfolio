@@ -48,14 +48,11 @@ const { frameworks, features } = Astro.props;
 </style>
 
 <script>
-  import { play } from './sound';
-
   // Accessible tabs: click or use arrow keys to switch.
   document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
     const panels = tabs.map((tab) => root.querySelector<HTMLElement>(`#${tab.getAttribute('aria-controls')}`)!);
     const select = (index: number, focus: boolean) => {
-      if (tabs[index].getAttribute('aria-selected') !== 'true') void play('switch');
       tabs.forEach((tab, i) => {
         tab.setAttribute('aria-selected', String(i === index));
         tab.tabIndex = i === index ? 0 : -1;

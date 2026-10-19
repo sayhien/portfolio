@@ -7,7 +7,6 @@ import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 import { site } from '../data/site';
 import BeeGarden from '../components/BeeGarden.astro';
-import SoundToggle from '../components/SoundToggle.astro';
 
 interface Props {
   title: string;
@@ -42,7 +41,6 @@ const year = new Date().getFullYear();
             <li><a href={site.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
           </ul>
         </nav>
-        <SoundToggle />
       </div>
       <hr class="rule" />
     </header>
@@ -115,6 +113,6 @@ const year = new Date().getFullYear();
     nav a { font-size: 14px; }
   }
 
-  .site-footer { margin-top: 120px; }
+  .site-footer { margin-top: var(--space-5); }
   .copyright { font-size: 14px; color: var(--muted); }
 </style>

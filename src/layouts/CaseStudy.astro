@@ -145,7 +145,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 
   .content { min-width: 0; max-width: 920px; }
 
-  .more { margin-top: 64px; padding-bottom: var(--space-5); }
+  .more { margin-top: 64px; }
   .more h2 { font-size: clamp(28px, 3vw, 36px); margin-bottom: var(--space-3); }
   .more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
   .more-card {
@@ -209,8 +209,6 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 </style>
 
 <script>
-  import { play } from '../components/sound';
-
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a'));
   const toc = document.querySelector<HTMLDetailsElement>('.toc');
   const narrow = window.matchMedia('(max-width: 1000px)');
@@ -233,7 +231,6 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   };
 
   links.forEach((a) => a.addEventListener('click', () => {
-    void play('tick');
     setCurrent(a.hash.slice(1));
     if (narrow.matches && toc) toc.open = false;
   }));

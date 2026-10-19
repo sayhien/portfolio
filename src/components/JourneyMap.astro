@@ -226,8 +226,6 @@ const toolIcons: Record<string, IconName> = {
 </style>
 
 <script>
-  import { play } from './sound';
-
   function setupJourneyMap(root: HTMLElement) {
     const scroller = root.querySelector<HTMLElement>('.jm-scroll');
     const labels = root.querySelector<HTMLElement>('.jm-labels');
@@ -262,10 +260,9 @@ const toolIcons: Record<string, IconName> = {
       root.toggleAttribute('data-more-right', !atEnd);
     };
 
-    steps.forEach((step, index) => step.addEventListener('click', () => { scrollToStage(index); void play('click'); }));
+    steps.forEach((step, index) => step.addEventListener('click', () => scrollToStage(index)));
     [prev, next].forEach((button) => button?.addEventListener('click', () => {
       const inView = visibleStages();
-      void play('click');
       const direction = Number(button.dataset.dir);
       const first = inView[0] ?? 0;
       scrollToStage(direction > 0 ? first + Math.max(1, inView.length) : first - Math.max(1, inView.length));

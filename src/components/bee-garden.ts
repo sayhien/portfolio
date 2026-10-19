@@ -2,10 +2,9 @@
 // first painted on a fine grid (hills, swaying grass, round flowers,
 // fireflies), then each grid cell scatters a few specks: bright cells keep
 // them all, dark cells none, so the moonlight builds up from density like a
-// stipple drawing. The bee and hearts are drawn sharp on top. Tapping the bee (or the "say hello" button) makes it chirp,
+// stipple drawing. The bee and hearts are made of specks too. Tapping the bee (or the "say hello" button) makes it chirp,
 // fly a loop and float up hearts.
 import { prefersReducedMotion } from './motion';
-import { audioContext } from './sound';
 import { animateWhileVisible } from './webgl-helpers';
 import { Bee, TAU, type Flower, type Hill, type Land, type Meadow, clamp, flowerOpen, flowerPose, makeFlowers, makeLand, seeded, wind } from './meadow';
 
@@ -52,11 +51,11 @@ function rgbOf(hex: string): [number, number, number] {
   return rgb;
 }
 
-/** Two rising sine notes, like a happy little bee. Silent when sound is off. */
+let audio: AudioContext | undefined;
+/** Two rising sine notes, like a happy little bee. */
 function chirp() {
-  const audio = audioContext();
-  if (!audio) return;
   try {
+    audio = audio ?? new AudioContext();
     const now = audio.currentTime;
     for (const [from, to, at] of [[620, 1100, 0], [900, 1350, 0.13]]) {
       const osc = audio.createOscillator(), gain = audio.createGain();
@@ -89,7 +88,7 @@ type Grid = {
 function makeGrid(W: number, H: number): Grid {
   const P = 4 / UNIT, lw = Math.ceil(W / P), lh = Math.ceil(H / P);
   const make = () => Object.assign(document.createElement('canvas'), { width: lw, height: lh });
-  return { P, lw, lh, per: 4, base: make(), grass: make(), frame: make(), blades: [], flies: [] };
+  return { P, lw, lh, per: 3, base: make(), grass: make(), frame: make(), blades: [], flies: [] };
 }
 
 /** Sky, stars, moon and hills never move, so they are painted once. */
@@ -249,7 +248,7 @@ function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks)
     const r = source[c * 4], g = source[c * 4 + 1], b = source[c * 4 + 2];
     const light = clamp((Math.max(r, g, b) / 255 - 0.08) * 1.35, 0, 1);
     if (light <= 0) continue;
-    const colour = (255 << 24) | (b << 16) | (g << 8) | r, size = light > 0.82 ? k + 1 : k;
+    const colour = (255 << 24) | (b << 16) | (g << 8) | r, size = k;
     for (let n = 0; n < grid.per; n++) {
       const i = c * grid.per + n;
       if (light < specks.threshold[i]) continue;
@@ -261,7 +260,7 @@ function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks)
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.putImageData(specks.image, 0, 0);
   // a faint glow so bright things bloom a little
-  ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.08; ctx.imageSmoothingEnabled = true;
+  ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.04; ctx.imageSmoothingEnabled = true;
   ctx.drawImage(grid.frame, 0, 0, bw, bh);
   ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
 }
@@ -325,7 +324,7 @@ class Garden implements Meadow {
     if (!this.bee) return;
     chirp();
     for (let i = 0; i < 3; i++) {
-      this.hearts.push({ x: this.bee.x + (i - 1) * 10, y: this.bee.y - 14, vx: (i - 1) * 14, vy: -42 - i * 6, age: -i * 0.12, life: 1.7 });
+      this.hearts.push({ x: this.bee.x + (i - 1) * 12, y: this.bee.y - 30, vx: (i - 1) * 14, vy: -42 - i * 6, age: -i * 0.12, life: 1.7 });
     }
     if (prefersReducedMotion()) {
       this.hearts.forEach((h) => { h.age = 0.3; h.y -= 18; });
@@ -373,11 +372,14 @@ class Garden implements Meadow {
     frame.drawImage(grid.base, 0, 0);
     frame.drawImage(grid.grass, 0, 0);
     this.paintFireflies(frame);
+    // The bee and hearts go on the grid too, so they turn into specks like the rest.
+    frame.setTransform(1 / grid.P, 0, 0, 1 / grid.P, 0, 0);
+    this.paintBee(frame);
+    this.paintHearts(frame);
+    frame.setTransform(1, 0, 0, 1, 0, 0);
     renderSpecks(this.ctx, grid, this.specks);
     this.ctx.setTransform(this.specks.k, 0, 0, this.specks.k, 0, 0);
     this.paintMoonHalo();
-    this.paintBee();
-    this.paintHearts();
   }
 
   /** A soft halo of moonlight, laid over the specks. */
@@ -391,12 +393,12 @@ class Garden implements Meadow {
     ctx.globalCompositeOperation = 'source-over';
   }
 
-  /** A round yellow bee with black stripes and fluttering white wings, drawn sharp. */
-  private paintBee() {
-    const ctx = this.ctx, { x, y, face, wing } = this.bee, colors = PALETTE.bee;
+  /** A round yellow bee with black stripes and fluttering white wings. */
+  private paintBee(ctx: CanvasRenderingContext2D) {
+    const { x, y, face, wing } = this.bee, colors = PALETTE.bee;
     const flap = prefersReducedMotion() ? 0.4 : Math.sin(wing) * 0.5 + 0.5;
     ctx.save();
-    ctx.translate(x, y); ctx.scale(face < 0 ? -1.3 : 1.3, 1.3);
+    ctx.translate(x, y); ctx.scale(face < 0 ? -1.6 : 1.6, 1.6);
     ctx.fillStyle = colors.wing;
     for (const [dx, tilt] of [[-3, -0.5], [2, -0.2]]) {
       ctx.beginPath();
@@ -407,19 +409,17 @@ class Garden implements Meadow {
     ctx.fillStyle = colors.body; ctx.fill();
     ctx.save(); ctx.clip();
     ctx.fillStyle = colors.stripe;
-    for (const sx of [-8, -3, 2]) ctx.fillRect(sx, -8, 2.6, 16);
+    for (const sx of [-5, 1]) ctx.fillRect(sx, -8, 2.2, 16);
     ctx.restore();
-    ctx.lineWidth = 1.2; ctx.strokeStyle = colors.stripe; ctx.stroke();
     ctx.fillStyle = colors.stripe;
     ctx.beginPath(); ctx.moveTo(-10, -1.6); ctx.lineTo(-14, 0); ctx.lineTo(-10, 1.6); ctx.fill();
-    ctx.beginPath(); ctx.arc(10, -0.5, 5, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(10.5, -0.5, 4, 0, TAU); ctx.fill();
     ctx.fillStyle = colors.eye;
-    ctx.beginPath(); ctx.arc(11.8, -1.8, 1.4, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(12, -1.5, 1.3, 0, TAU); ctx.fill();
     ctx.restore();
   }
 
-  private paintHearts() {
-    const ctx = this.ctx;
+  private paintHearts(ctx: CanvasRenderingContext2D) {
     for (const h of this.hearts) {
       if (h.age < 0) continue;
       const fade = 1 - clamp((h.age / h.life - 0.6) / 0.4, 0, 1), s = 5 + Math.min(1, h.age * 4) * 2;

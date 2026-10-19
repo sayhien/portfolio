@@ -90,8 +90,6 @@ const { image, alt, spots } = Astro.props;
 </style>
 
 <script>
-  import { play } from './sound';
-
   type Spot = { title: string; text: string };
   const GAP = 22; // space between the number and its card
 
@@ -134,7 +132,7 @@ const { image, alt, spots } = Astro.props;
       card.hidden = false;
       placeCard(shot, dots[index], card);
     };
-    dots.forEach((dot, i) => dot.addEventListener('click', () => { select(i); void play('pop'); }));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i)));
     new ResizeObserver(() => { if (!card.hidden) placeCard(shot, dots[current], card); }).observe(shot);
     select(0);
   });

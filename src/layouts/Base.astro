@@ -13,7 +13,7 @@ interface Props {
   description?: string;
 }
 const { title, description = site.intro } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const home = base;
 const year = new Date().getFullYear();
 ---
@@ -67,9 +67,9 @@ const year = new Date().getFullYear();
             <li><span>Resume</span><a href={site.resume} target="_blank" rel="noopener">View resume</a></li>
           </ul>
         </div>
-        <BeeGarden />
         <p class="copyright">&copy; {year} {site.name}</p>
       </div>
+      <BeeGarden />
     </footer>
     <script>
       // Ghost loading: shimmer until each image arrives, then fade it in.
@@ -150,7 +150,7 @@ const year = new Date().getFullYear();
   .foot-links span { color: var(--muted); font-size: 14px; }
   .foot-links a { text-decoration: none; font-weight: 500; }
   .foot-links a:hover { color: var(--accent); }
-  .copyright { font-size: 14px; color: var(--muted); padding: 20px 0 40px; }
+  .copyright { font-size: 14px; color: var(--muted); padding-bottom: 8px; }
   @media (max-width: 900px) {
     .foot-grid { grid-template-columns: minmax(0, 1fr); }
   }

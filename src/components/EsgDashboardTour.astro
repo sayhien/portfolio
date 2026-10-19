@@ -1,13 +1,12 @@
 ---
-// Dashboard screenshot with numbered hotspots. On wide screens the chosen
-// note opens in a small card right beside its number, placed away from the
-// part it explains. On small screens the notes are listed below the image.
+// Dashboard screenshot with numbered hotspots. Selecting a number opens a
+// small note card right beside it, on every screen size. The card is placed
+// away from the part it explains and kept inside the screenshot's width.
 // Every dot is a button described by its note, for keyboard and screen readers.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-/** place: where the note card opens, so it never covers the part it explains. */
-export type Hotspot = { x: number; y: number; title: string; text: string; place?: 'above' | 'below'; align?: 'start' | 'end' };
+export type Hotspot = { x: number; y: number; title: string; text: string };
 interface Props {
   image: ImageMetadata;
   alt: string;
@@ -15,37 +14,32 @@ interface Props {
 }
 const { image, alt, spots } = Astro.props;
 ---
-<figure class="tour" data-tour data-spots={JSON.stringify(spots)}>
+<figure class="tour" data-tour>
   <div class="shot-frame">
-  <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="shot">
-    <Image src={image} alt={alt} widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
-    {spots.map((spot, index) => (
-      <button
-        type="button"
-        class="dot"
-        style={`--x:${spot.x}%;--y:${spot.y}%;--n:${index}`}
-        aria-label={`${index + 1}. ${spot.title}`}
-        aria-describedby={`tour-note-${index}`}
-        data-index={index}
-      >{index + 1}</button>
-    ))}
-    <div class="pop" aria-hidden="true" data-pop>
-      <span class="num"></span>
-      <span><b></b><span class="pop-text"></span></span>
+    <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="shot">
+      <Image src={image} alt={alt} widths={[900, 1400, 2048]} sizes="(max-width: 1000px) 100vw, 920px" />
+      {spots.map((spot, index) => (
+        <button
+          type="button"
+          class="dot"
+          style={`--x:${spot.x}%;--y:${spot.y}%;--n:${index}`}
+          aria-label={`${index + 1}. ${spot.title}`}
+          aria-describedby={`tour-note-${index}`}
+          aria-pressed="false"
+          data-index={index}
+        >{index + 1}</button>
+      ))}
+      <div class="pop" aria-hidden="true" data-pop hidden>
+        <span class="num"></span>
+        <span><b></b><span class="pop-text"></span></span>
+      </div>
     </div>
   </div>
-  </div>
-  <ol class="notes">
-    {spots.map((spot, index) => (
-      <li data-index={index}>
-        <button type="button" class="note" data-index={index}>
-          <span class="num" aria-hidden="true">{index + 1}</span>
-          <span id={`tour-note-${index}`}><b>{spot.title}</b>{spot.text}</span>
-        </button>
-      </li>
-    ))}
-  </ol>
+  <ul class="visually-hidden">
+    {spots.map((spot, index) => <li id={`tour-note-${index}`}>{spot.text}</li>)}
+  </ul>
+  <script type="application/json" data-spots set:html={JSON.stringify(spots.map(({ title, text }) => ({ title, text })))} />
 </figure>
 
 <style>
@@ -63,83 +57,82 @@ const { image, alt, spots } = Astro.props;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s, background 0.2s;
   }
-  .dot::before { content: ''; position: absolute; inset: -8px; } /* 48px touch target */
+  .dot::before { content: ''; position: absolute; inset: -8px; } /* at least 44px to tap */
   .dot::after { content: ''; position: absolute; inset: -6px; border-radius: 999px; border: 2px solid var(--accent); opacity: 0; animation: ping 2.4s ease-out infinite; animation-delay: calc(var(--n) * 0.3s); }
   @keyframes ping { 0% { opacity: 0.7; transform: scale(0.7); } 70%, 100% { opacity: 0; transform: scale(1.5); } }
   .dot:hover, .dot.active { transform: translate(-50%, -50%) scale(1.15); background: var(--text); }
   .dot.active::after { animation: none; }
 
-  /* Note card beside the active number */
+  /* Note card beside the active number; JavaScript sets its left and top */
   .pop {
-    position: absolute; z-index: 2; width: min(320px, 46%);
+    position: absolute; z-index: 2; width: min(320px, 82%);
     display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start;
     padding: 14px 16px; border-radius: var(--radius);
     background: rgba(23, 27, 33, 0.97); border: 1px solid var(--accent);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
     pointer-events: none; animation: pop-in 0.2s ease-out;
   }
-  .pop[data-place='above'] { bottom: calc(100% - max(18px, var(--y)) + 26px); }
-  .pop[data-place='below'] { top: calc(max(18px, var(--y)) + 26px); }
-  .pop[data-align='start'] { left: max(0px, calc(max(18px, var(--x)) - 30px)); }
-  .pop[data-align='end'] { right: max(0px, calc(100% - var(--x) - 30px)); }
+  .pop[hidden] { display: none; }
+  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
   .pop b { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
   .pop-text { font-size: 14px; line-height: 1.5; color: var(--text-2); }
   @keyframes pop-in { from { opacity: 0; transform: translateY(4px); } }
 
-  .notes { list-style: none; margin: 20px 0 0; padding: 0; display: none; gap: 8px; }
-  .note {
-    width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
-    display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start;
-    padding: 12px 14px; border-radius: var(--radius); border: 1px solid transparent; background: none;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .note:hover { background: var(--surface); }
-  .note.active { background: var(--surface); border-color: var(--accent); }
-  .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-  .notes .num { background: var(--accent-soft); color: var(--accent); }
-  .note.active .num { background: var(--accent); color: var(--on-accent); }
-  .note b { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
-  .note span:last-child { font-size: 14px; line-height: 1.5; color: var(--text-2); }
-
-  /* Small screens: dots are too close for cards, so the notes list below takes over */
-  @media (max-width: 900px) {
-    .pop { display: none; }
-    .notes { display: grid; }
-    .dot { width: 24px; height: 24px; font-size: 11px; border-width: 1.5px; left: max(14px, var(--x)); top: max(14px, var(--y)); }
+  @media (max-width: 700px) {
+    .dot { width: 26px; height: 26px; font-size: 11px; border-width: 1.5px; left: max(14px, var(--x)); top: max(14px, var(--y)); }
+    .dot::before { inset: -10px; }
+    .pop { padding: 12px 14px; gap: 10px; grid-template-columns: 24px minmax(0, 1fr); }
+    .num { width: 24px; height: 24px; font-size: 12px; }
+    .pop b { font-size: 14px; }
+    .pop-text { font-size: 13px; }
   }
 </style>
 
 <script>
-  // Selecting a dot opens its note card beside it and highlights its note in the list.
+  type Spot = { title: string; text: string };
+  const GAP = 22; // space between the number and its card
+
+  // Place the card above the number when there is room, otherwise below,
+  // and slide it sideways so it stays within the screenshot.
+  function placeCard(shot: HTMLElement, dot: HTMLElement, card: HTMLElement) {
+    const shotBox = shot.getBoundingClientRect();
+    const dotBox = dot.getBoundingClientRect();
+    const centreX = dotBox.left + dotBox.width / 2 - shotBox.left;
+    const centreY = dotBox.top + dotBox.height / 2 - shotBox.top;
+    const width = card.offsetWidth, height = card.offsetHeight;
+    const left = Math.max(0, Math.min(centreX - 30, shotBox.width - width));
+    const above = centreY - GAP - height >= -34; // may rise over the frame bar
+    card.style.left = `${left}px`;
+    card.style.top = `${above ? centreY - GAP - height : centreY + GAP}px`;
+  }
+
   document.querySelectorAll<HTMLElement>('[data-tour]').forEach((tour) => {
+    const shot = tour.querySelector<HTMLElement>('.shot');
+    const card = tour.querySelector<HTMLElement>('[data-pop]');
     const dots = Array.from(tour.querySelectorAll<HTMLButtonElement>('.dot'));
-    const notes = Array.from(tour.querySelectorAll<HTMLButtonElement>('.note'));
-    const pop = tour.querySelector<HTMLElement>('[data-pop]');
-    const spots = JSON.parse(tour.dataset.spots || '[]') as { title: string; text: string; place?: string; align?: string; x: number; y: number }[];
-    const narrow = window.matchMedia('(max-width: 900px)');
-    const select = (index: number, fromDot: boolean) => {
+    let spots: Spot[] = [];
+    try {
+      spots = JSON.parse(tour.querySelector('[data-spots]')?.textContent || '[]');
+    } catch (error) {
+      console.warn('Dashboard notes could not be read', error);
+    }
+    if (!shot || !card || !spots.length) return;
+    let current = 0;
+
+    const select = (index: number) => {
+      current = index;
       dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === index);
         dot.setAttribute('aria-pressed', String(i === index));
       });
-      notes.forEach((note, i) => note.classList.toggle('active', i === index));
-      const spot = spots[index];
-      if (pop && spot) {
-        pop.querySelector('.num')!.textContent = String(index + 1);
-        pop.querySelector('b')!.textContent = spot.title;
-        pop.querySelector('.pop-text')!.textContent = spot.text;
-        pop.dataset.place = spot.place ?? 'above';
-        pop.dataset.align = spot.align ?? 'start';
-        pop.style.setProperty('--x', `${spot.x}%`);
-        pop.style.setProperty('--y', `${spot.y}%`);
-        pop.style.animation = 'none';
-        void pop.offsetWidth;
-        pop.style.animation = '';
-      }
-      if (fromDot && narrow.matches) notes[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      card.querySelector('.num')!.textContent = String(index + 1);
+      card.querySelector('b')!.textContent = spots[index].title;
+      card.querySelector('.pop-text')!.textContent = spots[index].text;
+      card.hidden = false;
+      placeCard(shot, dots[index], card);
     };
-    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i, true)));
-    notes.forEach((note, i) => note.addEventListener('click', () => select(i, false)));
-    select(0, false);
+    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i)));
+    new ResizeObserver(() => { if (!card.hidden) placeCard(shot, dots[current], card); }).observe(shot);
+    select(0);
   });
 </script>

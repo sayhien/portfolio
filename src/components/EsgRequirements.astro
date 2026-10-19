@@ -1,6 +1,6 @@
 ---
-// Key requirements as a numbered list that inks in when it scrolls in,
-// with a small looping scene beside each requirement.
+// Key requirements, each led by a small looping scene that shows it,
+// inking in one by one when the list scrolls in.
 const requirements = [
   'Support for both GRI and IFRS frameworks',
   'Ability to synchronise data from other ERP modules',
@@ -12,8 +12,6 @@ const requirements = [
 <ul class="req" data-requirements>
   {requirements.map((text, index) => (
     <li style={`--n:${index}`}>
-      <span class="box" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-      <span class="t">{text}</span>
       <div class="vig" aria-hidden="true">
         {index === 0 && (
           <svg class="ill" viewBox="0 0 120 68">
@@ -58,19 +56,18 @@ const requirements = [
           </svg>
         )}
       </div>
+      <span class="t">{text}</span>
     </li>
   ))}
 </ul>
 
 <style>
   .req { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 760px; }
-  .req li { display: grid; grid-template-columns: 26px minmax(0, 1fr) 128px; gap: 18px; align-items: center; padding: 8px 0; }
+  .req li { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 24px; align-items: center; padding: 6px 0; }
   .t { font-size: 17px; }
   .vig { aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 6px; }
-  .box { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
 
   /* Ticks play once when the list scrolls in */
-  .play .box { animation: ink 0.35s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.1s); }
   .play .t { animation: ink 0.4s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.2s); }
   .play .vig { animation: rise 0.5s ease-out backwards; animation-delay: calc(var(--n) * 0.45s + 0.15s); }
   @keyframes ink { from { color: var(--muted); } }
@@ -128,8 +125,7 @@ const requirements = [
   @keyframes chat-3 { 0%, 56% { opacity: 0; transform: translateY(6px); } 64%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
   @media (max-width: 600px) {
-    .req li { grid-template-columns: 26px minmax(0, 1fr); row-gap: 10px; }
-    .vig { grid-column: 2; max-width: 180px; }
+    .req li { grid-template-columns: 112px minmax(0, 1fr); gap: 16px; }
     .t { font-size: 16px; }
   }
 </style>

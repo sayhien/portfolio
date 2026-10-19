@@ -60,10 +60,6 @@ const personas = [
   { img: raj, name: 'Raj Patel', quote: 'Every new data source is another privacy risk to manage.',  role: 'IT Specialist', goals: ['Integrate ESG data from multiple sources into the ERP system', 'Protect customer privacy', 'Act against breaches of customer privacy and data losses'] },
 ];
 
-// Two columns, the second dropped down a step, so the cards do not sit in rows.
-const half = Math.ceil(personas.length / 2);
-const personaColumns = [personas.slice(0, half), personas.slice(half)];
-
 const painPoints: PainPoint[] = [
   { pain: 'Lack of clear communication about roles and responsibilities.', fix: 'Created user assignment to control who does what.', to: 'user-assignment', linkLabel: 'See user assignment', widget: 'assign' },
   { pain: 'Time consuming manual data collection processes.', fix: 'Created data synchronisation to automatically pull data from other modules.', to: 'data-synchronisation', linkLabel: 'See data synchronisation', widget: 'sync' },
@@ -232,23 +228,19 @@ const next: NextLink[] = [
     <p>
       Due to time constraints, and as the sole designer, I used AI to generate these personas to guide the design process. The system needed to serve both managers overseeing the entire reporting process and subject matter experts contributing specific data.
     </p>
-    <div class="personas">
-      {personaColumns.map((column) => (
-        <ul class="p-col">
-          {column.map((p) => (
-            <li class="persona">
-              <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 96px, 160px" />
-              <div class="p-body">
-                <h3>{p.name}</h3>
-                <p class="p-role">{p.role}</p>
-                <p class="p-quote">“{p.quote}”</p>
-                <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>
-              </div>
-            </li>
-          ))}
-        </ul>
+    <ul class="personas">
+      {personas.map((p, i) => (
+        <li class="persona" style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
+          <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 96px, 160px" />
+          <div class="p-body">
+            <h3>{p.name}</h3>
+            <p class="p-role">{p.role}</p>
+            <p class="p-quote">“{p.quote}”</p>
+            <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   </section>
 
   <section id="journey-map" class="sec">
@@ -414,16 +406,17 @@ const next: NextLink[] = [
 
 
 
-  .logos { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  .logos { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
   .logos li { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
   .logo-tile { flex: none; width: 112px; background: #fff; border-radius: 8px; padding: 8px 10px; } /* logos are drawn for white */
   .logos :global(img) { width: 100%; height: auto; }
   .logos p { font-size: 15px; line-height: 1.45; color: var(--text-2); }
   .logos b { color: var(--text); }
 
-  .personas { margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
-  .p-col { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); align-content: start; }
-  .p-col:nth-child(2) { margin-top: var(--space-5); } /* the stagger */
+  /* Zigzag: each card spans two half rows and starts one half row below the
+     last, so the eye reads left, right, left, right in list order. */
+  .personas { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
+  .personas > .persona { grid-row: var(--row) / span 2; grid-column: var(--col); }
   .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: var(--space-2); align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }
   .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
   .p-body { display: grid; gap: 6px; }
@@ -435,7 +428,7 @@ const next: NextLink[] = [
 
   .hint { font-size: 14px; color: var(--muted); margin-top: var(--space-1); }
 
-  .status-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); }
+  .status-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
   .st { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; }
   .st svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; color: var(--tone); }
   .st .fill { fill: var(--tone); stroke: none; }
@@ -450,7 +443,7 @@ const next: NextLink[] = [
   .learn-head { max-width: 560px; margin-bottom: var(--space-3); }
   .learn-head h2 { margin-bottom: var(--space-1); }
   .learn-sub { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 420px; }
-  .challenges { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+  .challenges { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gap-card); }
   .challenges li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3) var(--space-4); display: grid; gap: var(--space-3); }
   .ch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
   .challenges h3 { display: flex; align-items: center; gap: var(--space-2); font-size: 24px; }
@@ -483,7 +476,8 @@ const next: NextLink[] = [
   }
   @media (max-width: 700px) {
     .logos, .flow, .personas { grid-template-columns: minmax(0, 1fr); }
-    .p-col:nth-child(2) { margin-top: 0; }
+    .personas { row-gap: var(--gap-card); }
+    .personas > .persona { grid-row: auto; grid-column: auto; }
     :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); }
     .persona { grid-template-columns: 88px minmax(0, 1fr); }
     .flow { gap: var(--space-3); }

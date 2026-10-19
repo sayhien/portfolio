@@ -1,12 +1,13 @@
 // Moon Dust: the footer meadow drawn from tiny specks of light. The scene is
-// first painted on a coarse grid (hills, swaying grass, flowers, fireflies, the
-// bee), then each grid cell scatters a few specks: bright cells keep them all,
-// dark cells none, so the moonlight builds up from density like a
-// stipple drawing. Tapping the bee (or the "say hello" button) makes it chirp,
+// first painted on a fine grid (hills, swaying grass, round flowers,
+// fireflies), then each grid cell scatters a few specks: bright cells keep
+// them all, dark cells none, so the moonlight builds up from density like a
+// stipple drawing. The bee and hearts are drawn sharp on top. Tapping the bee (or the "say hello" button) makes it chirp,
 // fly a loop and float up hearts.
 import { prefersReducedMotion } from './motion';
+import { audioContext } from './sound';
 import { animateWhileVisible } from './webgl-helpers';
-import { Bee, type Flower, type Hill, type Land, type Meadow, clamp, flowerOpen, makeFlowers, makeLand, seeded, wind } from './meadow';
+import { Bee, TAU, type Flower, type Hill, type Land, type Meadow, clamp, flowerOpen, flowerPose, makeFlowers, makeLand, seeded, wind } from './meadow';
 
 const STILL_TIME = 7; // seconds in, for the reduced motion still picture
 const RENDERS_PER_SECOND = 30; // specks are placed by hand, so 30 a second keeps phones cool
@@ -21,13 +22,13 @@ const PALETTE = {
     { base: '#2c6b52', light: '#6ee7b7', dark: '#1f5440' },
   ],
   grass: ['#2a6450', '#3b8468', '#58b892', '#9fe6c8'],
-  stem: '#2a6650', bud: '#4f9c80',
+  stem: '#163a30', bud: '#4f9c80', // stems darker than the hill so they read
   petals: [
     ['#ff8a3d', '#fff1d6', '#c95f1f'], ['#ffc94a', '#ff6a2b', '#c9952f'],
     ['#fff1d6', '#ff8a3d', '#c9bda6'], ['#ff6a2b', '#ffd9a0', '#b84a17'],
   ],
   star: '#eceff3', starDim: '#3a4c47', moon: '#f6f3ea', moonShade: '#ffd9a0',
-  bee: { w: '#ffffff', y: '#ffc94a', k: '#0b0e11', h: '#0b0e11', e: '#ffffff' } as Record<string, string>,
+  bee: { wing: 'rgba(255, 255, 255, 0.88)', body: '#ffc94a', stripe: '#0b0e11', eye: '#ffffff' },
   heart: '#ff8a3d', fly: '#ffe2b0', flyGlow: '#8a5a3a', trail: '#ffc46b',
 };
 
@@ -37,10 +38,6 @@ const HILLS: Hill[] = [
   { base: 0.93, bumps: [[0.14, 0.1, 0.2], [0.64, 0.17, 0.25]] },
 ];
 
-// Sprites, facing right. w wing, y yellow, k black stripe, h head, e eye.
-const BEE_UP = ['..ww.ww..', '..wwwww..', '...www...', '.ykykyhh.', 'kykykyhhe', '.ykykyhh.'];
-const BEE_DOWN = ['.........', '.........', '..wwwww..', '.ykwwwyhh', 'kykykyhhe', '.ykykyhh.'];
-const HEART = ['.x.x.', 'xxxxx', 'xxxxx', '.xxx.', '..x..'];
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 const bayer = (x: number, y: number) => BAYER[(y & 3) * 4 + (x & 3)];
 
@@ -55,10 +52,11 @@ function rgbOf(hex: string): [number, number, number] {
   return rgb;
 }
 
-let audio: AudioContext | undefined;
+/** Two rising sine notes, like a happy little bee. Silent when sound is off. */
 function chirp() {
+  const audio = audioContext();
+  if (!audio) return;
   try {
-    audio = audio ?? new AudioContext();
     const now = audio.currentTime;
     for (const [from, to, at] of [[620, 1100, 0], [900, 1350, 0.13]]) {
       const osc = audio.createOscillator(), gain = audio.createGain();
@@ -80,17 +78,18 @@ function chirp() {
 // ---------------------------------------------------------------- The coarse grid
 
 type Blade = { x: number; y: number; h: number; worldX: number; flex: number; tone: number; front: boolean };
+const UNIT = 2; // the scene was designed in 4 pixel units; the grid is 2 pixels
 type Firefly = { x: number; y: number; ph: number; sp: number };
 type Grid = {
   P: number; lw: number; lh: number; per: number;
   base: HTMLCanvasElement; grass: HTMLCanvasElement; frame: HTMLCanvasElement;
-  blades: Blade[]; flies: Firefly[]; grassStep: number;
+  blades: Blade[]; flies: Firefly[];
 };
 
-function makeGrid(W: number, H: number, narrow: boolean): Grid {
-  const P = narrow ? 2 : 4, lw = Math.ceil(W / P), lh = Math.ceil(H / P);
+function makeGrid(W: number, H: number): Grid {
+  const P = 4 / UNIT, lw = Math.ceil(W / P), lh = Math.ceil(H / P);
   const make = () => Object.assign(document.createElement('canvas'), { width: lw, height: lh });
-  return { P, lw, lh, per: P >= 4 ? 4 : 3, base: make(), grass: make(), frame: make(), blades: [], flies: [], grassStep: -1 };
+  return { P, lw, lh, per: 4, base: make(), grass: make(), frame: make(), blades: [], flies: [] };
 }
 
 /** Sky, stars, moon and hills never move, so they are painted once. */
@@ -140,7 +139,7 @@ function makeBlades(grid: Grid, land: Land): Blade[] {
   const { P, lw, lh } = grid, rand = seeded(15), blades: Blade[] = [];
   for (let x = 0; x < lw; x++) {
     const ridge = Math.round(land.front.at(x * P + P / 2) / P);
-    const perColumn = 2 + Math.floor(rand() * 2);
+    const perColumn = 1 + Math.floor(rand() * 2.2);
     for (let k = 0; k < perColumn; k++) {
       const depth = Math.pow(rand(), 0.8);
       blades.push({
@@ -153,46 +152,64 @@ function makeBlades(grid: Grid, land: Land): Blade[] {
   return blades.sort((a, b) => a.y - b.y);
 }
 
-/** Grass and flowers move in little steps, 8 times a second. */
-function paintGrassAndFlowers(grid: Grid, flowers: Flower[], time: number) {
-  const t = Math.floor(time * 8) / 8;
-  const ctx = grid.grass.getContext('2d')!;
-  ctx.clearRect(0, 0, grid.lw, grid.lh);
-  const blade = (b: Blade) => {
-    const lean = Math.round(clamp(wind(b.worldX, t) * 0.8 * b.flex, -1.4, 1.6));
-    for (let j = 0; j < b.h; j++) {
-      const u = j / Math.max(1, b.h - 1);
-      ctx.fillStyle = j === b.h - 1 ? PALETTE.grass[Math.min(3, b.tone + 1)] : PALETTE.grass[b.tone];
-      ctx.fillRect(b.x + Math.round(lean * u * u), b.y - j, 1, 1);
+/** Grass blades are soft curves, drawn in one stroke per colour. */
+function strokeBlades(ctx: CanvasRenderingContext2D, blades: Blade[], t: number) {
+  for (let tone = 0; tone < 3; tone++) {
+    ctx.beginPath();
+    for (const b of blades) {
+      if (b.tone !== tone) continue;
+      const tipX = b.x + 0.5 + clamp(wind(b.worldX, t) * 0.8 * b.flex, -1.4, 1.6) * b.h * 0.3;
+      ctx.moveTo(b.x + 0.5, b.y + 1);
+      ctx.quadraticCurveTo(b.x + 0.5, b.y - b.h * 0.55, tipX, b.y - b.h);
     }
-  };
-  grid.blades.forEach((b) => { if (!b.front) blade(b); });
-  flowers.forEach((f) => paintFlower(ctx, grid.P, f, t));
-  grid.blades.forEach((b) => { if (b.front) blade(b); });
+    ctx.strokeStyle = PALETTE.grass[tone];
+    ctx.stroke();
+  }
 }
 
-/** A four petal flower; it grows from bud to half open to full as `open` rises. */
+function paintGrassAndFlowers(grid: Grid, flowers: Flower[], time: number) {
+  const ctx = grid.grass.getContext('2d')!;
+  ctx.clearRect(0, 0, grid.lw, grid.lh);
+  ctx.lineCap = 'round'; ctx.lineWidth = 0.9;
+  strokeBlades(ctx, grid.blades.filter((b) => !b.front), time);
+  flowers.forEach((f) => paintFlower(ctx, grid.P, f, time));
+  ctx.lineWidth = 0.9;
+  strokeBlades(ctx, grid.blades.filter((b) => b.front), time);
+}
+
+/** A round five petal flower on a curved stem; petals unfold as `open` rises. */
 function paintFlower(ctx: CanvasRenderingContext2D, P: number, f: Flower, t: number) {
-  const block = Math.max(1, Math.round((f.r > 26 ? 3 : f.r > 13 ? 2 : 1) * (4 / P)));
-  const baseX = Math.round(f.x / P), baseY = Math.round(f.y / P), stem = Math.max(3, Math.round((f.stem / P) * 0.75));
-  const lean = Math.round(clamp((wind(f.worldX, t) * 0.8 + f.lean) * f.flex * 1.6, -2, 2));
-  const headX = baseX + lean, headY = baseY - stem + (f.nod > 0.5 ? 1 : 0);
-  ctx.fillStyle = PALETTE.stem;
-  for (let j = 0; j < stem; j++) {
-    const u = j / stem, x = baseX + Math.round(lean * u * u);
-    ctx.fillRect(x, baseY - j, 1, 1);
-    if (f.leaf && j === Math.round(stem * 0.4)) ctx.fillRect(x + f.leaf, baseY - j - 1, 1, 1);
+  const { hx, hy } = flowerPose(f, t);
+  const baseX = f.x / P, baseY = f.y / P, headX = hx / P, headY = hy / P, size = f.r / P;
+  ctx.strokeStyle = PALETTE.stem; ctx.lineWidth = Math.max(0.8, size * 0.1);
+  ctx.beginPath();
+  ctx.moveTo(baseX, baseY);
+  ctx.quadraticCurveTo(baseX, (baseY + headY) / 2, headX, headY);
+  ctx.stroke();
+  if (f.leaf) {
+    const leafX = baseX + (headX - baseX) * 0.25, leafY = baseY + (headY - baseY) * 0.4;
+    ctx.fillStyle = PALETTE.stem; ctx.beginPath();
+    ctx.ellipse(leafX + f.leaf * size * 0.3, leafY, size * 0.32, size * 0.12, f.leaf * -0.5, 0, TAU);
+    ctx.fill();
   }
   const [petal, centre, shade] = PALETTE.petals[f.tone % PALETTE.petals.length];
-  const cell = (cx: number, cy: number, color: string) => {
-    const x = headX + cx * block - Math.floor(block / 2), y = headY + cy * block - block;
-    ctx.fillStyle = color; ctx.fillRect(x, y, block, block);
-    if (block > 1 && color === petal) { ctx.fillStyle = shade; ctx.fillRect(x + block - 1, y + block - 1, 1, 1); }
-  };
-  if (f.open < 0.3) { cell(0, 0, PALETTE.bud); return; }
-  if (f.open < 0.7) { cell(0, 0, petal); cell(0, -1, petal); cell(0, 1, PALETTE.bud); return; }
-  cell(0, -1, petal); cell(-1, 0, petal); cell(1, 0, petal); cell(0, 1, petal); cell(0, 0, centre);
-  if (block > 1) { ctx.fillStyle = '#ffffff'; ctx.fillRect(headX - Math.floor(block / 2), headY - block * 2, 1, 1); }
+  if (f.open < 0.3) {
+    ctx.fillStyle = PALETTE.bud; ctx.beginPath();
+    ctx.ellipse(headX, headY, size * 0.22, size * 0.32, 0, 0, TAU); ctx.fill();
+    return;
+  }
+  const spin = (headX - baseX) * 0.08 + f.phase, reach = size * (0.25 + 0.5 * f.open);
+  for (const [color, scale] of [[shade, 1], [petal, 0.86]] as const) {
+    ctx.fillStyle = color;
+    for (let i = 0; i < 5; i++) {
+      const angle = spin + (i * TAU) / 5;
+      ctx.beginPath();
+      ctx.ellipse(headX + Math.cos(angle) * reach * 0.55, headY + Math.sin(angle) * reach * 0.55, reach * 0.55 * scale, reach * 0.34 * scale, angle, 0, TAU);
+      ctx.fill();
+    }
+  }
+  ctx.fillStyle = centre; ctx.beginPath();
+  ctx.arc(headX, headY, Math.max(0.7, size * 0.2), 0, TAU); ctx.fill();
 }
 
 // ---------------------------------------------------------------- Specks
@@ -223,8 +240,8 @@ function makeSpecks(ctx: CanvasRenderingContext2D, grid: Grid, k: number): Speck
   return specks;
 }
 
-/** Scatter specks by brightness, then lay the bee and hearts on top as whole cells. */
-function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks, solid: number[]) {
+/** Scatter specks by brightness: bright cells keep every speck, dark ones none. */
+function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks) {
   const source = grid.frame.getContext('2d', { willReadFrequently: true })!.getImageData(0, 0, grid.lw, grid.lh).data;
   const { pixels, k } = specks, bw = specks.image.width, bh = specks.image.height;
   pixels.fill(specks.ground);
@@ -240,12 +257,6 @@ function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks,
       if (x + size > bw || y + size > bh) continue;
       for (let yy = 0; yy < size; yy++) pixels.fill(colour, (y + yy) * bw + x, (y + yy) * bw + x + size);
     }
-  }
-  const cellSize = grid.P * k;
-  for (const c of solid) {
-    const colour = (255 << 24) | (source[c * 4 + 2] << 16) | (source[c * 4 + 1] << 8) | source[c * 4];
-    const x = (c % grid.lw) * cellSize, y = Math.floor(c / grid.lw) * cellSize;
-    for (let yy = 0; yy < cellSize - 1; yy++) pixels.fill(colour, (y + yy) * bw + x, (y + yy) * bw + x + cellSize - 1);
   }
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.putImageData(specks.image, 0, 0);
@@ -283,7 +294,7 @@ class Garden implements Meadow {
     const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
     this.land = makeLand(HILLS, 0.5, W, H);
     this.flowers = makeFlowers(this.land, W, H, this.narrow, seeded(14));
-    this.grid = makeGrid(W, H, this.narrow);
+    this.grid = makeGrid(W, H);
     paintBackdrop(this.grid, this.land, this.narrow);
     this.grid.blades = makeBlades(this.grid, this.land);
     this.grid.flies = Array.from({ length: this.narrow ? 9 : 16 }, (_, i) => ({ x: ((i * 0.618) % 1) * W, y: H * (0.35 + ((i * 0.37) % 0.4)), ph: i * 1.7, sp: 0.3 + ((i * 0.29) % 0.5) }));
@@ -355,15 +366,71 @@ class Garden implements Meadow {
       this.updateFlowers(1);
       this.bee.placeAt(this.bee.home);
     }
-    const grid = this.grid, step = Math.floor(this.time * 8);
-    if (step !== grid.grassStep || prefersReducedMotion()) { grid.grassStep = step; paintGrassAndFlowers(grid, this.flowers, this.time); }
+    const grid = this.grid;
+    paintGrassAndFlowers(grid, this.flowers, this.time);
     const frame = grid.frame.getContext('2d', { willReadFrequently: true })!;
     frame.clearRect(0, 0, grid.lw, grid.lh);
     frame.drawImage(grid.base, 0, 0);
     frame.drawImage(grid.grass, 0, 0);
     this.paintFireflies(frame);
-    const solid = this.paintBeeAndHearts(frame);
-    renderSpecks(this.ctx, grid, this.specks, solid);
+    renderSpecks(this.ctx, grid, this.specks);
+    this.ctx.setTransform(this.specks.k, 0, 0, this.specks.k, 0, 0);
+    this.paintMoonHalo();
+    this.paintBee();
+    this.paintHearts();
+  }
+
+  /** A soft halo of moonlight, laid over the specks. */
+  private paintMoonHalo() {
+    const ctx = this.ctx, x = this.grid.lw * 0.82 * this.grid.P, y = this.grid.lh * 0.28 * this.grid.P;
+    const halo = ctx.createRadialGradient(x, y, 4, x, y, 110);
+    halo.addColorStop(0, 'rgba(246, 243, 234, 0.16)');
+    halo.addColorStop(1, 'rgba(246, 243, 234, 0)');
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = halo; ctx.fillRect(x - 110, y - 110, 220, 220);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /** A round yellow bee with black stripes and fluttering white wings, drawn sharp. */
+  private paintBee() {
+    const ctx = this.ctx, { x, y, face, wing } = this.bee, colors = PALETTE.bee;
+    const flap = prefersReducedMotion() ? 0.4 : Math.sin(wing) * 0.5 + 0.5;
+    ctx.save();
+    ctx.translate(x, y); ctx.scale(face < 0 ? -1.3 : 1.3, 1.3);
+    ctx.fillStyle = colors.wing;
+    for (const [dx, tilt] of [[-3, -0.5], [2, -0.2]]) {
+      ctx.beginPath();
+      ctx.ellipse(dx, -8 - flap * 2, 5, 7.5 - flap * 3, tilt - flap * 0.3, 0, TAU);
+      ctx.fill();
+    }
+    ctx.beginPath(); ctx.ellipse(0, 0, 10, 7, 0, 0, TAU);
+    ctx.fillStyle = colors.body; ctx.fill();
+    ctx.save(); ctx.clip();
+    ctx.fillStyle = colors.stripe;
+    for (const sx of [-8, -3, 2]) ctx.fillRect(sx, -8, 2.6, 16);
+    ctx.restore();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = colors.stripe; ctx.stroke();
+    ctx.fillStyle = colors.stripe;
+    ctx.beginPath(); ctx.moveTo(-10, -1.6); ctx.lineTo(-14, 0); ctx.lineTo(-10, 1.6); ctx.fill();
+    ctx.beginPath(); ctx.arc(10, -0.5, 5, 0, TAU); ctx.fill();
+    ctx.fillStyle = colors.eye;
+    ctx.beginPath(); ctx.arc(11.8, -1.8, 1.4, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+
+  private paintHearts() {
+    const ctx = this.ctx;
+    for (const h of this.hearts) {
+      if (h.age < 0) continue;
+      const fade = 1 - clamp((h.age / h.life - 0.6) / 0.4, 0, 1), s = 5 + Math.min(1, h.age * 4) * 2;
+      ctx.globalAlpha = fade; ctx.fillStyle = PALETTE.heart;
+      ctx.beginPath();
+      ctx.moveTo(h.x, h.y + s * 0.9);
+      ctx.bezierCurveTo(h.x - s * 1.6, h.y - s * 0.2, h.x - s * 0.6, h.y - s * 1.3, h.x, h.y - s * 0.4);
+      ctx.bezierCurveTo(h.x + s * 0.6, h.y - s * 1.3, h.x + s * 1.6, h.y - s * 0.2, h.x, h.y + s * 0.9);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
 
   private paintFireflies(frame: CanvasRenderingContext2D) {
@@ -371,8 +438,12 @@ class Garden implements Meadow {
     for (const fly of this.grid.flies) {
       const x = Math.round((fly.x + Math.sin(t * fly.sp + fly.ph) * 30) / P), y = Math.round((fly.y + Math.cos(t * fly.sp * 0.8 + fly.ph) * 16) / P);
       const glow = Math.sin(t * 2 + fly.ph * 3);
-      if (glow > 0.1) { frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, 1, 1); }
-      if (glow > 0.7) { frame.fillStyle = PALETTE.flyGlow; frame.fillRect(x - 1, y, 3, 1); frame.fillRect(x, y - 1, 1, 3); frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, 1, 1); }
+      if (glow > 0.1) { frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, UNIT, UNIT); }
+      if (glow > 0.7) {
+        frame.fillStyle = PALETTE.flyGlow;
+        frame.fillRect(x - UNIT, y, UNIT * 3, UNIT); frame.fillRect(x, y - UNIT, UNIT, UNIT * 3);
+        frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, UNIT, UNIT);
+      }
     }
     for (const p of this.trail) {
       if (p.age / p.life > 0.7 && Math.floor(t * 10) % 2) continue;
@@ -380,26 +451,6 @@ class Garden implements Meadow {
     }
   }
 
-  /** Returns the cells the bee and hearts cover, so they are drawn solid. */
-  private paintBeeAndHearts(frame: CanvasRenderingContext2D): number[] {
-    const { P, lw, lh } = this.grid, t = this.time, solid: number[] = [];
-    const unit = Math.max(1, Math.round(4 / P));
-    const mark = (x: number, y: number, color: string) => {
-      frame.fillStyle = color; frame.fillRect(x, y, unit, unit);
-      for (let yy = y; yy < y + unit; yy++) for (let xx = x; xx < x + unit; xx++) if (xx >= 0 && yy >= 0 && xx < lw && yy < lh) solid.push(yy * lw + xx);
-    };
-    const sprite = Math.floor(t * 14) % 2 ? BEE_UP : BEE_DOWN;
-    const bx = Math.round(this.bee.x / P) - 4 * unit, by = Math.round(this.bee.y / P) - 4 * unit, flip = this.bee.face < 0;
-    sprite.forEach((row, y) => [...row].forEach((ch, x) => {
-      if (ch !== '.') mark(bx + (flip ? row.length - 1 - x : x) * unit, by + y * unit, PALETTE.bee[ch]);
-    }));
-    for (const h of this.hearts) {
-      if (h.age < 0 || (h.age / h.life > 0.75 && Math.floor(t * 10) % 2)) continue;
-      const hx = Math.round(h.x / P) - 2 * unit, hy = Math.round(h.y / P) - 2 * unit;
-      HEART.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === 'x') mark(hx + x * unit, hy + y * unit, PALETTE.heart); }));
-    }
-    return solid;
-  }
 }
 
 /** Start the footer meadow. Returns false if this browser cannot draw it. */

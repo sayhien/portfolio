@@ -1,0 +1,39 @@
+---
+// Header button that turns the interface sounds on or off.
+---
+<button class="sound-toggle" type="button" aria-pressed="true" data-sound-toggle>
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" fill="currentColor" />
+    <path class="waves" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+    <path class="cross" d="m15.5 9.5 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+  </svg>
+  <span>Sound</span>
+</button>
+
+<style>
+  .sound-toggle {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px;
+    font: inherit; font-size: 14px; color: var(--text-2);
+    background: none; border: 1px solid var(--line-2); border-radius: 999px; cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .sound-toggle:hover { color: var(--text); border-color: var(--text-2); }
+  .sound-toggle[aria-pressed='true'] svg { color: var(--accent); }
+  .cross { display: none; }
+  .sound-toggle[aria-pressed='false'] .waves { display: none; }
+  .sound-toggle[aria-pressed='false'] .cross { display: inline; }
+</style>
+
+<script>
+  import { play, setSoundOn, soundOn } from './sound';
+
+  document.querySelectorAll<HTMLButtonElement>('[data-sound-toggle]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(soundOn()));
+    button.addEventListener('click', () => {
+      const on = !soundOn();
+      setSoundOn(on);
+      button.setAttribute('aria-pressed', String(on));
+      if (on) void play('ding', 0.6);
+    });
+  });
+</script>

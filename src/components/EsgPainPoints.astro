@@ -52,7 +52,7 @@ const { items } = Astro.props;
 </ol>
 
 <style>
-  .c1 { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .c1 { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gap-card); }
   .c1 > li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
   .copy { display: grid; gap: 20px; }
   .pain, .fix { display: grid; gap: 8px; }

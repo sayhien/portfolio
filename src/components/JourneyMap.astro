@@ -109,7 +109,7 @@ const toolIcons: Record<string, IconName> = {
 </div>
 
 <style>
-  .jm { --label-w: 176px; --col-w: 272px; --pain: var(--danger-soft); --pain-ink: var(--danger); --opp: var(--accent-soft); --opp-ink: var(--accent); margin-top: 36px; }
+  .jm { --label-w: 116px; --col-w: 272px; --pain: var(--danger-soft); --pain-ink: var(--danger); --opp: var(--accent-soft); --opp-ink: var(--accent); margin-top: var(--space-3); }
 
   /* Controls */
   .jm-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
@@ -160,8 +160,8 @@ const toolIcons: Record<string, IconName> = {
   }
   .lab {
     display: flex; align-items: flex-start; gap: 8px;
-    padding: 18px 16px; border-top: 1px solid var(--line);
-    font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+    padding: 18px 12px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted);
     min-width: 0; overflow-wrap: anywhere;
   }
   .lab-stage { border-top: 0; align-items: center; }
@@ -208,7 +208,7 @@ const toolIcons: Record<string, IconName> = {
   @media (max-width: 700px) {
     .jm-bar { display: none; }
     .jm-scroll { overflow: visible; border: 0; background: none; mask-image: none !important; }
-    .jm-grid { display: flex; flex-direction: column; gap: 16px; width: auto; }
+    .jm-grid { display: flex; flex-direction: column; gap: var(--gap-card); width: auto; }
     .jm-labels { display: none; }
     .stage { display: block; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
     .stage:last-child { border-right: 1px solid var(--line); }
@@ -226,6 +226,8 @@ const toolIcons: Record<string, IconName> = {
 </style>
 
 <script>
+  import { play } from './sound';
+
   function setupJourneyMap(root: HTMLElement) {
     const scroller = root.querySelector<HTMLElement>('.jm-scroll');
     const labels = root.querySelector<HTMLElement>('.jm-labels');
@@ -260,9 +262,10 @@ const toolIcons: Record<string, IconName> = {
       root.toggleAttribute('data-more-right', !atEnd);
     };
 
-    steps.forEach((step, index) => step.addEventListener('click', () => scrollToStage(index)));
+    steps.forEach((step, index) => step.addEventListener('click', () => { scrollToStage(index); void play('click'); }));
     [prev, next].forEach((button) => button?.addEventListener('click', () => {
       const inView = visibleStages();
+      void play('click');
       const direction = Number(button.dataset.dir);
       const first = inView[0] ?? 0;
       scrollToStage(direction > 0 ? first + Math.max(1, inView.length) : first - Math.max(1, inView.length));

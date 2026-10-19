@@ -32,7 +32,7 @@ const { image, alt, spots } = Astro.props;
       ))}
       <div class="pop" aria-hidden="true" data-pop hidden>
         <span class="num"></span>
-        <span><b></b><span class="pop-text"></span></span>
+        <span class="pop-body"><b></b><span class="pop-text"></span></span>
       </div>
     </div>
   </div>
@@ -66,16 +66,17 @@ const { image, alt, spots } = Astro.props;
   /* Note card beside the active number; JavaScript sets its left and top */
   .pop {
     position: absolute; z-index: 2; width: min(320px, 82%);
-    display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start;
-    padding: 14px 16px; border-radius: var(--radius);
+    display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: center;
+    padding: 12px 16px; border-radius: var(--radius);
     background: rgba(23, 27, 33, 0.97); border: 1px solid var(--accent);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
     pointer-events: none; animation: pop-in 0.2s ease-out;
   }
   .pop[hidden] { display: none; }
   .num { width: 28px; height: 28px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-  .pop b { display: block; font-size: 15px; color: var(--text); margin-bottom: 2px; }
-  .pop-text { font-size: 14px; line-height: 1.5; color: var(--text-2); }
+  .pop-body { display: grid; gap: 2px; line-height: 1.35; }
+  .pop b { font-size: 15px; color: var(--text); }
+  .pop-text { font-size: 14px; line-height: 1.4; color: var(--text-2); }
   @keyframes pop-in { from { opacity: 0; transform: translateY(4px); } }
 
   @media (max-width: 700px) {
@@ -89,6 +90,8 @@ const { image, alt, spots } = Astro.props;
 </style>
 
 <script>
+  import { play } from './sound';
+
   type Spot = { title: string; text: string };
   const GAP = 22; // space between the number and its card
 
@@ -131,7 +134,7 @@ const { image, alt, spots } = Astro.props;
       card.hidden = false;
       placeCard(shot, dots[index], card);
     };
-    dots.forEach((dot, i) => dot.addEventListener('click', () => select(i)));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { select(i); void play('pop'); }));
     new ResizeObserver(() => { if (!card.hidden) placeCard(shot, dots[current], card); }).observe(shot);
     select(0);
   });

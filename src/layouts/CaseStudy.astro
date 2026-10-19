@@ -146,19 +146,20 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   .content { min-width: 0; max-width: 920px; }
 
   .more { margin-top: 64px; padding-bottom: var(--space-5); }
-  .more h2 { font-size: 40px; margin-bottom: var(--space-3); }
-  .more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .more h2 { font-size: clamp(28px, 3vw, 36px); margin-bottom: var(--space-3); }
+  .more-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
   .more-card {
-    display: flex; flex-direction: column; gap: var(--space-2);
-    padding: var(--space-4); border-radius: var(--radius);
+    display: flex; flex-direction: column; gap: var(--space-1);
+    padding: var(--space-3); border-radius: var(--radius);
     background: var(--surface); border: 1px solid var(--line);
     text-decoration: none;
     transition: border-color 0.2s, transform 0.3s;
   }
   .more-card:hover { border-color: var(--accent); transform: translateY(-3px); }
-  .more-head { display: flex; align-items: center; gap: 16px; }
-  .more-card h3 { font-size: 28px; }
-  .more-card p { color: var(--text-2); }
+  .more-head { display: flex; align-items: center; gap: var(--space-2); }
+  .more-card h3 { font-size: 22px; }
+  .more-card p { color: var(--text-2); font-size: 15px; line-height: 1.5; }
+  .more-card .go { margin-top: auto; padding-top: var(--space-1); }
   .go { color: var(--accent); font-weight: 600; font-size: 15px; }
 
   @media (max-width: 1000px) {
@@ -198,6 +199,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     .toc-progress span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
     .toc nav { max-height: 60vh; overflow: auto; padding-bottom: 12px; }
     .hero-media { margin-bottom: var(--space-4); }
+  }
+  @media (max-width: 560px) {
     .more-grid { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 600px) {
@@ -206,6 +209,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 </style>
 
 <script>
+  import { play } from '../components/sound';
+
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a'));
   const toc = document.querySelector<HTMLDetailsElement>('.toc');
   const narrow = window.matchMedia('(max-width: 1000px)');
@@ -228,6 +233,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   };
 
   links.forEach((a) => a.addEventListener('click', () => {
+    void play('tick');
     setCurrent(a.hash.slice(1));
     if (narrow.matches && toc) toc.open = false;
   }));

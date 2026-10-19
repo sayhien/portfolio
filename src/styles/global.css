@@ -37,10 +37,11 @@
   --space-3: 24px;
   --space-4: 32px;
   --space-5: 48px;
+  --gap-card: 32px; /* space between boxes */
 }
 
 @media (max-width: 900px) {
-  :root { --gutter: 20px; }
+  :root { --gutter: 20px; --gap-card: 24px; }
 }
 
 *, *::before, *::after { box-sizing: border-box; }

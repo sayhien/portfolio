@@ -27,8 +27,8 @@ const { items } = Astro.props;
 </ul>
 
 <style>
-  .qa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 48px; }
-  .qa > li { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+  .qa { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; gap: var(--space-4); }
+  .qa > li { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-4); align-items: center; }
 
   .quote { position: relative; margin: 0; padding: 0.2em 0 0 0.3em; font-size: clamp(30px, 3.6vw, 44px); isolation: isolate; }
   .mark {

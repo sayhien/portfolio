@@ -30,6 +30,13 @@
   --gutter: 64px;
   --max: 1440px;
   --radius: 12px;
+
+  /* Spacing scale: every gap in the case study uses one of these */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
 }
 
 @media (max-width: 900px) {
@@ -112,11 +119,6 @@ p { margin: 0; }
   white-space: nowrap;
 }
 
-/* Motion: the page wide pause button freezes every CSS animation. */
-[data-motion='paused'] *,
-[data-motion='paused'] *::before,
-[data-motion='paused'] *::after { animation-play-state: paused !important; }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -133,11 +135,11 @@ img.is-loaded { animation: img-in 0.45s ease-out; }
 @keyframes img-in { from { opacity: 0; } }
 
 /* Feature rows: copy beside a framed video, alternating sides. */
-.feature-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 40px; align-items: center; margin-top: 28px; }
+.feature-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: var(--space-4); align-items: center; margin-top: var(--space-3); }
 .feature-row.flip > :first-child { order: 2; }
 .feature-row > figure { margin: 0; }
 @media (max-width: 1000px) {
-  .feature-row { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .feature-row { grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
   .feature-row.flip > :first-child { order: 0; }
 }
 

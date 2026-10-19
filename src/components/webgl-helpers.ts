@@ -1,6 +1,5 @@
 // Small WebGL and animation helpers. earth.ts uses all of them for the case
 // study backgrounds; bee-garden.ts uses animateWhileVisible for the footer.
-import { isPaused } from './motion';
 
 export function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
   const shader = gl.createShader(type);
@@ -32,23 +31,22 @@ export function uploadAttribute(gl: WebGLRenderingContext, program: WebGLProgram
 
 /**
  * Call onFrame with the seconds since the last frame, but only while the host
- * is on screen, the page is not paused, and the scene has not stopped.
+ * is on screen and the scene has not stopped.
  * Returns a function that stops the loop for good.
  */
 export function animateWhileVisible(host: HTMLElement, onFrame: (dt: number) => void): () => void {
   let last = 0, visible = false, frame = 0, stopped = false;
   const loop = (now: number) => {
     frame = 0;
-    if (!visible || isPaused() || stopped) return;
+    if (!visible || stopped) return;
     const dt = Math.min(0.05, (now - (last || now)) / 1000);
     last = now;
     onFrame(dt);
     frame = requestAnimationFrame(loop);
   };
   const sync = () => {
-    if (visible && !isPaused() && !stopped && !frame) { last = 0; frame = requestAnimationFrame(loop); }
+    if (visible && !stopped && !frame) { last = 0; frame = requestAnimationFrame(loop); }
   };
   new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { rootMargin: '100px' }).observe(host);
-  new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-motion'] });
   return () => { stopped = true; };
 }

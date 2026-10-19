@@ -17,59 +17,53 @@ const { items } = Astro.props;
 <ol class="c1" data-painpoints>
   {items.map((item) => (
     <li>
-      <div class="pain">
-        <span class="lbl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19ZM12 10v4.5M12 17.2v.1" /></svg>Pain point</span>
-        <p>{item.pain}</p>
-      </div>
-      <div class="bridge" aria-hidden="true"><span><svg viewBox="0 0 24 24"><path d="M4 12h15M14 6l6 6-6 6" /></svg></span></div>
-      <div class="fix">
-        <div class="txt">
+      <div class="copy">
+        <div class="pain">
+          <span class="lbl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19ZM12 10v4.5M12 17.2v.1" /></svg>Pain point</span>
+          <p>{item.pain}</p>
+        </div>
+        <div class="fix">
           <span class="lbl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" /></svg>Solution</span>
           <p>{item.fix}</p>
           <a href={`#${item.to}`}>{item.linkLabel} <span aria-hidden="true">&darr;</span></a>
         </div>
-        {item.widget === 'assign' && (
-          <div class="widget" aria-hidden="true" data-widget="assign">
-            <div class="wtitle"><span>GRI 2 assignees</span><span>Permission</span></div>
-          </div>
-        )}
-        {item.widget === 'sync' && (
-          <div class="widget" aria-hidden="true" data-widget="sync">
-            <div class="wtitle"><span>Synchronise data</span><span class="sync-ic"><svg viewBox="0 0 24 24"><path d="M4.5 11a7.5 7.5 0 0 1 13.2-4.3L20 9M20 4v5h-5M19.5 13a7.5 7.5 0 0 1-13.2 4.3L4 15M4 20v-5h5" /></svg></span></div>
-            <div class="depts"></div>
-            <div class="fields"></div>
-            <span class="sample">Sample values</span>
-          </div>
-        )}
-        {item.widget === 'chat' && (
-          <div class="widget" aria-hidden="true" data-widget="chat">
-            <div class="wtitle"><span>Disclosure 2-1, legal name</span><span class="pill p-acc chat-status">Flagged</span></div>
-            <div class="chat"></div>
-          </div>
-        )}
       </div>
+      {item.widget === 'assign' && (
+        <div class="widget" aria-hidden="true" data-widget="assign">
+          <div class="wtitle"><span>GRI 2 assignees</span><span>Permission</span></div>
+        </div>
+      )}
+      {item.widget === 'sync' && (
+        <div class="widget" aria-hidden="true" data-widget="sync">
+          <div class="wtitle"><span>Synchronise data</span><span class="sync-ic"><svg viewBox="0 0 24 24"><path d="M4.5 11a7.5 7.5 0 0 1 13.2-4.3L20 9M20 4v5h-5M19.5 13a7.5 7.5 0 0 1-13.2 4.3L4 15M4 20v-5h5" /></svg></span></div>
+          <div class="depts"></div>
+          <div class="fields"></div>
+          <span class="sample">Sample values</span>
+        </div>
+      )}
+      {item.widget === 'chat' && (
+        <div class="widget" aria-hidden="true" data-widget="chat">
+          <div class="wtitle"><span>Disclosure 2-1, legal name</span><span class="pill p-acc chat-status">Flagged</span></div>
+          <div class="chat"></div>
+        </div>
+      )}
     </li>
   ))}
 </ol>
 
 <style>
-  .c1 { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }
-  .c1 > li { display: grid; grid-template-columns: minmax(0, 0.8fr) 104px minmax(0, 1.7fr); align-items: stretch; }
-  .pain { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; }
+  .c1 { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .c1 > li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .copy { display: grid; gap: 20px; }
+  .pain, .fix { display: grid; gap: 8px; }
   .lbl { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
   .lbl svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
   .pain .lbl { color: var(--danger); }
-  .pain p, .txt p { font-size: 17px; line-height: 1.5; color: var(--text); }
-  .bridge { display: grid; place-items: center; position: relative; }
-  .bridge::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed var(--line-2); }
-  .bridge span { position: relative; width: 36px; height: 36px; border-radius: 999px; background: var(--accent); display: grid; place-items: center; }
-  .bridge svg { width: 18px; height: 18px; fill: none; stroke: var(--on-accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .fix { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; align-items: center; }
   .fix .lbl { color: var(--accent); }
-  .txt { display: grid; gap: 8px; }
-  .txt a { font-size: 14px; font-weight: 600; color: var(--accent); }
+  .copy p { font-size: 17px; line-height: 1.5; color: var(--text); }
+  .fix a { font-size: 14px; font-weight: 600; color: var(--accent); }
 
-  .widget { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 12px; display: grid; gap: 8px; color: var(--text-2); min-width: 0; }
+  .widget { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 12px; display: grid; gap: 8px; color: var(--text-2); min-width: 0; }
   .wtitle { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .widget :global(.av) { width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; font-size: 10px; font-weight: 700; color: var(--on-accent); flex: none; }
   .widget :global(.pill) { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 9px; white-space: nowrap; letter-spacing: 0; text-transform: none; }
@@ -111,14 +105,11 @@ const { items } = Astro.props;
   @keyframes blink { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
   @keyframes msg-in { from { opacity: 0; transform: translateY(6px); } }
 
-  @media (max-width: 1100px) {
-    .c1 > li { grid-template-columns: minmax(0, 1fr); }
-    .bridge { height: 72px; }
-    .bridge::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 2px dashed var(--line-2); }
-    .bridge svg { transform: rotate(90deg); }
+  @media (max-width: 1000px) {
+    .c1 > li { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   }
   @media (max-width: 600px) {
-    .fix { grid-template-columns: minmax(0, 1fr); }
+    .c1 > li { padding: 20px; }
   }
 </style>
 

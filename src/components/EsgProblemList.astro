@@ -94,8 +94,8 @@ const { answer } = Astro.props;
 </div>
 
 <style>
-  .problems { display: grid; gap: 20px; margin-top: 28px; max-width: 760px; }
-  .plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .problems { display: grid; gap: var(--space-3); margin-top: var(--space-3); max-width: 760px; }
+  .plist { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
   .plist li { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 24px; align-items: center; }
   .plist p { font-size: 17px; color: var(--text-2); }
   .vig { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 4px; }

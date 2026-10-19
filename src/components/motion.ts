@@ -1,11 +1,9 @@
 // Shared motion helpers for animated case study pieces.
-// Motion respects three things: the visitor's reduced motion setting,
-// the page wide pause button, and whether the piece is on screen.
+// Motion respects two things: the visitor's reduced motion setting,
+// and whether the piece is on screen.
 
 export const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-export const isPaused = () => document.documentElement.dataset.motion === 'paused';
 
 /** Restart a CSS animation class on an element. */
 export function restartClass(element: Element, className = 'play') {
@@ -46,11 +44,11 @@ export function trackVisibility(element: HTMLElement) {
   return state;
 }
 
-/** Wait that only counts down while visible and not paused. */
+/** Wait that only counts down while visible. */
 export async function sleepWhileActive(ms: number, state: { visible: boolean }) {
   let remaining = ms;
   while (remaining > 0) {
     await new Promise((resolve) => setTimeout(resolve, 100));
-    if (state.visible && !isPaused()) remaining -= 100;
+    if (state.visible) remaining -= 100;
   }
 }

@@ -43,7 +43,7 @@ const { image, alt, spots } = Astro.props;
 </figure>
 
 <style>
-  .tour { margin: 40px 0 0; }
+  .tour { margin: var(--space-4) 0 0; }
   /* Let note cards and edge numbers spill past the frame instead of being cut off */
   .tour .shot-frame { overflow: visible; }
   .tour .shot-frame-bar { border-radius: var(--radius) var(--radius) 0 0; }

@@ -11,6 +11,7 @@
   --line-2: #2e3641;
   --accent: #6ee7b7;
   --accent-soft: rgba(110, 231, 183, 0.12);
+  --accent-line: rgba(110, 231, 183, 0.35); /* quiet vertical rules and quote bars */
   --on-accent: #0b0e11;
   --night: #0b0e11;
 

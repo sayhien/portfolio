@@ -22,7 +22,6 @@ import type { PainPoint } from '../components/EsgPainPoints.astro';
 import { onFirstView, restartClass } from '../components/motion';
 import type { IconName } from '../components/Icon.astro';
 
-import hero from '../assets/esg/hero.png';
 import ifrs from '../assets/esg/ifrs-logo.png';
 import gri from '../assets/esg/gri-logo.png';
 import dashboard from '../assets/esg/dashboard.png';
@@ -190,23 +189,6 @@ const next: NextLink[] = [
   next={next}
   heroScene="globe"
 >
-  <figure slot="hero" class="hero-fig">
-    <Image
-      src={hero}
-      alt="The GRI 2 General Disclosures reporting screen with a disclosure progress sidebar, input fields and requirement guidance, overlaid with the compliance confidence and status distribution cards"
-      widths={[640, 1000, 1360]}
-      sizes="(max-width: 1440px) 100vw, 1312px"
-      loading="eager"
-      class="hero-img"
-    />
-    <svg class="sketch sketch-line" viewBox="0 0 60 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M44 100C30 86 26 74 32 60S40 30 30 2" vector-effect="non-scaling-stroke" pathLength="100" />
-    </svg>
-    <svg class="sketch sketch-head" viewBox="0 0 30 20" aria-hidden="true">
-      <path d="M4 17C8 11 11 6 15 2c3 5 7 10 11 14" pathLength="100" />
-    </svg>
-    <figcaption class="hero-cap" data-hero-cap>Where sustainability data goes in</figcaption>
-  </figure>
 
   <section id="introduction" class="sec">
     <p class="sn">{n('introduction')}</p>
@@ -233,8 +215,8 @@ const next: NextLink[] = [
       The initial phase involved getting the business requirements from the entrepreneur, and understanding the complex reporting frameworks (GRI and IFRS) and how they would integrate with the existing ERP system.
     </p>
     <ul class="logos">
-      <li><Image src={gri} alt="" widths={[240]} sizes="120px" /><p><b>GRI</b> covers broad environmental, social and governance impacts.</p></li>
-      <li><Image src={ifrs} alt="" widths={[240]} sizes="120px" /><p><b>IFRS</b> covers the financial side of sustainability.</p></li>
+      <li><span class="logo-tile"><Image src={gri} alt="" widths={[240]} sizes="120px" /></span><p><b>GRI</b> covers broad environmental, social and governance impacts.</p></li>
+      <li><span class="logo-tile"><Image src={ifrs} alt="" widths={[240]} sizes="120px" /></span><p><b>IFRS</b> covers the financial side of sustainability.</p></li>
     </ul>
     <h3 class="sub">Key requirements identified</h3>
     <EsgRequirements />
@@ -379,15 +361,15 @@ const next: NextLink[] = [
         <li>
           <div class="ch-head">
             <h3><span class="ch-icon"><Icon name={c.icon} size={22} /></span>{c.title}</h3>
+            <p class:list={['stamp', `tone-${c.status.tone}`]}>
+              <span class="visually-hidden">Status: </span>{c.status.label}{c.status.note && <small>{c.status.note}</small>}
+            </p>
           </div>
           <dl class="flow">
             <div><dt><Icon name="alert" size={14} />Challenge</dt><dd>{c.challenge}</dd></div>
             <div><dt><Icon name="bulb" size={14} />Solution</dt><dd>{c.solution}</dd></div>
             <div><dt><Icon name="target" size={14} />Result</dt><dd>{c.result}</dd></div>
           </dl>
-          <p class:list={['stamp', `tone-${c.status.tone}`]}>
-            <span class="visually-hidden">Status: </span>{c.status.label}{c.status.note && <small>{c.status.note}</small>}
-          </p>
         </li>
       ))}
     </ol>
@@ -396,31 +378,11 @@ const next: NextLink[] = [
 
 <script>
   import { onFirstView, restartClass } from '../components/motion';
-  // The hero arrow draws itself once; stamps slam onto the challenge results.
-  document.querySelectorAll<HTMLElement>('.hero-fig').forEach((fig) => onFirstView(fig, () => restartClass(fig), 0.5));
+  // Stamps slam onto the challenge results when the list scrolls in.
   document.querySelectorAll<HTMLElement>('[data-challenges] > li').forEach((card) => onFirstView(card, () => restartClass(card), 0.5));
 </script>
 
 <style>
-  .hero-fig { margin: 0; }
-  :global(.hero-img) { width: 100%; }
-  /* A hand drawn arrow from the caption up to the input fields. It runs
-     between the logo and the confidence card so it covers nothing important. */
-  .hero-fig { position: relative; --arrow-x: 27.6%; }
-  .hero-cap { margin: 14px 0 0 calc(var(--arrow-x) + 14px); font-family: var(--display); font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: var(--text); }
-  .sketch { position: absolute; overflow: visible; pointer-events: none; }
-  .sketch path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; filter: drop-shadow(0 0 2px rgba(11, 14, 17, 0.9)); }
-  .sketch-line { left: calc(var(--arrow-x) - 40px); top: 59%; bottom: 14px; width: 54px; height: auto; }
-  .sketch-head { left: calc(var(--arrow-x) - 28px); top: calc(59% - 1px); width: 30px; height: 20px; }
-  .hero-fig.play .sketch-line path { animation: sketch 0.8s ease-out backwards; }
-  .hero-fig.play .sketch-head path { animation: sketch 0.3s ease-out 0.75s backwards; }
-  @keyframes sketch { from { stroke-dashoffset: 100; } }
-  @media (max-width: 800px) {
-    .hero-cap { font-size: 16px; margin-top: 10px; }
-    .sketch path { stroke-width: 2.2; }
-  }
-
-
   .sec { padding: 72px 0; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
   .sec:first-child { border-top: 0; padding-top: 0; }
   .sn { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 14px; }
@@ -439,14 +401,15 @@ const next: NextLink[] = [
   figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; }
 
 
-  blockquote { margin: 0 0 24px; font-family: var(--display); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent); letter-spacing: -0.01em; }
+  blockquote { margin: 0 0 24px; font-family: var(--display); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent-line); letter-spacing: -0.01em; }
 
 
 
 
   .logos { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .logos li { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
-  .logos :global(img) { width: 112px; height: auto; flex: none; background: #fff; border-radius: 8px; padding: 8px 10px; } /* logos are drawn for white */
+  .logo-tile { flex: none; width: 112px; background: #fff; border-radius: 8px; padding: 8px 10px; } /* logos are drawn for white */
+  .logos :global(img) { width: 100%; height: auto; }
   .logos p { font-size: 15px; line-height: 1.45; color: var(--text-2); }
   .logos b { color: var(--text); }
 
@@ -456,7 +419,7 @@ const next: NextLink[] = [
   .p-body { display: grid; gap: 6px; }
   .persona h3 { font-size: 22px; }
   .p-role { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
-  .p-quote { font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--text); margin: 4px 0 6px; padding-left: 12px; border-left: 2px solid var(--accent); }
+  .p-quote { font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--text); margin: 4px 0 6px; padding-left: 12px; border-left: 2px solid var(--accent-line); }
   .persona ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
   .persona li + li { margin-top: 3px; }
 
@@ -481,9 +444,8 @@ const next: NextLink[] = [
   .ch-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
   .challenges h3 { display: flex; align-items: center; gap: 14px; font-size: 24px; }
   .ch-icon { width: 44px; height: 44px; flex: none; border-radius: 10px; background: var(--surface-2); display: grid; place-items: center; color: var(--text); }
-  .challenges li { position: relative; padding-bottom: 84px; overflow: hidden; }
   .stamp {
-    position: absolute; right: 28px; bottom: 22px; transform: rotate(-7deg);
+    position: relative; flex: none; margin: 0 6px 0 auto; transform: rotate(-7deg);
     display: grid; justify-items: center; gap: 2px;
     border: 2.5px solid currentColor; border-radius: 8px; padding: 6px 14px;
     font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.2;

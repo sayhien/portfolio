@@ -11,10 +11,8 @@ import BeeGarden from '../components/BeeGarden.astro';
 interface Props {
   title: string;
   description?: string;
-  /** Show the large "Let's work together." line in the footer. */
-  footerTitle?: boolean;
 }
-const { title, description = site.intro, footerTitle = true } = Astro.props;
+const { title, description = site.intro } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const home = base;
 const year = new Date().getFullYear();
@@ -39,7 +37,7 @@ const year = new Date().getFullYear();
           <ul>
             <li><a href={`${home}#work`}>Case Studies</a></li>
             <li><a href={site.resume} target="_blank" rel="noopener">Resume</a></li>
-            <li><a href={`${home}#contact`}>Contact</a></li>
+            <li><a href={`mailto:${site.email}`}>Contact</a></li>
             <li><a href={site.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
           </ul>
         </nav>
@@ -51,27 +49,11 @@ const year = new Date().getFullYear();
       <slot />
     </main>
 
-    <footer class="site-footer" id="contact">
-      <div class="wrap">
-        <hr class="rule" />
-        <div class="foot-grid">
-          <div>
-            <p class="eyebrow">Contact</p>
-            {footerTitle && <h2 class="foot-title">Let's work together.</h2>}
-            <p class="foot-copy">
-              I'm available for full time positions, freelance projects, or consultations in UX design.
-            </p>
-          </div>
-          <ul class="foot-links">
-            <li><span>Email</span><a href={`mailto:${site.email}`}>{site.email}</a></li>
-            <li><span>WhatsApp</span><a href={site.whatsappLink} target="_blank" rel="noopener">{site.whatsapp}</a></li>
-            <li><span>LinkedIn</span><a href={site.linkedin} target="_blank" rel="noopener">Loo Say Hien</a></li>
-            <li><span>Resume</span><a href={site.resume} target="_blank" rel="noopener">View resume</a></li>
-          </ul>
-        </div>
+    <footer class="site-footer">
+      <div class="wrap"><hr class="rule" /></div>
+      <BeeGarden>
         <p class="copyright">&copy; {year} {site.name}</p>
-      </div>
-      <BeeGarden />
+      </BeeGarden>
     </footer>
     <script>
       // Ghost loading: shimmer until each image arrives, then fade it in.
@@ -132,29 +114,5 @@ const year = new Date().getFullYear();
   }
 
   .site-footer { margin-top: 120px; }
-  .foot-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 48px;
-    padding: 72px 0 56px;
-  }
-  .foot-title { font-size: clamp(40px, 5vw, 64px); margin: 16px 0 20px; }
-  .foot-copy { color: var(--text-2); max-width: 460px; font-size: 18px; }
-  .eyebrow + .foot-copy { margin-top: 16px; }
-  .foot-links { list-style: none; margin: 0; padding: 0; align-self: end; }
-  .foot-links li {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px 0;
-    border-top: 1px solid var(--line);
-  }
-  .foot-links li:last-child { border-bottom: 1px solid var(--line); }
-  .foot-links span { color: var(--muted); font-size: 14px; }
-  .foot-links a { text-decoration: none; font-weight: 500; }
-  .foot-links a:hover { color: var(--accent); }
-  .copyright { font-size: 14px; color: var(--muted); padding-bottom: 8px; }
-  @media (max-width: 900px) {
-    .foot-grid { grid-template-columns: minmax(0, 1fr); }
-  }
+  .copyright { font-size: 14px; color: var(--muted); }
 </style>

@@ -1,467 +1,423 @@
-// The footer landscape, drawn only with green particles in the style of an
-// engraved print: drifting clouds, distant mountains, shaded rolling hills
-// with trees, a meadow, butterflies and birds, and a few large open flowers
-// in front. A yellow bee flies between those flowers and drinks from their
-// centres. Tapping the bee (or the "say hello" button) makes it stop, chirp
-// and float up hearts, then carry on. One draw call, about 40,000 points.
+// Moon Dust: the footer meadow drawn from tiny specks of light. The scene is
+// first painted on a coarse grid (hills, swaying grass, flowers, fireflies, the
+// bee), then each grid cell scatters a few specks: bright cells keep them all,
+// dark cells none, so the moonlight builds up from density like a
+// stipple drawing. Tapping the bee (or the "say hello" button) makes it chirp,
+// fly a loop and float up hearts.
 import { prefersReducedMotion } from './motion';
-import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
+import { animateWhileVisible } from './webgl-helpers';
+import { Bee, type Flower, type Hill, type Land, type Meadow, clamp, flowerOpen, makeFlowers, makeLand, seeded, wind } from './meadow';
 
-const MAX_DPR = 1.5;
-const MAX_FLOWERS = 4;
-const STILL_TIME = 12; // seconds in, for the reduced motion still picture
+const STILL_TIME = 7; // seconds in, for the reduced motion still picture
+const RENDERS_PER_SECOND = 30; // specks are placed by hand, so 30 a second keeps phones cool
 
-const KIND = {
-  sky: 13, cloud: 0, mountain: 1, hill: 2, tree: 3, field: 4, grass: 5, wildflower: 6,
-  flower: 7, butterfly: 8, bird: 9, bee: 10, nectar: 11, heart: 12,
-} as const;
+// Night Graphite with mint hills, yellow and orange flowers, a black and white bee.
+const PALETTE = {
+  ground: '#0f1216',
+  sky: ['#0f1216', '#10161a', '#121b1d', '#142121', '#172826', '#1b302c'],
+  hills: [
+    { base: '#1d3a33', light: '#3b7563', dark: '#142a25' },
+    { base: '#24503f', light: '#4f9c80', dark: '#1a3c30' },
+    { base: '#2c6b52', light: '#6ee7b7', dark: '#1f5440' },
+  ],
+  grass: ['#2a6450', '#3b8468', '#58b892', '#9fe6c8'],
+  stem: '#2a6650', bud: '#4f9c80',
+  petals: [
+    ['#ff8a3d', '#fff1d6', '#c95f1f'], ['#ffc94a', '#ff6a2b', '#c9952f'],
+    ['#fff1d6', '#ff8a3d', '#c9bda6'], ['#ff6a2b', '#ffd9a0', '#b84a17'],
+  ],
+  star: '#eceff3', starDim: '#3a4c47', moon: '#f6f3ea', moonShade: '#ffd9a0',
+  bee: { w: '#ffffff', y: '#ffc94a', k: '#0b0e11', h: '#0b0e11', e: '#ffffff' } as Record<string, string>,
+  heart: '#ff8a3d', fly: '#ffe2b0', flyGlow: '#8a5a3a', trail: '#ffc46b',
+};
 
-const VERTEX = `
-precision highp float;
-attribute vec4 aData; // kind, index, sub index, random
-attribute vec4 aRnd;
-uniform vec2 uRes;
-uniform float uT, uDpr, uFlowerN, uCollect, uTapAge, uFacing, uFlap;
-uniform vec3 uBee; // x, y, flower it is visiting
-uniform vec4 uFlowers[${MAX_FLOWERS}]; // x, head height, radius, petals
-varying vec3 vCol;
-varying float vA;
-const float PI = 3.14159265, TAU = 6.2831853, BEE = 1.5;
-const vec3 MINT = vec3(.43,.91,.72), DEEP = vec3(.13,.5,.42), PALE = vec3(.76,.98,.88);
-const vec3 GOLD = vec3(.99,.78,.25), INK = vec3(.16,.12,.07);
+const HILLS: Hill[] = [
+  { base: 0.64, bumps: [[0.12, 0.11, 0.12], [0.44, 0.06, 0.1], [0.8, 0.14, 0.15]] },
+  { base: 0.77, bumps: [[0.3, 0.14, 0.18], [0.72, 0.08, 0.15], [1.0, 0.06, 0.1]] },
+  { base: 0.93, bumps: [[0.14, 0.1, 0.2], [0.64, 0.17, 0.25]] },
+];
 
-float h1(float n){ return fract(sin(n*12.9898 + 4.1414)*43758.5453); }
-vec2 disc(float a, float b){ return vec2(cos(a*TAU), sin(a*TAU))*sqrt(b); }
-vec2 rot(vec2 p, float a){ float c = cos(a), s = sin(a); return vec2(c*p.x - s*p.y, s*p.x + c*p.y); }
-float wind(float x, float t){ return sin(t*.8 + x*.006)*.6 + sin(t*1.9 + x*.02)*.25 + .3*sin(t*.37 + 2.); }
+// Sprites, facing right. w wing, y yellow, k black stripe, h head, e eye.
+const BEE_UP = ['..ww.ww..', '..wwwww..', '...www...', '.ykykyhh.', 'kykykyhhe', '.ykykyhh.'];
+const BEE_DOWN = ['.........', '.........', '..wwwww..', '.ykwwwyhh', 'kykykyhhe', '.ykykyhh.'];
+const HEART = ['.x.x.', 'xxxxx', 'xxxxx', '.xxx.', '..x..'];
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
+const bayer = (x: number, y: number) => BAYER[(y & 3) * 4 + (x & 3)];
 
-// Ridge line of each layer: 0 far mountains, 1 to 3 hills, 4 the meadow
-float ridge(float layer, float x){
-  float u = x/max(uRes.x, 1.), H = uRes.y;
-  if(layer < .5) return H*(.6 + .07*sin(u*7. + 1.3) + .035*sin(u*17. + .4) + .015*sin(u*41. + 2.));
-  if(layer < 1.5) return H*(.44 + .06*sin(u*4.5 + 2.2) + .02*sin(u*13. + 1.));
-  if(layer < 2.5) return H*(.34 + .07*sin(u*3.2 - .6) + .02*sin(u*9. + 3.));
-  if(layer < 3.5) return H*(.24 + .045*sin(u*2.6 + 1.7) + .015*sin(u*11.));
-  return H*.13;
-}
-// 1 when a nearer layer covers this point
-float covered(float layer, vec2 p){
-  for(int k = 1; k < 5; k++){ float L = float(k); if(L > layer && p.y < ridge(L, p.x) - 1.) return 1.; }
-  return 0.;
-}
-// Engraved hatching under a ridge: lines follow the ridge, lit on slopes facing the light
-vec2 hatch(float layer, float lines, float gap, out float a){
-  float x = aRnd.x*uRes.x;
-  float k = floor(aRnd.y*lines);
-  float y = ridge(layer, x) - k*gap - k*k*.15;
-  float slope = (ridge(layer, x + 3.) - ridge(layer, x - 3.))/6.;
-  float lit = clamp(.55 - slope*4., 0., 1.);
-  float dash = step(.22, h1(floor(x/(5. + k)) + k*13. + layer*7.));
-  a = k < .5 ? .95 : (.2 + .65*lit)*pow(1. - k/lines, 1.1)*dash;
-  return vec2(x, y + (aRnd.z - .5)*.8);
-}
-vec2 flowerHead(vec4 f, float t){ float w = wind(f.x, t); return vec2(f.x + w*14., f.y - abs(w)*3.); }
-vec2 heart(float a){ float s = sin(a); return vec2(16.*s*s*s, 13.*cos(a) - 5.*cos(2.*a) - 2.*cos(3.*a) - cos(4.*a))/16.; }
-
-vec2 place(out vec3 col, out float a, out float size){
-  float kind = aData.x, i = aData.y, r = aData.w;
-  float W = uRes.x, H = uRes.y, t = uT;
-  float scale = clamp(W/1200., .6, 1.2);
-  size = 1.5; a = 1.; col = MINT;
-
-  if(kind > 12.5){ // faint engraved lines across the sky
-    float k = floor(aRnd.y*46.);
-    float y = H*.5 + k*H*.011;
-    float x = aRnd.x*W;
-    float dash = step(.35, h1(floor(x/9.) + k*17.));
-    col = DEEP*1.3; a = .05 + .1*(k/46.); a *= dash; size = 1.2;
-    return vec2(x, y);
+const rgbCache = new Map<string, [number, number, number]>();
+function rgbOf(hex: string): [number, number, number] {
+  let rgb = rgbCache.get(hex);
+  if (!rgb) {
+    const n = parseInt(hex.slice(1), 16);
+    rgb = [n >> 16, (n >> 8) & 255, n & 255];
+    rgbCache.set(hex, rgb);
   }
-  if(kind < .5){ // clouds drifting across the sky, lit from above
-    float s = (.95 + .55*h1(i + 2.))*scale;
-    float cx = mod(h1(i)*(W + 600.) + t*(6. + i*1.6), W + 600.) - 300.;
-    float cy = H*(.72 + .1*h1(i + 7.));
-    float b = floor(aRnd.x*6.);
-    vec2 bc = vec2((h1(i*7. + b) - .5)*190., abs(h1(i*5. + b) - .5)*44.)*s;
-    float rad = (38. + 52.*h1(i*3. + b))*s;
-    vec2 q = disc(aRnd.y, aRnd.z);
-    vec2 p = vec2(cx, cy) + bc + q*rad*vec2(1., .68);
-    p.y = max(p.y, cy - 8.*s);
-    float top = clamp((p.y - cy - bc.y)/(rad*.68), -1., 1.);
-    float edge = smoothstep(.55, 1., length(q));
-    col = mix(DEEP*1.2, PALE, .5 + .5*top);
-    a = (.18 + .62*smoothstep(-.5, 1., top))*(.6 + .6*edge); size = 1.7;
-    return p;
-  }
-  if(kind < 1.5){ // far mountains
-    vec2 p = hatch(0., 12., 4.5, a);
-    col = mix(DEEP, MINT, .5); a *= .85*(1. - covered(0., p)); size = 1.4;
-    return p;
-  }
-  if(kind < 2.5){ // three rolling hills
-    float layer = 1. + i;
-    vec2 p = hatch(layer, 12., 4.5 + i*.6, a);
-    col = mix(DEEP*1.1, MINT, .45 + i*.18); a *= (.85 + i*.1)*(1. - covered(layer, p)); size = 1.5 + i*.1;
-    return p;
-  }
-  if(kind < 3.5){ // clumps of trees along the hill tops
-    float layer = 1. + step(.5, h1(i*3.1));
-    float x = h1(i*1.7)*W;
-    float rad = (5. + 9.*h1(i*2.3))*(layer > 1.5 ? 1.15 : .9)*scale;
-    vec2 q = disc(aRnd.x, aRnd.y);
-    vec2 p = vec2(x, ridge(layer, x) + rad*.7) + q*rad*vec2(1.1, 1.);
-    float light = clamp(.5 + .6*dot(normalize(q + 1e-4), vec2(-.6, .8)), 0., 1.);
-    col = mix(DEEP*1.2, MINT, light*.85); a = (.5 + .5*light)*(1. - covered(layer, p)); size = 1.5;
-    return p;
-  }
-  if(kind < 4.5){ // the near field, softly stippled
-    vec2 p = vec2(aRnd.x*W, aRnd.y*aRnd.y*ridge(4., 0.));
-    col = mix(DEEP, MINT, aRnd.z*.5); a = .18 + .2*aRnd.w; size = 1.4;
-    return p;
-  }
-  if(kind < 5.5){ // grass blades swaying in the wind
-    float x = aRnd.x*W;
-    float base = aRnd.y*ridge(4., 0.)*1.15;
-    float near = 1. - base/(H*.15);
-    float h = (8. + near*near*46. + aRnd.z*14.)*scale;
-    float u = aData.z/13.;
-    float bend = (wind(x, t)*9. + (aRnd.w - .5)*12.)*u*u;
-    col = mix(DEEP, MINT, .3 + .6*u); a = (.4 + .5*u)*(.5 + .5*near); size = 1.5;
-    return vec2(x + bend, base + u*h);
-  }
-  if(kind < 6.5){ // small wildflowers dotted over the meadow
-    float x = h1(i*1.3)*W;
-    float y = h1(i*2.9)*H*.2 + 4.;
-    float petal = floor(aRnd.x*6.);
-    vec2 p = vec2(x + wind(x, t)*4., y) + (petal < .5 ? vec2(0.) : vec2(cos(petal*1.257), sin(petal*1.257))*2.4*scale);
-    col = petal < .5 ? MINT : PALE; a = .75; size = 1.6;
-    return p;
-  }
-  if(kind < 7.5){ // large open flowers facing the viewer
-    if(i >= uFlowerN){ a = 0.; return vec2(-100.); }
-    vec4 f = uFlowers[int(i)];
-    vec2 c = flowerHead(f, t);
-    float R = f.z, w = wind(f.x, t);
-    float glow = uCollect*step(abs(i - uBee.z), .1);
-    if(r < .1){ // stem
-      float u = aRnd.x;
-      col = DEEP*1.25; a = .85; size = 1.7;
-      return vec2(mix(f.x, c.x, u*u) + (aRnd.y - .5)*1.6, mix(-6., c.y - R*.15, u));
-    }
-    if(r < .2){ // two leaves on the stem
-      float side = step(.5, aRnd.y)*2. - 1.;
-      float u = .3 + step(.5, aRnd.y)*.22;
-      vec2 base = vec2(mix(f.x, c.x, u*u), mix(-6., c.y, u));
-      float v = aRnd.x, across = aRnd.z*2. - 1.;
-      across = sign(across)*pow(abs(across), .35);
-      vec2 dir = normalize(vec2(side, .9 + w*side*.2));
-      vec2 p = base + dir*v*R*1.1 + vec2(-dir.y, dir.x)*sin(PI*v)*R*.22*across;
-      col = mix(DEEP*1.2, MINT, .2 + .5*v); a = .75; size = 1.6;
-      return p;
-    }
-    float nod = .88 + .08*sin(t*1.3 + i*2.);
-    float spin = w*.12;
-    if(r < .8){ // petals, drawn by their outlines and centre veins like an engraving
-      float petals = f.w;
-      float k = floor(aRnd.x*petals);
-      float ang = (k + .5)/petals*TAU + spin + .05*sin(t*3. + k + i);
-      float v = .28 + .72*sqrt(aRnd.y);
-      float halfW = R*.19*pow(sin(PI*(v - .28)/.72), .7);
-      float across = aRnd.z*2. - 1.;
-      across = aRnd.w < .25 ? 0. : sign(across)*pow(abs(across), .3);
-      vec2 p = rot(vec2(v*R, across*halfW), ang);
-      col = mix(MINT, PALE, .3 + .7*abs(across))*(1. + glow*.25); a = .9; size = 1.6;
-      return c + vec2(p.x, p.y*nod);
-    }
-    // the open centre: stamens around a soft disc
-    vec2 q = disc(aRnd.x, aRnd.y)*R*.27;
-    float rim = smoothstep(.6, 1., length(q)/(R*.27));
-    col = mix(DEEP*1.5, PALE, .3 + .6*rim)*(1. + glow*.6); a = .95; size = 1.8;
-    return c + vec2(q.x, q.y*nod);
-  }
-  if(kind < 8.5){ // butterflies drifting over the meadow
-    vec2 c = vec2(W*(.5 + .42*sin(t*.11 + i*2.4)), H*(.3 + .08*sin(t*.37 + i) + .04*sin(t*1.3 + i)));
-    float flap = .2 + .8*abs(sin(t*9. + i*1.7));
-    if(r < .12){ col = DEEP*1.4; a = 1.; size = 1.5; return c + vec2(0., (aRnd.x - .5)*7.*scale); }
-    float side = step(.5, aRnd.z)*2. - 1.;
-    float upper = step(.4, aRnd.w);
-    vec2 q = disc(aRnd.x, aRnd.y)*vec2(5., 4.)*(upper > .5 ? 1. : .7)*scale;
-    vec2 p = vec2((abs(q.x) + 4.*scale)*side*flap, q.y + (upper > .5 ? 3. : -3.)*scale);
-    col = mix(MINT, PALE, aRnd.y); a = .85; size = 1.5;
-    return c + p;
-  }
-  if(kind < 9.5){ // birds gliding far away
-    float x = mod(t*(12. + h1(i)*6.) + h1(i + 4.)*(W + 200.), W + 200.) - 100.;
-    float y = H*(.66 + .14*h1(i + 3.)) + sin(t*.5 + i)*6.;
-    float s = aRnd.x*2. - 1.;
-    float flap = 2. + 3.*sin(t*5. + i*1.3);
-    col = DEEP*1.4; a = .75; size = 1.4;
-    return vec2(x + s*7.*scale, y + abs(s)*flap*scale);
-  }
-  if(kind < 10.5){ // the bee
-    float bob = sin(t*6.)*1.5;
-    vec2 c = uBee.xy + vec2(0., bob);
-    size = 2.4;
-    if(r < .62){ // striped body
-      vec2 p = disc(aRnd.x, aRnd.y)*vec2(11., 8.);
-      float band = step(.5, fract((p.x + 11.)/6.5));
-      col = mix(GOLD, INK, band*step(-7., p.x));
-      return c + BEE*vec2(p.x*uFacing, p.y);
-    }
-    if(r < .74){ // head with an eye
-      vec2 q = disc(aRnd.x, aRnd.y)*5.5;
-      col = mix(vec3(.2,.17,.12), vec3(1.), step(length(q - vec2(1.8, 1.2)), 1.6));
-      return c + BEE*vec2((12. + q.x)*uFacing, q.y + 1.);
-    }
-    if(r < .78){ // antennae
-      float u = aRnd.x, side = step(.5, aRnd.y)*2. - 1.;
-      col = vec3(.25,.2,.14); size = 1.6;
-      return c + BEE*vec2((14. + u*5. + side*u*2.)*uFacing, 5. + u*7.);
-    }
-    float side = step(.5, aRnd.z); // wings, flapping
-    vec2 p = disc(aRnd.x, aRnd.y)*vec2(6., 9.)*vec2(1., uFlap);
-    col = vec3(.88,.95,1.); a = .45;
-    return c + BEE*vec2((p.x - 3. + side*6.)*uFacing, p.y + 9.);
-  }
-  if(kind < 11.5){ // nectar rising from the flower's centre to the bee
-    vec2 from = flowerHead(uFlowers[int(uBee.z)], t);
-    float u = fract(aRnd.x + t*.7);
-    vec2 p = mix(from, uBee.xy, u) + vec2(sin(u*9. + aRnd.y*6.), cos(u*7. + aRnd.z*6.))*4.*(1. - u);
-    col = GOLD; a = uCollect*(1. - u)*.9; size = 2.;
-    return p;
-  }
-  // hearts that float up after a tap
-  float k = floor(aRnd.x*3.);
-  vec2 p = uBee.xy + vec2((k - 1.)*16., 14.) + vec2(sin(uTapAge*4. + k)*6., uTapAge*60.) + heart(aRnd.y*TAU)*(7. + k*2.);
-  col = GOLD; a = (uTapAge < 1.4 ? 1. : 0.)*(1. - uTapAge/1.4); size = 2.2;
-  return p;
+  return rgb;
 }
 
-void main(){
-  vec3 col; float a, size;
-  vec2 p = place(col, a, size);
-  gl_Position = vec4(p.x/uRes.x*2. - 1., p.y/uRes.y*2. - 1., 0., 1.);
-  gl_PointSize = size*uDpr;
-  vCol = col; vA = a;
-}`;
-
-const FRAGMENT = `
-precision mediump float;
-varying vec3 vCol;
-varying float vA;
-void main(){
-  float r = length(gl_PointCoord - .5);
-  if(r > .5) discard;
-  float a = vA*smoothstep(.5, .3, r);
-  gl_FragColor = vec4(vCol*a, a);
-}`;
-
-type Flower = { x: number; height: number; radius: number; petals: number };
-
-// Particle groups, back to front (the sky lines go first), as [kind, groups, points per group].
-// Later points draw over earlier ones, which gives the landscape its depth.
-function buildParticles(narrow: boolean) {
-  const n = (count: number) => Math.round(count * (narrow ? 0.6 : 1));
-  const groups: [number, number, number][] = [
-    [KIND.sky, 1, n(5000)],
-    [KIND.cloud, 4, n(1500)],
-    [KIND.mountain, 1, n(7000)],
-    [KIND.hill, 3, n(9000)],
-    [KIND.tree, 44, 80],
-    [KIND.field, 1, n(2500)],
-    [KIND.grass, n(420), 14],
-    [KIND.wildflower, n(200), 7],
-    [KIND.flower, MAX_FLOWERS, 2200],
-    [KIND.butterfly, 2, 160],
-    [KIND.bird, 5, 24],
-    [KIND.bee, 1, 700],
-    [KIND.nectar, 1, 80],
-    [KIND.heart, 1, 90],
-  ];
-  const total = groups.reduce((sum, [, count, per]) => sum + count * per, 0);
-  const data = new Float32Array(total * 4);
-  const rnd = new Float32Array(total * 4);
-  let p = 0;
-  for (const [kind, count, per] of groups) {
-    for (let i = 0; i < count; i++) {
-      const shared = [Math.random(), Math.random(), Math.random(), Math.random()];
-      for (let j = 0; j < per; j++, p++) {
-        data.set([kind, i, j, Math.random()], p * 4);
-        // each grass blade keeps one set of randoms so its points line up
-        rnd.set(kind === KIND.grass ? shared : [Math.random(), Math.random(), Math.random(), Math.random()], p * 4);
-      }
-    }
-  }
-  return { data, rnd, total };
-}
-
-function layoutFlowers(width: number, height: number): Flower[] {
-  const count = width < 700 ? 2 : width < 1100 ? 3 : 4;
-  const radius = Math.max(30, Math.min(58, width * 0.034));
-  return Array.from({ length: count }, (_, i) => ({
-    x: width * ((i + 0.5) / count) + (Math.random() - 0.5) * (width / count) * 0.3,
-    height: height * (0.2 + Math.random() * 0.16),
-    radius: radius * (0.85 + Math.random() * 0.3),
-    petals: 8 + Math.floor(Math.random() * 5),
-  }));
-}
-
-// Must match wind() and flowerHead() in the shader, so the bee lands on the flower.
-const wind = (x: number, t: number) => Math.sin(t * 0.8 + x * 0.006) * 0.6 + Math.sin(t * 1.9 + x * 0.02) * 0.25 + 0.3 * Math.sin(t * 0.37 + 2);
-
-// A short, friendly two note chirp made on the fly; no sound files needed.
-let audio: AudioContext | null = null;
+let audio: AudioContext | undefined;
 function chirp() {
   try {
-    audio ??= new AudioContext();
+    audio = audio ?? new AudioContext();
     const now = audio.currentTime;
-    [[620, 1100, 0], [900, 1350, 0.13]].forEach(([from, to, at]) => {
-      const osc = audio!.createOscillator();
-      const gain = audio!.createGain();
+    for (const [from, to, at] of [[620, 1100, 0], [900, 1350, 0.13]]) {
+      const osc = audio.createOscillator(), gain = audio.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(from, now + at);
       osc.frequency.exponentialRampToValueAtTime(to, now + at + 0.09);
       gain.gain.setValueAtTime(0.0001, now + at);
-      gain.gain.exponentialRampToValueAtTime(0.18, now + at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.16, now + at + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + at + 0.16);
-      osc.connect(gain).connect(audio!.destination);
+      osc.connect(gain).connect(audio.destination);
       osc.start(now + at);
       osc.stop(now + at + 0.18);
-    });
+    }
   } catch (error) {
     console.warn('The bee could not make a sound in this browser', error);
   }
 }
 
-/** Start the garden. Returns false if this browser cannot draw it. */
-export function startBeeGarden(host: HTMLElement, canvas: HTMLCanvasElement, helloButton: HTMLButtonElement | null): boolean {
-  const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
-  if (!gl) return false;
-  let program: WebGLProgram;
-  try {
-    program = buildProgram(gl, VERTEX, FRAGMENT);
-  } catch (error) {
-    console.warn('Bee garden could not start', error);
-    return false;
+// ---------------------------------------------------------------- The coarse grid
+
+type Blade = { x: number; y: number; h: number; worldX: number; flex: number; tone: number; front: boolean };
+type Firefly = { x: number; y: number; ph: number; sp: number };
+type Grid = {
+  P: number; lw: number; lh: number; per: number;
+  base: HTMLCanvasElement; grass: HTMLCanvasElement; frame: HTMLCanvasElement;
+  blades: Blade[]; flies: Firefly[]; grassStep: number;
+};
+
+function makeGrid(W: number, H: number, narrow: boolean): Grid {
+  const P = narrow ? 2 : 4, lw = Math.ceil(W / P), lh = Math.ceil(H / P);
+  const make = () => Object.assign(document.createElement('canvas'), { width: lw, height: lh });
+  return { P, lw, lh, per: P >= 4 ? 4 : 3, base: make(), grass: make(), frame: make(), blades: [], flies: [], grassStep: -1 };
+}
+
+/** Sky, stars, moon and hills never move, so they are painted once. */
+function paintBackdrop(grid: Grid, land: Land, narrow: boolean) {
+  const { P, lw, lh } = grid;
+  const ctx = grid.base.getContext('2d')!;
+  const image = ctx.createImageData(lw, lh), data = image.data;
+  const put = (x: number, y: number, hex: string) => {
+    if (x < 0 || y < 0 || x >= lw || y >= lh) return;
+    const [r, g, b] = rgbOf(hex), i = (y * lw + x) * 4;
+    data[i] = r; data[i + 1] = g; data[i + 2] = b; data[i + 3] = 255;
+  };
+  const rand = seeded(8), sky = PALETTE.sky, horizon = lh * 0.62;
+  for (let y = 0; y < lh; y++) {
+    const v = clamp(y / horizon, 0, 1) * (sky.length - 1), i = Math.floor(v);
+    for (let x = 0; x < lw; x++) put(x, y, v - i > bayer(x, y) ? sky[Math.min(i + 1, sky.length - 1)] : sky[i]);
   }
-  gl.useProgram(program);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // normal blending, so nearer layers sit on top
+  for (let s = 0; s < lw * 0.18; s++) put(Math.floor(rand() * lw), Math.floor(rand() * horizon * 0.8), rand() < 0.25 ? PALETTE.star : PALETTE.starDim);
+  const mx = Math.round(lw * 0.82), my = Math.round(lh * 0.28), mr = Math.round((narrow ? 5 : 6) * (4 / P) * 1.25);
+  for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) {
+    if (Math.hypot(x, y) <= mr - 0.4) put(mx + x, my + y, (x + y) / (mr * 2) + 0.5 > bayer(x, y) + 0.45 ? PALETTE.moonShade : PALETTE.moon);
+  }
+  land.layers.forEach((layer, li) => paintHill(put, grid, layer.at, PALETTE.hills[li], rand));
+  ctx.putImageData(image, 0, 0);
+}
 
-  const u = (name: string) => gl.getUniformLocation(program, name);
-  const loc = {
-    res: u('uRes'), t: u('uT'), dpr: u('uDpr'), flowers: u('uFlowers'), flowerN: u('uFlowerN'), bee: u('uBee'),
-    collect: u('uCollect'), tap: u('uTapAge'), facing: u('uFacing'), flap: u('uFlap'),
-  };
-  const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-  let width = 0, height = 0, total = 0, flowers: Flower[] = [];
-
-  const setup = () => {
-    width = host.clientWidth; height = host.clientHeight;
-    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-    const particles = buildParticles(width < 700);
-    total = particles.total;
-    uploadAttribute(gl, program, 'aData', particles.data, 4);
-    uploadAttribute(gl, program, 'aRnd', particles.rnd, 4);
-    flowers = layoutFlowers(width, height);
-    const packed = new Float32Array(MAX_FLOWERS * 4);
-    flowers.forEach((f, i) => packed.set([f.x, f.height, f.radius, f.petals], i * 4));
-    gl.uniform4fv(loc.flowers, packed);
-    gl.uniform1f(loc.flowerN, flowers.length);
-  };
-  setup();
-
-  // The bee's simple life: fly to a flower, drink from its centre, choose another.
-  const bee = { x: width * 0.15, y: height * 0.75, vx: 0, vy: 0, facing: 1, target: 0, mode: 'fly', timer: 0, tapAge: 9, collect: 0 };
-  const headOf = (i: number, t: number) => {
-    const f = flowers[i], w = wind(f.x, t);
-    return { x: f.x + w * 14, y: f.height - Math.abs(w) * 3 + 6 };
-  };
-  const pickFlower = () => {
-    let next = Math.floor(Math.random() * flowers.length);
-    if (next === bee.target) next = (next + 1) % flowers.length;
-    bee.target = next;
-  };
-  pickFlower();
-
-  const step = (t: number, dt: number) => {
-    bee.tapAge += dt;
-    if (bee.mode === 'stunned') {
-      bee.timer -= dt;
-      bee.vx *= 0.85; bee.vy *= 0.85;
-      if (bee.timer <= 0) bee.mode = 'fly';
-    } else if (bee.mode === 'sip') {
-      const head = headOf(bee.target, t);
-      bee.x += (head.x - bee.x) * 0.25; bee.y += (head.y - bee.y) * 0.25;
-      bee.timer -= dt;
-      if (bee.timer <= 0) { bee.mode = 'fly'; pickFlower(); bee.vy = 40; }
-    } else {
-      const head = headOf(bee.target, t);
-      const dx = head.x - bee.x, dy = head.y + 26 - bee.y, dist = Math.hypot(dx, dy) || 1;
-      const speed = Math.min(110, 35 + dist * 0.5);
-      bee.vx += ((dx / dist) * speed - bee.vx) * 0.05;
-      bee.vy += ((dy / dist) * speed - bee.vy) * 0.05 + Math.sin(t * 3.1) * 1.4; // a lazy wobble, arcing above the meadow
-      if (dist < 28) { bee.mode = 'sip'; bee.timer = 2 + Math.random() * 1.6; }
+function paintHill(put: (x: number, y: number, hex: string) => void, grid: Grid, at: (x: number) => number, colors: typeof PALETTE.hills[number], rand: () => number) {
+  const { P, lw, lh } = grid;
+  for (let x = 0; x < lw; x++) {
+    const ridge = Math.round(at(x * P + P / 2) / P);
+    const slope = at(x * P + P * 3) - at(x * P - P * 2); // positive faces the moon
+    for (let y = Math.max(0, ridge); y < lh; y++) {
+      const d = y - ridge;
+      let color = colors.base;
+      if (d === 0) color = colors.light;
+      else if (d < 5 && bayer(x, y) < (slope > 0 ? 0.7 : 0.3) * (1 - d / 5)) color = colors.light;
+      else if (d > 6 && bayer(x, y) < 0.18 && slope < 0) color = colors.dark;
+      const noise = rand();
+      if (noise < 0.05) color = colors.dark;
+      else if (noise < 0.08) color = colors.light;
+      put(x, y, color);
     }
-    if (bee.mode !== 'sip') { bee.x += bee.vx * dt; bee.y += bee.vy * dt; }
-    bee.y = Math.max(30, Math.min(height - 30, bee.y));
-    if (Math.abs(bee.vx) > 4) bee.facing += ((bee.vx > 0 ? 1 : -1) - bee.facing) * 0.15;
-    bee.collect += ((bee.mode === 'sip' ? 1 : 0) - bee.collect) * 0.08;
-  };
+  }
+}
 
-  const draw = (t: number) => {
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform2f(loc.res, width, height);
-    gl.uniform1f(loc.t, t);
-    gl.uniform1f(loc.dpr, dpr);
-    gl.uniform3f(loc.bee, bee.x, bee.y, bee.target);
-    gl.uniform1f(loc.collect, bee.collect);
-    gl.uniform1f(loc.tap, bee.tapAge);
-    gl.uniform1f(loc.facing, bee.facing);
-    const flapSpeed = bee.mode === 'stunned' ? 12 : 48;
-    gl.uniform1f(loc.flap, 0.35 + 0.65 * Math.abs(Math.sin(t * flapSpeed)));
-    gl.drawArrays(gl.POINTS, 0, total);
-  };
+function makeBlades(grid: Grid, land: Land): Blade[] {
+  const { P, lw, lh } = grid, rand = seeded(15), blades: Blade[] = [];
+  for (let x = 0; x < lw; x++) {
+    const ridge = Math.round(land.front.at(x * P + P / 2) / P);
+    const perColumn = 2 + Math.floor(rand() * 2);
+    for (let k = 0; k < perColumn; k++) {
+      const depth = Math.pow(rand(), 0.8);
+      blades.push({
+        x, y: ridge + 1 + Math.floor(depth * (lh - ridge - 1)),
+        h: Math.round((2 + rand() * 2 + depth * 4) * (4 / P)),
+        worldX: x * P + land.offset, flex: 0.6 + rand() * 0.6, tone: Math.floor(rand() * 3), front: depth > 0.6,
+      });
+    }
+  }
+  return blades.sort((a, b) => a.y - b.y);
+}
 
-  const reduced = prefersReducedMotion();
-  let time = reduced ? STILL_TIME : 0;
-  const restAtFlower = () => {
-    const head = headOf(bee.target, time);
-    bee.x = head.x; bee.y = head.y; bee.mode = 'sip'; bee.collect = 1;
+/** Grass and flowers move in little steps, 8 times a second. */
+function paintGrassAndFlowers(grid: Grid, flowers: Flower[], time: number) {
+  const t = Math.floor(time * 8) / 8;
+  const ctx = grid.grass.getContext('2d')!;
+  ctx.clearRect(0, 0, grid.lw, grid.lh);
+  const blade = (b: Blade) => {
+    const lean = Math.round(clamp(wind(b.worldX, t) * 0.8 * b.flex, -1.4, 1.6));
+    for (let j = 0; j < b.h; j++) {
+      const u = j / Math.max(1, b.h - 1);
+      ctx.fillStyle = j === b.h - 1 ? PALETTE.grass[Math.min(3, b.tone + 1)] : PALETTE.grass[b.tone];
+      ctx.fillRect(b.x + Math.round(lean * u * u), b.y - j, 1, 1);
+    }
   };
-  const sayHello = () => {
-    chirp();
-    bee.mode = 'stunned'; bee.timer = 1.3; bee.tapAge = 0;
-    if (reduced) { bee.tapAge = 0.4; draw(time); } // a still frame with hearts
-  };
-  const nearBee = (event: PointerEvent) => {
-    const box = canvas.getBoundingClientRect();
-    return Math.hypot(event.clientX - box.left - bee.x, box.bottom - event.clientY - bee.y) < 48;
-  };
-  canvas.addEventListener('pointerdown', (event) => { if (nearBee(event)) sayHello(); });
-  canvas.addEventListener('pointermove', (event) => { canvas.style.cursor = nearBee(event) ? 'pointer' : ''; });
-  helloButton?.addEventListener('click', sayHello);
+  grid.blades.forEach((b) => { if (!b.front) blade(b); });
+  flowers.forEach((f) => paintFlower(ctx, grid.P, f, t));
+  grid.blades.forEach((b) => { if (b.front) blade(b); });
+}
 
-  new ResizeObserver(() => {
-    if (Math.abs(host.clientWidth - width) < 2 && Math.abs(host.clientHeight - height) < 2) return;
-    setup();
-    if (bee.target >= flowers.length) pickFlower();
-    bee.x = Math.min(bee.x, width - 20);
-    if (reduced) { restAtFlower(); draw(time); }
-  }).observe(host);
+/** A four petal flower; it grows from bud to half open to full as `open` rises. */
+function paintFlower(ctx: CanvasRenderingContext2D, P: number, f: Flower, t: number) {
+  const block = Math.max(1, Math.round((f.r > 26 ? 3 : f.r > 13 ? 2 : 1) * (4 / P)));
+  const baseX = Math.round(f.x / P), baseY = Math.round(f.y / P), stem = Math.max(3, Math.round((f.stem / P) * 0.75));
+  const lean = Math.round(clamp((wind(f.worldX, t) * 0.8 + f.lean) * f.flex * 1.6, -2, 2));
+  const headX = baseX + lean, headY = baseY - stem + (f.nod > 0.5 ? 1 : 0);
+  ctx.fillStyle = PALETTE.stem;
+  for (let j = 0; j < stem; j++) {
+    const u = j / stem, x = baseX + Math.round(lean * u * u);
+    ctx.fillRect(x, baseY - j, 1, 1);
+    if (f.leaf && j === Math.round(stem * 0.4)) ctx.fillRect(x + f.leaf, baseY - j - 1, 1, 1);
+  }
+  const [petal, centre, shade] = PALETTE.petals[f.tone % PALETTE.petals.length];
+  const cell = (cx: number, cy: number, color: string) => {
+    const x = headX + cx * block - Math.floor(block / 2), y = headY + cy * block - block;
+    ctx.fillStyle = color; ctx.fillRect(x, y, block, block);
+    if (block > 1 && color === petal) { ctx.fillStyle = shade; ctx.fillRect(x + block - 1, y + block - 1, 1, 1); }
+  };
+  if (f.open < 0.3) { cell(0, 0, PALETTE.bud); return; }
+  if (f.open < 0.7) { cell(0, 0, petal); cell(0, -1, petal); cell(0, 1, PALETTE.bud); return; }
+  cell(0, -1, petal); cell(-1, 0, petal); cell(1, 0, petal); cell(0, 1, petal); cell(0, 0, centre);
+  if (block > 1) { ctx.fillStyle = '#ffffff'; ctx.fillRect(headX - Math.floor(block / 2), headY - block * 2, 1, 1); }
+}
 
-  if (reduced) {
-    restAtFlower();
-    draw(time);
+// ---------------------------------------------------------------- Specks
+
+type Specks = {
+  k: number; image: ImageData; pixels: Uint32Array; ground: number;
+  x: Float32Array; y: Float32Array; threshold: Float32Array;
+};
+
+/** Each grid cell gets a few fixed speck spots and a brightness each needs to show. */
+function makeSpecks(ctx: CanvasRenderingContext2D, grid: Grid, k: number): Specks {
+  const count = grid.lw * grid.lh * grid.per, rand = seeded(99), size = grid.P * k;
+  const image = ctx.createImageData(grid.lw * size, grid.lh * size);
+  const specks: Specks = {
+    k, image, pixels: new Uint32Array(image.data.buffer),
+    x: new Float32Array(count), y: new Float32Array(count), threshold: new Float32Array(count), ground: 0,
+  };
+  for (let c = 0; c < grid.lw * grid.lh; c++) {
+    const cx = (c % grid.lw) * size, cy = Math.floor(c / grid.lw) * size;
+    for (let n = 0; n < grid.per; n++) {
+      const i = c * grid.per + n;
+      specks.x[i] = cx + rand() * size; specks.y[i] = cy + rand() * size;
+      specks.threshold[i] = (n + rand()) / grid.per;
+    }
+  }
+  const [r, g, b] = rgbOf(PALETTE.ground);
+  specks.ground = (255 << 24) | (b << 16) | (g << 8) | r;
+  return specks;
+}
+
+/** Scatter specks by brightness, then lay the bee and hearts on top as whole cells. */
+function renderSpecks(ctx: CanvasRenderingContext2D, grid: Grid, specks: Specks, solid: number[]) {
+  const source = grid.frame.getContext('2d', { willReadFrequently: true })!.getImageData(0, 0, grid.lw, grid.lh).data;
+  const { pixels, k } = specks, bw = specks.image.width, bh = specks.image.height;
+  pixels.fill(specks.ground);
+  for (let c = 0; c < grid.lw * grid.lh; c++) {
+    const r = source[c * 4], g = source[c * 4 + 1], b = source[c * 4 + 2];
+    const light = clamp((Math.max(r, g, b) / 255 - 0.08) * 1.35, 0, 1);
+    if (light <= 0) continue;
+    const colour = (255 << 24) | (b << 16) | (g << 8) | r, size = light > 0.82 ? k + 1 : k;
+    for (let n = 0; n < grid.per; n++) {
+      const i = c * grid.per + n;
+      if (light < specks.threshold[i]) continue;
+      const x = specks.x[i] | 0, y = specks.y[i] | 0;
+      if (x + size > bw || y + size > bh) continue;
+      for (let yy = 0; yy < size; yy++) pixels.fill(colour, (y + yy) * bw + x, (y + yy) * bw + x + size);
+    }
+  }
+  const cellSize = grid.P * k;
+  for (const c of solid) {
+    const colour = (255 << 24) | (source[c * 4 + 2] << 16) | (source[c * 4 + 1] << 8) | source[c * 4];
+    const x = (c % grid.lw) * cellSize, y = Math.floor(c / grid.lw) * cellSize;
+    for (let yy = 0; yy < cellSize - 1; yy++) pixels.fill(colour, (y + yy) * bw + x, (y + yy) * bw + x + cellSize - 1);
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.putImageData(specks.image, 0, 0);
+  // a faint glow so bright things bloom a little
+  ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.08; ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(grid.frame, 0, 0, bw, bh);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+}
+
+// ---------------------------------------------------------------- The garden
+
+type Mote = { x: number; y: number; vx: number; vy: number; age: number; life: number };
+
+class Garden implements Meadow {
+  W = 0; H = 0; time = STILL_TIME; life = 0;
+  flowers: Flower[] = [];
+  private narrow = false;
+  private land!: Land;
+  private grid!: Grid;
+  private specks!: Specks;
+  private bee!: Bee;
+  private trail: Mote[] = [];
+  private hearts: Mote[] = [];
+  private sinceRender = Infinity;
+
+  constructor(private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D) {
+    this.setup();
+  }
+
+  /** Build everything for the current size. Returns false if the canvas has no size yet. */
+  setup() {
+    const W = this.canvas.clientWidth, H = this.canvas.clientHeight;
+    if (!W || !H) return false;
+    this.W = W; this.H = H; this.narrow = W < 700;
+    const k = (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1;
+    this.land = makeLand(HILLS, 0.5, W, H);
+    this.flowers = makeFlowers(this.land, W, H, this.narrow, seeded(14));
+    this.grid = makeGrid(W, H, this.narrow);
+    paintBackdrop(this.grid, this.land, this.narrow);
+    this.grid.blades = makeBlades(this.grid, this.land);
+    this.grid.flies = Array.from({ length: this.narrow ? 9 : 16 }, (_, i) => ({ x: ((i * 0.618) % 1) * W, y: H * (0.35 + ((i * 0.37) % 0.4)), ph: i * 1.7, sp: 0.3 + ((i * 0.29) % 0.5) }));
+    this.canvas.width = this.grid.lw * this.grid.P * k;
+    this.canvas.height = this.grid.lh * this.grid.P * k;
+    this.specks = makeSpecks(this.ctx, this.grid, k);
+    this.bee = new Bee(this);
+    this.render();
     return true;
   }
-  const stop = animateWhileVisible(host, (dt) => {
-    time += dt;
-    step(time, dt);
-    draw(time);
-  });
-  canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); stop(); console.warn('Bee garden lost its graphics context and stopped'); });
+
+  resizeIfNeeded() {
+    if (Math.abs(this.canvas.clientWidth - this.W) > 1 || Math.abs(this.canvas.clientHeight - this.H) > 1) this.setup();
+  }
+
+  emitTrail(x: number, y: number) {
+    if (this.trail.length > 90) this.trail.shift();
+    this.trail.push({ x, y, vx: (Math.random() - 0.5) * 8, vy: 6 + Math.random() * 8, age: 0, life: 1 + Math.random() * 0.6 });
+  }
+
+  nearBee(event: PointerEvent) {
+    if (!this.bee) return false;
+    const box = this.canvas.getBoundingClientRect();
+    return Math.hypot(event.clientX - box.left - this.bee.x, event.clientY - box.top - this.bee.y) < 36;
+  }
+
+  hello() {
+    if (!this.bee) return;
+    chirp();
+    for (let i = 0; i < 3; i++) {
+      this.hearts.push({ x: this.bee.x + (i - 1) * 10, y: this.bee.y - 14, vx: (i - 1) * 14, vy: -42 - i * 6, age: -i * 0.12, life: 1.7 });
+    }
+    if (prefersReducedMotion()) {
+      this.hearts.forEach((h) => { h.age = 0.3; h.y -= 18; });
+      this.render();
+      this.hearts = [];
+      return;
+    }
+    this.bee.hello();
+  }
+
+  step(dt: number) {
+    if (!this.bee || prefersReducedMotion()) return;
+    this.time += dt; this.life += dt;
+    this.updateFlowers(dt);
+    this.bee.update(dt);
+    for (const list of [this.trail, this.hearts]) {
+      for (const p of list) { p.age += dt; if (p.age > 0) { p.x += p.vx * dt; p.y += p.vy * dt; } }
+    }
+    this.trail = this.trail.filter((p) => p.age < p.life);
+    this.hearts = this.hearts.filter((h) => h.age < h.life);
+    this.sinceRender += dt;
+    if (this.sinceRender >= 1 / RENDERS_PER_SECOND - 0.001) { this.sinceRender = 0; this.render(); }
+  }
+
+  private updateFlowers(dt: number) {
+    const sipping = this.bee?.state === 'sip' ? this.flowers[this.bee.target] : null;
+    for (const f of this.flowers) {
+      f.nod += ((f === sipping ? 1 : 0) - f.nod) * Math.min(1, dt * 4);
+      f.open = flowerOpen(f, this.time, this.life);
+    }
+  }
+
+  /** Paint the grid frame, then turn it into specks. The still picture is fixed at STILL_TIME. */
+  render() {
+    if (!this.W) return;
+    if (prefersReducedMotion()) {
+      this.time = STILL_TIME; this.life = 99;
+      this.updateFlowers(1);
+      this.bee.placeAt(this.bee.home);
+    }
+    const grid = this.grid, step = Math.floor(this.time * 8);
+    if (step !== grid.grassStep || prefersReducedMotion()) { grid.grassStep = step; paintGrassAndFlowers(grid, this.flowers, this.time); }
+    const frame = grid.frame.getContext('2d', { willReadFrequently: true })!;
+    frame.clearRect(0, 0, grid.lw, grid.lh);
+    frame.drawImage(grid.base, 0, 0);
+    frame.drawImage(grid.grass, 0, 0);
+    this.paintFireflies(frame);
+    const solid = this.paintBeeAndHearts(frame);
+    renderSpecks(this.ctx, grid, this.specks, solid);
+  }
+
+  private paintFireflies(frame: CanvasRenderingContext2D) {
+    const { P } = this.grid, t = this.time;
+    for (const fly of this.grid.flies) {
+      const x = Math.round((fly.x + Math.sin(t * fly.sp + fly.ph) * 30) / P), y = Math.round((fly.y + Math.cos(t * fly.sp * 0.8 + fly.ph) * 16) / P);
+      const glow = Math.sin(t * 2 + fly.ph * 3);
+      if (glow > 0.1) { frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, 1, 1); }
+      if (glow > 0.7) { frame.fillStyle = PALETTE.flyGlow; frame.fillRect(x - 1, y, 3, 1); frame.fillRect(x, y - 1, 1, 3); frame.fillStyle = PALETTE.fly; frame.fillRect(x, y, 1, 1); }
+    }
+    for (const p of this.trail) {
+      if (p.age / p.life > 0.7 && Math.floor(t * 10) % 2) continue;
+      frame.fillStyle = PALETTE.trail; frame.fillRect(Math.round(p.x / P), Math.round(p.y / P), 1, 1);
+    }
+  }
+
+  /** Returns the cells the bee and hearts cover, so they are drawn solid. */
+  private paintBeeAndHearts(frame: CanvasRenderingContext2D): number[] {
+    const { P, lw, lh } = this.grid, t = this.time, solid: number[] = [];
+    const unit = Math.max(1, Math.round(4 / P));
+    const mark = (x: number, y: number, color: string) => {
+      frame.fillStyle = color; frame.fillRect(x, y, unit, unit);
+      for (let yy = y; yy < y + unit; yy++) for (let xx = x; xx < x + unit; xx++) if (xx >= 0 && yy >= 0 && xx < lw && yy < lh) solid.push(yy * lw + xx);
+    };
+    const sprite = Math.floor(t * 14) % 2 ? BEE_UP : BEE_DOWN;
+    const bx = Math.round(this.bee.x / P) - 4 * unit, by = Math.round(this.bee.y / P) - 4 * unit, flip = this.bee.face < 0;
+    sprite.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch !== '.') mark(bx + (flip ? row.length - 1 - x : x) * unit, by + y * unit, PALETTE.bee[ch]);
+    }));
+    for (const h of this.hearts) {
+      if (h.age < 0 || (h.age / h.life > 0.75 && Math.floor(t * 10) % 2)) continue;
+      const hx = Math.round(h.x / P) - 2 * unit, hy = Math.round(h.y / P) - 2 * unit;
+      HEART.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === 'x') mark(hx + x * unit, hy + y * unit, PALETTE.heart); }));
+    }
+    return solid;
+  }
+}
+
+/** Start the footer meadow. Returns false if this browser cannot draw it. */
+export function startBeeGarden(host: HTMLElement, canvas: HTMLCanvasElement, helloButton: HTMLButtonElement | null): boolean {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return false;
+  let garden: Garden;
+  try {
+    garden = new Garden(canvas, ctx);
+  } catch (error) {
+    console.error('The footer meadow could not start', error);
+    return false;
+  }
+  helloButton?.addEventListener('click', () => garden.hello());
+  canvas.addEventListener('pointerdown', (event) => { if (garden.nearBee(event)) garden.hello(); });
+  canvas.addEventListener('pointermove', (event) => { canvas.style.cursor = garden.nearBee(event) ? 'pointer' : ''; });
+  new ResizeObserver(() => garden.resizeIfNeeded()).observe(host);
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => garden.render());
+  animateWhileVisible(host, (dt) => garden.step(dt));
   return true;
 }

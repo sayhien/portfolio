@@ -1,5 +1,5 @@
-// Small WebGL and animation helpers shared by the particle scenes
-// (earth.ts for the case study backgrounds, bee-garden.ts for the footer).
+// Small WebGL and animation helpers. earth.ts uses all of them for the case
+// study backgrounds; bee-garden.ts uses animateWhileVisible for the footer.
 import { isPaused } from './motion';
 
 export function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {

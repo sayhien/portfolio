@@ -23,7 +23,7 @@ interface Props {
 const { title, kicker, heading, lede, meta, sections, next = [], heroScene } = Astro.props;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
-<Base title={title} description={lede} footerTitle={false}>
+<Base title={title} description={lede}>
   <article>
     <div class="hero-zone">
     {heroScene && <EarthScene mode={heroScene} layout="background" />}

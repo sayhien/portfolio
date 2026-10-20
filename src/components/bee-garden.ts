@@ -28,7 +28,8 @@ const NIGHT = {
     ['#ff8a3d', '#fff1d6', '#c95f1f'], ['#ffc94a', '#ff6a2b', '#c9952f'],
     ['#fff1d6', '#ff8a3d', '#c9bda6'], ['#ff6a2b', '#ffd9a0', '#b84a17'],
   ],
-  star: '#eceff3', starDim: '#3a4c47', moon: '#f6f3ea', moonShade: '#ffd9a0',
+  // white stars, matching the page's star sky
+  star: '#eceff3', starDim: '#5f646b', moon: '#f6f3ea', moonShade: '#ffd9a0',
   bee: { wing: 'rgba(255, 255, 255, 0.88)', body: '#ffc94a', stripe: '#0b0e11', eye: '#ffffff' },
   heart: '#ff8a3d', fly: '#ffe2b0', flyGlow: '#8a5a3a', trail: '#ffc46b',
   halo: '246, 243, 234', haloSize: 110,

@@ -1,0 +1,15 @@
+---
+// The quiet star sky fixed behind every page. Decorative only.
+---
+<canvas class="star-sky" aria-hidden="true" data-star-sky></canvas>
+
+<style>
+  .star-sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+</style>
+
+<script>
+  import { startStarSky } from './star-sky';
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-star-sky]');
+  // Without a 2D canvas the page simply has a plain dark background.
+  if (canvas && !startStarSky(canvas)) canvas.remove();
+</script>

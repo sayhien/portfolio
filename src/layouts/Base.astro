@@ -7,6 +7,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 import { site } from '../data/site';
 import BeeGarden from '../components/BeeGarden.astro';
+import StarSky from '../components/StarSky.astro';
 
 interface Props {
   title: string;
@@ -29,6 +30,7 @@ const year = new Date().getFullYear();
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
   </head>
   <body>
+    <StarSky />
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
@@ -50,7 +52,7 @@ const year = new Date().getFullYear();
     </main>
 
     <footer class="site-footer">
-      <BeeGarden>
+      <BeeGarden line={site.footerLine}>
         <p class="copyright">&copy; {year} {site.name}</p>
       </BeeGarden>
     </footer>
@@ -105,6 +107,8 @@ const year = new Date().getFullYear();
   }
   nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
   .site-header { position: relative; z-index: 2; }
+  /* page content sits above the fixed star sky */
+  main, .site-footer { position: relative; z-index: 1; }
 
   @media (max-width: 720px) {
     .site-header .bar { flex-wrap: wrap; gap: 4px 12px; padding-top: 18px; padding-bottom: 10px; min-height: 0; }

@@ -1,0 +1,76 @@
+---
+// Home page hero: the headline over Saturn, then a scroll-driven flight through
+// the rings into Earth. The canvas is decorative; the headline and intro are
+// real text and always readable. Without graphics support the hero is simply
+// the text over the star sky.
+interface Props {
+  eyebrow: string;
+  heading: string;
+  intro: string;
+}
+const { eyebrow, heading, intro } = Astro.props;
+---
+<section class="space-hero" data-space-hero>
+  <canvas class="space-canvas" aria-hidden="true" data-space-canvas></canvas>
+  <div class="space-sticky">
+    <div class="wrap space-copy" data-space-copy>
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{heading}</h1>
+      <p class="space-intro">{intro}</p>
+      <p class="space-hint" data-space-hint aria-hidden="true">Scroll to travel to Earth</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The tall section gives the flight its scroll distance; the copy stays pinned. */
+  .space-hero { position: relative; height: 176vh; }
+  .space-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+  .space-canvas.is-off { visibility: hidden; }
+  .space-sticky { position: sticky; top: 0; height: 100vh; display: grid; align-content: center; z-index: 1; }
+  /* a soft dark fade behind the headline so the rings never fight the text */
+  .space-sticky::before {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 62vw; pointer-events: none;
+    background: linear-gradient(to right, rgba(15, 18, 22, 0.88), rgba(15, 18, 22, 0));
+    opacity: var(--copy, 1);
+  }
+  .space-copy { position: relative; display: grid; gap: 20px; width: 100%; opacity: var(--copy, 1); }
+  .space-copy > * { max-width: 600px; }
+  .space-copy h1 { font-size: clamp(38px, 4.8vw, 68px); line-height: 1.04; letter-spacing: -0.03em; text-wrap: balance; }
+  .space-intro { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 520px; }
+  .space-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }
+  .space-hero.no-space .space-hint { display: none; }
+
+  @media (max-width: 760px) {
+    .space-sticky { align-content: start; padding-top: 32px; }
+    .space-sticky::before { width: 100%; background: linear-gradient(to bottom, rgba(15, 18, 22, 0.9) 40%, rgba(15, 18, 22, 0) 70%); }
+    .space-intro { font-size: 16px; }
+  }
+  /* No flight for reduced motion or without graphics: a normal height hero */
+  @media (prefers-reduced-motion: reduce) {
+    .space-hero { height: auto; min-height: 100vh; }
+    .space-sticky { position: relative; }
+    .space-hint { display: none; }
+  }
+  .space-hero.no-space { height: auto; }
+  .space-hero.no-space .space-sticky { position: relative; height: auto; padding-block: 96px; }
+</style>
+
+<script>
+  import { startSpaceHero } from './space-hero';
+
+  const section = document.querySelector<HTMLElement>('[data-space-hero]');
+  const canvas = section?.querySelector<HTMLCanvasElement>('[data-space-canvas]');
+  if (section && canvas) {
+    const copy = section.querySelector<HTMLElement>('.space-sticky');
+    // The headline fades out early in the flight, as Saturn slides away.
+    const onProgress = (p: number) => copy?.style.setProperty('--copy', String(1 - Math.min(1, p / 0.18)));
+    if (!startSpaceHero(section, canvas, onProgress)) {
+      section.classList.add('no-space');
+      canvas.remove();
+    } else {
+      // The canvas is fixed, so hide it once the hero has scrolled away.
+      new IntersectionObserver(([entry]) => canvas.classList.toggle('is-off', !entry.isIntersecting)).observe(section);
+    }
+  }
+</script>

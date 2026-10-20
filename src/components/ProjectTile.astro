@@ -20,7 +20,7 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
         src={p.thumb}
         alt={p.thumbAlt ?? ''}
         widths={[480, 720, 1000]}
-        sizes="(max-width: 900px) 100vw, 640px"
+        sizes="(max-width: 900px) 100vw, 460px"
         loading={index < 2 ? 'eager' : 'lazy'}
       />
     ) : (
@@ -100,6 +100,5 @@ const cta = p.href ? 'Read case study' : 'Case study coming soon';
     padding: 4px 12px;
   }
   .more { font-size: 15px; font-weight: 600; color: var(--accent); margin-top: 4px; }
-  a.tile:hover .more { text-decoration: underline; text-underline-offset: 4px; }
   .soon .more { color: var(--muted); font-weight: 500; }
 </style>

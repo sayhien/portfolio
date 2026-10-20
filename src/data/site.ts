@@ -1,10 +1,10 @@
 import type { ImageMetadata } from 'astro';
-import esgThumb from '../assets/esg/thumbnail.png';
+import esgThumb from '../assets/esg/thumbnail.jpg';
 import chatbotThumb from '../assets/project-ai-chatbot.png';
-import remittanceThumb from '../assets/project-remittance.png';
-import healthcareThumb from '../assets/project-healthcare-report.png';
-import libraryThumb from '../assets/project-design-library.png';
-import breadcrumbThumb from '../assets/project-breadcrumb.png';
+import remittanceThumb from '../assets/project-remittance.jpg';
+import healthcareThumb from '../assets/project-healthcare-report.jpg';
+import libraryThumb from '../assets/project-design-library.jpg';
+import breadcrumbThumb from '../assets/project-breadcrumb.jpg';
 
 export const site = {
   name: 'Loo Say Hien',
@@ -56,7 +56,7 @@ export const projects: Project[] = [
     tags: ['Enterprise SaaS', 'Research', 'UI design'],
     href: 'esg-reporting-module/',
     thumb: esgThumb,
-    thumbAlt: 'ESG reporting dashboard for Tomie Technologies shown on a laptop, with the status distribution and compliance confidence cards',
+    thumbAlt: 'Tomie ESG reporting dashboard on a laptop, with the status distribution donut and an 82 percent compliance confidence card',
     tint: '#122a2c',
     ratio: 0.69,
   },
@@ -94,7 +94,7 @@ export const projects: Project[] = [
     tags: ['Design system', 'Figma', 'Angular Material'],
     href: `${framer}/docdoc-library`,
     thumb: libraryThumb,
-    thumbAlt: 'docdoc design library showing tables, provider cards, label and value lists and section navigation',
+    thumbAlt: 'docdoc design library components: side navigation, provider cards with star ratings, dialogs, label and value lists, a data table and page headers',
     external: true,
     tint: '#2b2338',
     ratio: 0.72,
@@ -107,7 +107,7 @@ export const projects: Project[] = [
     tags: ['Healthcare', 'Research', 'UI design'],
     href: `${framer}/docdoc-breadcrumb`,
     thumb: breadcrumbThumb,
-    thumbAlt: 'docdoc policy administration screen with a long breadcrumb trail shortened to Policy administration, then Edit restriction',
+    thumbAlt: 'Three docdoc screens stacked one layer deeper each, with a large breadcrumb reading Policy administration, then an ellipsis that reveals Edit policy and Edit plan, then Edit restriction',
     external: true,
     tint: '#122a2c',
     ratio: 0.7,

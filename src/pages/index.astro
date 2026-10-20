@@ -44,7 +44,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 45px;
     align-items: start;
-    max-width: calc((100% - 32px) * 0.7 + 45px);
+    max-width: 1300px; /* two columns of about 630px */
     margin: 0 auto;
   }
   .col { display: flex; flex-direction: column; gap: 40px; }

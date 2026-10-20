@@ -18,6 +18,8 @@ const PARTICLES = 330000;
 const PHONE_SCALE = 0.5;
 const MAX_DPR = 1.5;
 const STILL_TIME = 40;
+// Scroll progress milestones. The swoosh into Earth gets the last 28% of the scroll.
+const THROUGH_RINGS = 0.417, EARTH_FILLS = 0.72, SWOOSH_END = 0.995;
 
 const ease = (v: number) => { const x = Math.min(1, Math.max(0, v)); return x * x * (3 - 2 * x); };
 const mix = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -40,14 +42,14 @@ type Camera = { eye: Vec3; target: Vec3; shift: [number, number]; dist: number }
 
 /** Where the camera is for a scroll progress from 0 (Saturn) to 1 (inside Earth's clouds). */
 function cameraAt(p: number, narrow: boolean): Camera {
-  if (p < 0.45) {
-    const k = ease(p / 0.45);
+  if (p < THROUGH_RINGS) {
+    const k = ease(p / THROUGH_RINGS);
     const shift: [number, number] = narrow ? [0.2 * (1 - k), -0.35 * (1 - k)] : [0.75 * (1 - k), 0.02 * (1 - k)];
     return { eye: mix(START, THROUGH, k), target: mix([150, 0, 0], EARTH, ease(k * 1.5)), shift, dist: 3000 };
   }
   // Close in on Earth evenly in log space: first until it fills the view, then into the clouds.
   const dir = norm(sub(THROUGH, EARTH)), d0 = length(sub(THROUGH, EARTH)), lg = Math.log;
-  const k1 = ease((p - 0.45) / 0.35), k2 = ease((p - 0.8) / 0.15);
+  const k1 = ease((p - THROUGH_RINGS) / (EARTH_FILLS - THROUGH_RINGS)), k2 = ease((p - EARTH_FILLS) / (SWOOSH_END - 0.06 - EARTH_FILLS));
   const near = lg(d0) + (lg(EARTH_RADIUS * 2.2) - lg(d0)) * k1;
   const dist = Math.exp(near + (lg(EARTH_RADIUS * 1.03) - lg(EARTH_RADIUS * 2.2)) * k2);
   return { eye: add(EARTH, scale(dir, dist)), target: EARTH, shift: [0, 0], dist };
@@ -123,7 +125,7 @@ export function startSpaceHero(section: HTMLElement, canvas: HTMLCanvasElement, 
     gl.uniform1f(loc.uSizeRef, 900 * Math.min(1, Math.max(0.12, cam.dist / 1400)));
     gl.uniform1f(loc.uFog, 40000);
     gl.uniform1f(loc.uNear, near);
-    gl.uniform1f(loc.uEnter, ease((p - 0.88) / 0.1));
+    gl.uniform1f(loc.uEnter, ease((p - 0.84) / (SWOOSH_END - 0.84)));
     gl.uniform1f(loc.uTiltX, RING_TILT_X);
     gl.uniform1f(loc.uTiltZ, RING_TILT_Z);
     gl.uniform1f(loc.uScroll, window.scrollY / Math.max(1, window.innerHeight));

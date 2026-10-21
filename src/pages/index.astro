@@ -27,6 +27,11 @@ const right = projects.filter((_, i) => i % 2 === 1);
 </Base>
 
 <style>
+  /* The work rises over the tail of the swoosh, so there is no empty sky to scroll through */
+  .work { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.space-hero:not(.no-space)) ~ .work { margin-top: -45vh; }
+  }
   .work-head {
     display: flex;
     justify-content: space-between;

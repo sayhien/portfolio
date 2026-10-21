@@ -24,7 +24,7 @@ const { eyebrow, heading, intro } = Astro.props;
 
 <style>
   /* The tall section gives the flight its scroll distance; the copy stays pinned. */
-  .space-hero { position: relative; height: 183vh; }
+  .space-hero { position: relative; height: 208vh; }
   .space-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
   .space-canvas.is-off { visibility: hidden; }
   .space-sticky { position: sticky; top: 0; height: 100vh; display: grid; align-content: center; z-index: 1; }
@@ -64,7 +64,7 @@ const { eyebrow, heading, intro } = Astro.props;
   if (section && canvas) {
     const copy = section.querySelector<HTMLElement>('.space-sticky');
     // The headline fades out early in the flight, as Saturn slides away.
-    const onProgress = (p: number) => copy?.style.setProperty('--copy', String(1 - Math.min(1, p / 0.18)));
+    const onProgress = (p: number) => copy?.style.setProperty('--copy', String(1 - Math.min(1, p / 0.14)));
     if (!startSpaceHero(section, canvas, onProgress)) {
       section.classList.add('no-space');
       canvas.remove();

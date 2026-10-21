@@ -20,8 +20,9 @@ const EARTH_SHARE = 0.3; // particles that form Earth's surface
 const PHONE_SCALE = 0.5;
 const MAX_DPR = 1.5;
 const STILL_TIME = 40;
-// Scroll progress milestones. The swoosh into Earth gets the last 28% of the scroll.
-const THROUGH_RINGS = 0.417, EARTH_FILLS = 0.72, SWOOSH_END = 0.995;
+// Scroll progress milestones. The swoosh into Earth gets the last 44% of the scroll,
+// and the work section rises over its tail (see index.astro).
+const THROUGH_RINGS = 0.32, EARTH_FILLS = 0.554, SWOOSH_END = 0.995;
 
 const ease = (v: number) => { const x = Math.min(1, Math.max(0, v)); return x * x * (3 - 2 * x); };
 const mix = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -133,7 +134,7 @@ export function startSpaceHero(section: HTMLElement, canvas: HTMLCanvasElement, 
     gl.uniform1f(loc.uSizeRef, 900 * Math.min(1, Math.max(0.12, cam.dist / 1400)));
     gl.uniform1f(loc.uFog, 40000);
     gl.uniform1f(loc.uNear, near);
-    gl.uniform1f(loc.uEnter, ease((p - 0.84) / (SWOOSH_END - 0.84)));
+    gl.uniform1f(loc.uEnter, ease((p - 0.7) / (SWOOSH_END - 0.7)));
     gl.uniform1f(loc.uTiltX, RING_TILT_X);
     gl.uniform1f(loc.uTiltZ, RING_TILT_Z);
     gl.uniform1f(loc.uScroll, window.scrollY / Math.max(1, window.innerHeight));

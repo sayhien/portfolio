@@ -101,7 +101,7 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
   // The swoosh: streaks of light spiral past the edges of the screen as we are pulled into Earth
   if(s.x < .16){
     gScreen = 1.;
-    float pull = sin(PI*clamp((uP - .72)/.275, 0., 1.));
+    float pull = sin(PI*clamp((uP - .554)/.44, 0., 1.));
     float lane = floor(r.x*180.); float ang = lane/180.*TAU + (q.y - .5)*.012; float u = fract(h1(lane*3.7) + t*.9 + uP*6.);
     float rad = .15 + u*u*1.6; float len = (.04 + .5*pull)*rad;
     float along = r.z;

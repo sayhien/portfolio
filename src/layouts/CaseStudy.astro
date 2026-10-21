@@ -209,6 +209,14 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 </style>
 
 <script>
+  // Opening a case study from a link always starts at the top, unless the link
+  // points to a section. Back and forward keep the reader's place.
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+  if (!location.hash && navigation?.type !== 'back_forward') {
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  }
+
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a'));
   const toc = document.querySelector<HTMLDetailsElement>('.toc');
   const narrow = window.matchMedia('(max-width: 1000px)');

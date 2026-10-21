@@ -5,6 +5,7 @@
 import { prefersReducedMotion } from './motion';
 import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
 import { FRAGMENT, VERTEX } from './space-hero-scene';
+import { uploadLand } from './earth';
 
 type Vec3 = [number, number, number];
 
@@ -14,7 +15,8 @@ const RING_TILT_X = 0.16;
 const RING_TILT_Z = -0.12;
 const START: Vec3 = [1400, 190, 1100];
 const GAP_ANGLE = 2.35; // where on the ring the camera threads the Cassini gap
-const PARTICLES = 330000;
+const PARTICLES = 380000;
+const EARTH_SHARE = 0.3; // particles that form Earth's surface
 const PHONE_SCALE = 0.5;
 const MAX_DPR = 1.5;
 const STILL_TIME = 40;
@@ -73,7 +75,7 @@ function lookAt(eye: Vec3, target: Vec3): Float32Array {
  */
 export function startSpaceHero(section: HTMLElement, canvas: HTMLCanvasElement, onProgress: (p: number) => void): boolean {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
-  if (!gl) return false;
+  if (!gl || gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) < 1) return false;
   let program: WebGLProgram;
   try {
     program = buildProgram(gl, VERTEX, FRAGMENT);
@@ -88,9 +90,15 @@ export function startSpaceHero(section: HTMLElement, canvas: HTMLCanvasElement, 
   const seeds = new Float32Array(count * 4);
   for (let i = 0; i < seeds.length; i++) seeds[i] = Math.random();
   uploadAttribute(gl, program, 'aSeed', seeds, 4);
+  const index = new Float32Array(count);
+  for (let i = 0; i < count; i++) index[i] = i;
+  uploadAttribute(gl, program, 'aIdx', index, 1);
+  uploadLand(gl);
 
-  const names = ['uProj', 'uView', 'uEye', 'uE', 'uT', 'uDpr', 'uSizeRef', 'uFog', 'uNear', 'uEnter', 'uTiltX', 'uTiltZ', 'uScroll', 'uP', 'uAspect'] as const;
+  const names = ['uProj', 'uView', 'uEye', 'uE', 'uT', 'uDpr', 'uSizeRef', 'uFog', 'uNear', 'uEnter', 'uTiltX', 'uTiltZ', 'uScroll', 'uP', 'uAspect', 'uEarthN', 'uLand'] as const;
   const loc = Object.fromEntries(names.map((name) => [name, gl.getUniformLocation(program, name)])) as Record<(typeof names)[number], WebGLUniformLocation | null>;
+  gl.uniform1i(loc.uLand, 0);
+  gl.uniform1f(loc.uEarthN, Math.round(count * EARTH_SHARE));
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE); // additive light
 

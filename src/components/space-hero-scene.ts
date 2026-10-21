@@ -7,6 +7,9 @@
 export const VERTEX = `
 precision highp float;
 attribute vec4 aSeed;
+attribute float aIdx;
+uniform float uEarthN;
+uniform sampler2D uLand;
 uniform mat4 uProj, uView;
 uniform vec3 uEye, uE;
 uniform float uT, uDpr, uSizeRef, uFog, uNear, uEnter, uTiltX, uTiltZ, uScroll, uP;
@@ -52,9 +55,26 @@ float ringDensity(float x){
   d *= 1. - .85*(smoothstep(2.44, 2.45, x) - smoothstep(2.47, 2.48, x));
   return max(d, 0.);
 }
+float landAt(vec3 n){
+  float lat = asin(clamp(n.y, -1., 1.)); float lon = atan(n.x, n.z);
+  return step(.5, texture2D(uLand, vec2(lon/(2.*PI) + .5, .5 - lat/PI)).r);
+}
 vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 3.), q = rnd(s, 17.);
   float keep = 1. - uEnter;
+  // Earth's surface: even dots over the sphere with real continents, the same look as the ESG globe
+  if(aIdx < uEarthN){
+    float y = 1. - 2.*(aIdx + .5)/uEarthN, rr = sqrt(max(0., 1. - y*y)), ang = aIdx*2.399963229728653;
+    vec3 n = vec3(rr*sin(ang), y, rr*cos(ang));
+    vec3 LE = normalize(normalize(uEye - uE) + vec3(-.75, .35, 0.));
+    float lit = .35 + .65*max(0., dot(n, LE));
+    float L = landAt(rotX(rotY(n, t*.03), -.3));
+    float close = smoothstep(ER*5., ER*1.15, length(uEye - uE));
+    gSize = 1. + 1.4*close;
+    vec3 p = uE + n*ER;
+    col = (L > .5 ? MINT*1.25 : DEEP*1.2)*(.7 + .6*lit); a = (L > .5 ? 1. : .2)*(.7 + .3*lit)*(1. - .95*hidden(p, uE, ER))*keep;
+    return p;
+  }
   // Twinkling stars all around the scene
   if(s.x < .07){
     vec3 p = sph(r.xy)*(18000. + r.z*6000.);
@@ -131,30 +151,17 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
     vec3 n = sph(r.yz); float lit = max(0., dot(n, L));
     col = (k < .5 ? ORANGE : k < 1.5 ? BLUE : mix(BLUE, WHITE, .5))*(.35 + .8*lit); a = (.3 + .7*lit)*keep; return C + n*R;
   }
-  // Earth: oceans, mint and green land, white poles, turning slowly, with its moon
+  // Earth: its air and its moon (the surface is drawn above)
   vec3 n = sph(s.yz); vec3 spun = rotY(n, t*.03);
   // Earth is lit from just beside our viewpoint, so its day side faces us with a sliver of night at one edge
   vec3 LE = normalize(normalize(uEye - uE) + vec3(-.75, .35, 0.));
   float lit = .14 + .86*max(0., dot(n, LE));
   // Up close the specks grow, so the planet and clouds fill in as we arrive
   float close = smoothstep(ER*5., ER*1.15, length(uEye - uE));
-  if(s.x < .84){
-    gSize = 1. + 1.6*close;
-    float land = smoothstep(.5, .54, fbm(spun*2.4 + 3.));
-    float ice = smoothstep(.82, .9, abs(n.y));
-    float relief = .82 + .36*fbm(spun*11. + 1.);
-    vec3 p = uE + n*ER; float seen = 1. - .95*hidden(p, uE, ER);
-    // City lights twinkle on the night side of the land
-    float night = max(0., -dot(n, LE));
-    if(land > .5 && night > .08 && q.y < .14){ col = mix(GOLD, ORANGE, q.z); a = .85*seen*keep*(.6 + .4*sin(t*2. + q.w*30.)); return p; }
-    vec3 ocean = mix(BLUE, DEEP, .35)*.95 + WHITE*.12*pow(max(0., dot(reflect(-LE, n), normalize(uEye - p))), 24.);
-    col = mix(mix(ocean, mix(MINT, GREEN, .5)*relief*1.15, land), WHITE, ice)*(.45 + .85*lit);
-    a = (.45 + .55*lit)*(.8 + .2*land)*seen*keep; return p;
-  }
   if(s.x < .945){
-    gSize = 1. + 4.*close;
-    float cloud = smoothstep(.56, .72, fbm(rotY(n, t*.045)*3.2 + 7.));
-    vec3 p = uE + n*ER*(1.025 + q.x*.02); col = WHITE*(.5 + .6*lit); a = cloud*.55*(1. - .95*hidden(p, uE, ER))*keep; return p;
+    // thin glowing air, brighter on the lit edge (as on the ESG globe)
+    vec3 p = uE + n*ER*(1.01 + q.x*q.x*.09);
+    col = mix(MINT, BLUE, q.w*.6); a = .14*lit*(1. - q.x)*(1. - .95*hidden(p, uE, ER))*keep; return p;
   }
   if(s.x < .98){
     float h = q.x*q.x; vec3 p = uE + n*ER*(1. + .07*h);

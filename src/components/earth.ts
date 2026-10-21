@@ -64,7 +64,8 @@ function uploadParticles(gl: WebGLRenderingContext, program: WebGLProgram, count
   uploadAttribute(gl, program, 'aGeo', geo, 3);
 }
 
-function uploadLand(gl: WebGLRenderingContext) {
+/** Upload the continents as a texture on unit 0 (used by the globe here and the home page Earth). */
+export function uploadLand(gl: WebGLRenderingContext) {
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);

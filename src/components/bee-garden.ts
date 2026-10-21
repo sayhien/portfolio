@@ -119,6 +119,13 @@ function makeGrid(W: number, H: number): Grid {
   return { P, lw, lh, per: 3, base: make(), grass: make(), frame: make(), blades: [], flies: [] };
 }
 
+/** Where the moon or sun sits, in grid cells. On phones it drops below the
+ *  footer links so it never shines behind text. */
+function moonSpot(lw: number, lh: number, P: number) {
+  const phone = lw * P <= 700;
+  return { x: lw * (phone ? 0.88 : 0.82), y: lh * (phone ? 0.54 : 0.28) };
+}
+
 /** Sky, stars, moon and hills never move, so they are painted once. */
 function paintBackdrop(grid: Grid, land: Land, narrow: boolean) {
   const { P, lw, lh } = grid;
@@ -135,7 +142,7 @@ function paintBackdrop(grid: Grid, land: Land, narrow: boolean) {
     for (let x = 0; x < lw; x++) put(x, y, v - i > bayer(x, y) ? sky[Math.min(i + 1, sky.length - 1)] : sky[i]);
   }
   if (!PALETTE.day) for (let s = 0; s < lw * 0.18; s++) put(Math.floor(rand() * lw), Math.floor(rand() * horizon * 0.8), rand() < 0.25 ? PALETTE.star : PALETTE.starDim);
-  const mx = Math.round(lw * 0.82), my = Math.round(lh * 0.28), mr = Math.round((narrow ? 5 : 6) * (4 / P) * (PALETTE.day ? 1.5 : 1.25));
+  const spot = moonSpot(lw, lh, P), mx = Math.round(spot.x), my = Math.round(spot.y), mr = Math.round((narrow ? 5 : 6) * (4 / P) * (PALETTE.day ? 1.5 : 1.25));
   for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) {
     if (Math.hypot(x, y) <= mr - 0.4) put(mx + x, my + y, (x + y) / (mr * 2) + 0.5 > bayer(x, y) + 0.45 ? PALETTE.moonShade : PALETTE.moon);
   }
@@ -416,7 +423,7 @@ class Garden implements Meadow {
 
   /** Slowly turning rays around the sun, drawn on the grid so they become specks. */
   private paintSunRays(frame: CanvasRenderingContext2D) {
-    const { lw, lh } = this.grid, x = lw * 0.82, y = lh * 0.28, t = this.time;
+    const { lw, lh, P } = this.grid, { x, y } = moonSpot(lw, lh, P), t = this.time;
     frame.save();
     frame.strokeStyle = PALETTE.moonShade; frame.lineCap = 'round';
     for (let i = 0; i < 12; i++) {
@@ -433,7 +440,7 @@ class Garden implements Meadow {
 
   /** A soft halo of moonlight or sunlight, laid over the specks. */
   private paintMoonHalo() {
-    const ctx = this.ctx, x = this.grid.lw * 0.82 * this.grid.P, y = this.grid.lh * 0.28 * this.grid.P;
+    const ctx = this.ctx, { P } = this.grid, spot = moonSpot(this.grid.lw, this.grid.lh, P), x = spot.x * P, y = spot.y * P;
     const { halo: rgb, haloSize: size } = PALETTE;
     const halo = ctx.createRadialGradient(x, y, 4, x, y, size);
     halo.addColorStop(0, `rgba(${rgb}, ${PALETTE.day ? 0.24 : 0.16})`);

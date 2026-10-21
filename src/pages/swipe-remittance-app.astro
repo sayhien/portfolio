@@ -188,7 +188,7 @@ const next = caseLinks(['esg-reporting-module', 'docdoc-healthcare-report']);
           <h3>Optical character recognition</h3>
           <p>Users scan their ID card instead of typing it in, which cuts manual entry and speeds up forms.</p>
         </div>
-        <div class="phones"><img src={framerImage('UAgQiiAWrXnv9cnSS2Ms9TD6iA.png')} alt="Screen scanning an ID card with the camera" loading="lazy" decoding="async" /></div>
+        <div class="phones is-small"><img src={framerImage('UAgQiiAWrXnv9cnSS2Ms9TD6iA.png')} alt="Screen scanning an ID card with the camera" loading="lazy" decoding="async" /></div>
       </div>
       <div class="tool">
         <div class="tool-copy">
@@ -261,6 +261,7 @@ const next = caseLinks(['esg-reporting-module', 'docdoc-healthcare-report']);
   .phones { display: flex; justify-content: center; gap: var(--space-2); }
   .phones img { min-width: 0; flex: 1 1 0; max-width: 220px; height: auto; border-radius: 8px; background: var(--surface-2); }
   .phones img:only-child { max-width: 460px; }
+  .phones.is-small img { max-width: 230px; }
 
   @media (max-width: 760px) {
     .flow-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }

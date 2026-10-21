@@ -1,6 +1,9 @@
 ---
 // Big numbers for test results. With a `before` value the card shows the move
 // from before to after in words and numbers, so colour is never the only cue.
+// When the numbers scroll into view their digits spin like an airport
+// departure board, then settle. The real value is always in the page text;
+// the board is a decoration on top and is skipped for reduced motion.
 interface Stat {
   label: string;
   value: string;
@@ -12,14 +15,18 @@ interface Props {
   items: Stat[];
 }
 const { items } = Astro.props;
+const isDigit = (char: string) => /\d/.test(char);
 ---
-<ul class="stats">
+<ul class="stats" data-flap-board>
   {items.map((stat) => (
     <li>
       <p class="label">{stat.label}</p>
       <p class="value">
         {stat.before && <><span class="before"><span class="visually-hidden">from </span>{stat.before}</span><span class="arrow" aria-hidden="true">&rarr;</span><span class="visually-hidden"> to </span></>}
-        {stat.value}
+        <span class="visually-hidden">{stat.value}</span>
+        <span class="flap" aria-hidden="true">
+          {[...stat.value].map((char) => isDigit(char) ? <span class="cell" data-final={char}>{char}</span> : <span class="sym">{char}</span>)}
+        </span>
       </p>
       {stat.change && <p class:list={['change', { better: stat.better }]}>{stat.change}</p>}
     </li>
@@ -35,4 +42,47 @@ const { items } = Astro.props;
   .arrow { font-size: 0.5em; color: var(--muted); }
   .change { font-size: 14px; font-weight: 600; color: var(--text-2); }
   .change.better { color: var(--accent); }
+
+  .flap { display: inline-flex; align-items: baseline; perspective: 300px; }
+  .sym { white-space: pre; }
+  /* While spinning, each digit sits on a small board tile with a hinge line. */
+  .cell { position: relative; display: inline-block; min-width: 0.62em; text-align: center; border-radius: 5px; padding: 0 1px; transition: background 0.4s, box-shadow 0.4s; }
+  .spinning .cell { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-2); }
+  .spinning .cell::after { content: ''; position: absolute; left: 0; right: 0; top: 52%; height: 1px; background: var(--bg); opacity: 0.9; }
+  .cell.tick { animation: flip 0.09s ease-out; }
+  @keyframes flip { from { transform: rotateX(80deg); opacity: 0.5; } }
 </style>
+
+<script>
+  import { onFirstView } from './motion';
+
+  const SPIN_MS = 70, FIRST_STOP_MS = 650, STOP_GAP_MS = 160;
+
+  /** Spin one digit until its stop time, then land on the real value. */
+  function spinCell(cell: HTMLElement, stopAt: number, start: number) {
+    const final = cell.dataset.final ?? cell.textContent ?? '';
+    const step = (now: number) => {
+      const done = now - start >= stopAt;
+      cell.textContent = done ? final : String(Math.floor(Math.random() * 10));
+      cell.classList.remove('tick'); void cell.offsetWidth; cell.classList.add('tick');
+      if (!done) setTimeout(() => step(performance.now()), SPIN_MS);
+    };
+    step(start);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-flap-board]').forEach((board) => {
+    onFirstView(board, () => {
+      const start = performance.now();
+      const flaps = Array.from(board.querySelectorAll<HTMLElement>('.flap'));
+      flaps.forEach((flap, cardIndex) => {
+        flap.classList.add('spinning');
+        const cells = Array.from(flap.querySelectorAll<HTMLElement>('.cell'));
+        cells.forEach((cell, index) => {
+          const stopAt = FIRST_STOP_MS + (cardIndex * 2 + index) * STOP_GAP_MS;
+          spinCell(cell, stopAt, start);
+        });
+        setTimeout(() => flap.classList.remove('spinning'), FIRST_STOP_MS + (cardIndex * 2 + cells.length) * STOP_GAP_MS + 200);
+      });
+    }, 0.5);
+  });
+</script>

@@ -53,7 +53,7 @@ const creation: Card[] = [
 
 const cardCriteria: Step[] = [
   { title: 'Alignment', text: 'The Material 2 card only held a title and a paragraph. We needed rows of labels and values, so we customised it.', img: framerImage('s7XmPUdhwojltjIhBdrhM6PnVo0.png'), alt: 'Angular Material logo' },
-  { title: 'Target audience', text: 'Tables were an option, but cards were easier to scan in the member app. That suits healthcare users who need information fast.', img: framerImage('EOfXag1MF8MevIXHkrpWMv5cYU.png'), alt: 'Cards on a mobile screen' },
+  { title: 'Target audience', text: 'Tables were an option, but cards were easier to scan in the member app. That suits healthcare users who need information fast.', img: framerImage('EOfXag1MF8MevIXHkrpWMv5cYU.png'), alt: 'Cards on a mobile screen', tall: true },
   { title: 'Responsiveness', text: 'Labels and values keep a 0.7 to 1 ratio on both mobile and desktop.', img: framerImage('jXMuIcfiN2rB7fmcwYcqLwYy8k.png'), alt: 'Mobile and desktop cards with the same label to value ratio' },
   { title: 'Functionality', text: 'Tapping the card opens more information on another page. An ellipsis button in the top right offers more options.', img: framerImage('LMU1Dhhb2PyIy3s5Yh55pwhgAc.png'), alt: 'The menu that opens from the card’s ellipsis button' },
   { title: 'Best practices', text: 'Text in both columns is left aligned for easier reading. On desktop, values stay within 50 to 75 characters to reduce eye strain. The layout was inspired by Amazon’s product details, which users already know.', img: framerImage('1EbW05taIKQb1piHgmlxL28dsw.png'), alt: 'Amazon product details used as inspiration' },
@@ -128,8 +128,10 @@ const next = caseLinks(['docdoc-healthcare-report', 'docdoc-breadcrumb']);
   <section id="expansion" class="sec">
     <p class="sn">{n('expansion')}</p>
     <h2>Library Expansion Process</h2>
-    <p>Our roadmap decided which functions we worked on, and new components often came out of that work. The card component shows how.</p>
-    <Shot src={framerImage('SFbYDxZu9K5jNXgSH6M1d8Bjj9E.png')} alt="The card component used across different screens" />
+    <div class="side">
+      <p>Our roadmap decided which functions we worked on, and new components often came out of that work. The card component shows how.</p>
+      <Shot src={framerImage('SFbYDxZu9K5jNXgSH6M1d8Bjj9E.png')} alt="The card component used across different screens" />
+    </div>
     <StepList items={expansion} />
   </section>
 
@@ -185,6 +187,12 @@ const next = caseLinks(['docdoc-healthcare-report', 'docdoc-breadcrumb']);
 </CaseStudy>
 
 <style>
+  /* Intro text beside its picture, so the picture stays a supporting size. */
+  .side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--space-4); align-items: center; }
+  .side p { color: var(--text-2); font-size: 18px; line-height: 1.7; }
+  .side :global(figure) { margin-top: 0; }
+  @media (max-width: 760px) { .side { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); } }
+
   /* Ten checks in two columns: picture on the left, question on the right. */
   .checks { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
   .checks li { display: grid; grid-template-columns: 160px minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: var(--space-2); row-gap: 6px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }

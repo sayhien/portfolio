@@ -49,11 +49,13 @@ interface Props {
   size?: number;
   label?: string;
   class?: string;
+  /** Draws itself on a slow loop, like the case study badges. On by default for icons 18px and up. */
+  live?: boolean;
 }
-const { name, size = 20, label, class: className } = Astro.props;
+const { name, size = 20, label, class: className, live = size >= 18 } = Astro.props;
 ---
 <svg
-  class:list={['icon', className]}
+  class:list={['icon', className, { live }]}
   viewBox="0 0 24 24"
   width={size}
   height={size}
@@ -65,4 +67,18 @@ const { name, size = 20, label, class: className } = Astro.props;
   role={label ? 'img' : undefined}
   aria-label={label}
   aria-hidden={label ? undefined : 'true'}
-><path d={iconPaths[name]} /></svg>
+><path d={iconPaths[name]} pathLength="1" /></svg>
+
+<style>
+  /* The line draws in, rests, then slips away and draws again. Each icon can
+     be offset with --n so a row of icons ripples instead of blinking together.
+     Reduced motion turns animation off, which leaves the icon fully drawn. */
+  .live path { stroke-dasharray: 1 1; stroke-dashoffset: 0; animation: icon-draw 5.2s ease-in-out infinite; animation-delay: calc(var(--n, 0) * 0.45s); }
+  @keyframes icon-draw {
+    0% { stroke-dashoffset: 1; }
+    28%, 86% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -1; }
+  }
+  :global(a:hover) .live, :global(li:hover) > * > .live { transform: rotate(-6deg) scale(1.06); }
+  .live { transition: transform 0.3s; }
+</style>

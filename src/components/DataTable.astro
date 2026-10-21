@@ -1,12 +1,19 @@
 ---
 // A real table for research findings. The first cell of each row is its
-// header. Wide tables scroll sideways inside a focusable box on small screens.
+// header, with an optional icon that hints at what the row means. Wide tables
+// scroll sideways inside a focusable box on small screens.
+import Icon from './Icon.astro';
+import type { IconName } from './Icon.astro';
+
 interface Props {
   caption: string;
   head: string[];
   rows: string[][];
+  /** One icon per row, in the same order as the rows. */
+  icons?: IconName[];
 }
-const { caption, head, rows } = Astro.props;
+const { caption, head, rows, icons } = Astro.props;
+if (icons && icons.length !== rows.length) throw new Error(`DataTable "${caption}" needs one icon per row`);
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={caption}>
   <table>
@@ -15,9 +22,11 @@ const { caption, head, rows } = Astro.props;
       <tr>{head.map((cell) => <th scope="col">{cell}</th>)}</tr>
     </thead>
     <tbody>
-      {rows.map(([first, ...rest]) => (
-        <tr>
-          <th scope="row">{first}</th>
+      {rows.map(([first, ...rest], index) => (
+        <tr style={`--n:${index}`}>
+          <th scope="row">
+            {icons ? <span class="row-head"><span class="tile" aria-hidden="true"><Icon name={icons[index]} size={18} /></span>{first}</span> : first}
+          </th>
           {rest.map((cell) => <td>{cell}</td>)}
         </tr>
       ))}
@@ -33,4 +42,7 @@ const { caption, head, rows } = Astro.props;
   thead th { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
   tbody th { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: 0.02em; min-width: 150px; }
   td { color: var(--text-2); }
+  .row-head { display: flex; align-items: center; gap: 12px; }
+  .tile { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  tbody th:has(.row-head) { min-width: 200px; }
 </style>

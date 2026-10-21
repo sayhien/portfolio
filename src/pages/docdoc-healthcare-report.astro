@@ -120,6 +120,7 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
       img: framerImage('mbuNBcuKi8LUtAvAnElcE49yj6g.png'),
       name: 'Dr. Syima',
       role: 'Member representative',
+      quote: 'I want every caller to hang up with a doctor booked, not more questions.',
       facts: [
         { label: 'Daily routine', text: 'Handles member calls every day, manages specialist and member data, keeps data private, and takes medical training.' },
         { label: 'Goals', text: 'A faster workflow, accurate reports, and happy callers who book appointments.' },
@@ -147,8 +148,10 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
     <p class="sn">{n('test-plan')}</p>
     <h2>Usability Test Plan</h2>
     <p>Seven participants from the member representative and system analyst teams did five tasks in a Figma prototype.</p>
-    <CardGrid items={plan} min={280} />
-    <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
+    <div class="side">
+      <CardGrid items={plan} min={280} />
+      <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
+    </div>
   </section>
 
   <section id="result" class="sec">
@@ -164,20 +167,22 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
   <section id="task-analysis" class="sec">
     <p class="sn">{n('task-analysis')}</p>
     <h2>One of the Task Analyses</h2>
-    <h3 class="sub">Report generation</h3>
-    <StatCompare items={[
-      { label: 'Facilitator and observer score', value: '61.5%' },
-      { label: 'User satisfaction score', value: '73.33%' },
-    ]} />
-    <h3 class="sub">Issues</h3>
-    <ul class="issues">
-      <li>Some participants looked for a Review button at the bottom of the page.</li>
-      <li>The IC or passport field was missing from the doctor and schedule selection page.</li>
-    </ul>
-    <div class="feature-row">
-      <Shot src={framerImage('D6h5jVrlGVkWzdpxnj6BB7zPp4.png')} alt="Graph of participant responses for the report generation task" />
-      <YouTube id="7kyFGPCXBo0" title="Report generation task in the prototype" />
+    <div class="side analysis">
+      <div>
+        <h3 class="sub">Report generation</h3>
+        <StatCompare items={[
+          { label: 'Facilitator and observer score', value: '61.5%' },
+          { label: 'User satisfaction score', value: '73.33%' },
+        ]} />
+        <h3 class="sub">Issues</h3>
+        <ul class="issues">
+          <li>Some participants looked for a Review button at the bottom of the page.</li>
+          <li>The IC or passport field was missing from the doctor and schedule selection page.</li>
+        </ul>
+      </div>
+      <Shot src={framerImage('D6h5jVrlGVkWzdpxnj6BB7zPp4.png')} alt="Graph of participant ratings for the report generation task, with a quote from a physician case manager" />
     </div>
+    <div class="video"><YouTube id="7kyFGPCXBo0" title="Report generation task in the prototype" /></div>
     <ul class="links">
       <li><a href={report} target="_blank" rel="noopener">Read the full usability report for the other tasks</a></li>
     </ul>
@@ -200,11 +205,20 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
   .story p { font-size: 15px; line-height: 1.55; color: var(--text-2); }
   .story-n { display: block; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
 
+  /* Two column blocks: text and cards on the left, the picture on the right. */
+  .side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--space-4); align-items: center; margin-top: var(--space-3); }
+  .side > :global(*) { margin-top: 0; }
+  .side :global(.cards) { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+  .analysis { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .analysis .sub:first-child { margin-top: 0; }
+  .analysis :global(figure) { margin-top: 0; }
+  .video { margin-top: var(--space-4); }
   .issues { margin: 0; padding-left: 20px; max-width: 700px; font-size: 17px; line-height: 1.65; color: var(--text-2); }
   .issues li + li { margin-top: 6px; }
 
   @media (max-width: 900px) {
     .story { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .side, .analysis { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 600px) {
     .two-apps, .story { grid-template-columns: minmax(0, 1fr); }

@@ -2,6 +2,8 @@
 import Base from './Base.astro';
 import CaseIcon from '../components/CaseIcon.astro';
 import EarthScene from '../components/EarthScene.astro';
+import CaseSky from '../components/CaseSky.astro';
+import type { CaseSkyName } from '../components/case-sky';
 import type { EarthMode } from '../components/earth-scenes';
 import type { CaseIconKind } from '../components/CaseIcon.astro';
 
@@ -18,14 +20,17 @@ interface Props {
   sections: Section[];
   next?: NextLink[];
   heroScene?: EarthMode;
+  /** A particle sky for the hero instead of the earth scene (for the other case studies). */
+  heroSky?: CaseSkyName;
 }
-const { title, kicker, heading, lede, meta, sections, next = [], heroScene } = Astro.props;
+const { title, kicker, heading, lede, meta, sections, next = [], heroScene, heroSky } = Astro.props;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
 <Base title={title} description={lede}>
   <article>
     <div class="hero-zone">
     {heroScene && <EarthScene mode={heroScene} layout="background" />}
+    {heroSky && <CaseSky name={heroSky} />}
     <header class="wrap cs-hero">
       <p class="eyebrow">{kicker}</p>
       <h1>{heading}</h1>

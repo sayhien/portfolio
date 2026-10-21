@@ -28,7 +28,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
 
 <style>
   /* The work rises over the tail of the swoosh, so there is no empty sky to scroll through */
-  .work { position: relative; z-index: 1; }
+  .work { position: relative; z-index: 1; --cols-width: 975px; /* two columns of about 465px plus the gap */ }
   @media (prefers-reduced-motion: no-preference) {
     :global(.space-hero:not(.no-space)) ~ .work { margin-top: -45vh; }
   }
@@ -38,7 +38,8 @@ const right = projects.filter((_, i) => i % 2 === 1);
     align-items: baseline;
     padding-bottom: 28px;
     border-bottom: 1px solid var(--line);
-    margin-bottom: 40px;
+    margin: 0 auto 40px;
+    max-width: var(--cols-width); /* the heading and the count sit on the outer edges of the two columns */
   }
   .work-head h2 { font-size: 40px; }
   .work-head p { font-size: 14px; color: var(--muted); }
@@ -49,7 +50,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 45px;
     align-items: start;
-    max-width: 975px; /* two columns of about 465px */
+    max-width: var(--cols-width);
     margin: 0 auto;
   }
   .col { display: flex; flex-direction: column; gap: 40px; }
@@ -57,6 +58,7 @@ const right = projects.filter((_, i) => i % 2 === 1);
 
   @media (max-width: 900px) {
     .masonry { display: flex; flex-direction: column; gap: 24px; max-width: none; }
+    .work-head { max-width: none; }
     .col { display: contents; }
     .col:nth-child(2) { padding-top: 0; }
     .work-head h2 { font-size: 32px; }

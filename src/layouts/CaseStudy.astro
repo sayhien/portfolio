@@ -1,5 +1,6 @@
 ---
 import Base from './Base.astro';
+import '../styles/case-study.css';
 import CaseIcon from '../components/CaseIcon.astro';
 import EarthScene from '../components/EarthScene.astro';
 import CaseSky from '../components/CaseSky.astro';
@@ -69,7 +70,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
         </details>
         <div class="toc-progress" aria-hidden="true"><span data-toc-progress></span></div>
       </aside>
-      <div class="content">
+      <div class="content cs-content">
         <slot />
       </div>
     </div>

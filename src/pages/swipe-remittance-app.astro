@@ -1,0 +1,270 @@
+---
+import CaseStudy from '../layouts/CaseStudy.astro';
+import Personas from '../components/Personas.astro';
+import type { Persona } from '../components/Personas.astro';
+import CardGrid from '../components/CardGrid.astro';
+import type { Card } from '../components/CardGrid.astro';
+import StatCompare from '../components/StatCompare.astro';
+import Shot from '../components/Shot.astro';
+import YouTube from '../components/YouTube.astro';
+import { caseLinks } from '../data/site';
+import { framerImage } from '../data/framer-images';
+import { sectionNumber } from '../layouts/sections';
+
+const sections = [
+  { id: 'introduction', title: 'Introduction' },
+  { id: 'app-failure', title: 'App Failure After Launch' },
+  { id: 'usability-failure', title: 'Usability Testing Failure' },
+  { id: 'segments', title: 'A Tale of Two Segments' },
+  { id: 'core-problem', title: 'Core Problem Defined' },
+  { id: 'priority-pain-points', title: 'Priority Pain Points' },
+  { id: 'opportunities', title: 'From Pain Points to Opportunities' },
+  { id: 'solution-toolkit', title: 'The Solution Toolkit' },
+  { id: 'usability-success', title: 'Usability Testing Success' },
+  { id: 'pivot', title: 'Pivot and Outcome' },
+];
+const n = sectionNumber(sections);
+
+const failures: Card[] = [
+  { icon: 'alert', title: 'Users abandoned core tasks' },
+  { icon: 'chat', title: 'Support channels were flooded' },
+  { icon: 'flask', title: 'Core tasks were never tested with users' },
+];
+
+const keyPains: Card[] = [
+  { icon: 'listcog', title: 'Too many form fields' },
+  { icon: 'shield', title: 'Personal questions that felt intrusive' },
+  { icon: 'compass', title: 'Cash outlets hard to find' },
+  { icon: 'layers', title: 'The same screens repeated across flows' },
+];
+
+const personas: Persona[] = [
+  { img: framerImage('FGYzi8JdgbTaM4U8oo2GTNteaw.png'), name: 'Alex, the Convenience Seeker', role: 'White collar workers', quote: 'Convenience matters more than rates.', facts: [
+    { label: 'Goal', text: 'Send money home easily and reliably, even at a worse exchange rate, because convenience comes first.' },
+    { label: 'Pain point', text: 'Travelling to a remittance shop, then queuing.' },
+    { label: 'Insight', text: 'Chooses speed and ease over the best rate, and sticks with familiar bank apps despite the worse deal.' },
+  ] },
+  { img: framerImage('7zkmUTeZaNBcoAyZqkugay630.png'), name: 'Mary, the Value Maximiser', role: 'Blue collar workers', quote: 'Rates matter more than convenience.', facts: [
+    { label: 'Goal', text: 'Find the remittance shop with the best exchange rate, then send money.' },
+    { label: 'Pain point', text: 'Not getting the most out of money her family depends on.' },
+    { label: 'Insight', text: 'Values every cent. She will put up with friction and learn a new app if more money reaches her family.' },
+  ] },
+];
+
+const goals: Card[] = [
+  { icon: 'rise', title: 'Raise completion' },
+  { icon: 'tool', title: 'Cut costs' },
+  { icon: 'badge', title: 'Restore trust' },
+];
+
+const priorities: Card[] = [
+  { icon: 'listcog', title: 'Excessive and intrusive fields', text: 'Forms asked for personal details the task didn’t need, which added friction and privacy worries.' },
+  { icon: 'compass', title: 'Vague wayfinding', text: 'Users struggled to find cash top up outlets, with poor instructions and no visual guide.' },
+  { icon: 'layers', title: 'Duplicate screens', text: 'The same amount, one time password and confirmation screens appeared in sign up, top up and send.' },
+  { icon: 'book', title: 'No first run guidance', text: 'No tutorials in the app, so users failed again and again and got frustrated.' },
+];
+
+const hmw: Card[] = [
+  { label: 'How might we', title: 'inspire users to fill in fields quickly?' },
+  { label: 'How might we', title: 'help users find cash points easily?' },
+  { label: 'How might we', title: 'guide users across the process?' },
+  { label: 'How might we', title: 'ease the pain of spending?' },
+];
+
+const tips = [
+  { file: 'vTfOHgyFmbGoUZdA1XWsNfz1s8.png', alt: 'Tip screen: send money to your loved ones anywhere' },
+  { file: 'BBsazmC6tJT7osqiNctabmn8.png', alt: 'Tip screen: bring your ID card' },
+  { file: '43QJYMQcm22UDpIZ8DMw4xmA4U.png', alt: 'Tip screen: don’t worry, your details have been saved' },
+];
+
+const reading = [
+  { title: 'Why I started user interviews', href: 'https://medium.com/@arctic_ocean/why-i-started-user-interviews-395c3aa6988c' },
+  { title: 'Our target audience doesn’t want to use our remittance app, part 1', href: 'https://medium.com/@arctic_ocean/our-target-audience-doesnt-want-to-use-our-remittance-app-b25c3b7c17c3' },
+  { title: 'Our target audience doesn’t want to use our remittance app, part 2', href: 'https://medium.com/@arctic_ocean/our-target-audience-doesnt-want-to-use-our-remittance-app-part-2-d57b427c7500' },
+];
+
+const next = caseLinks(['esg-reporting-module', 'docdoc-healthcare-report']);
+---
+<CaseStudy
+  title="Swipe Remittance, a UX case study by Loo Say Hien"
+  kicker="Case study, Swipe"
+  heading="Money that lands home, wherever home is."
+  lede="After a year of business driven patches, I started user research to find out why the core flows of a remittance app for foreign workers were failing, and led the redesign that fixed them."
+  meta={[
+    { label: 'Role', value: 'UX Designer' },
+    { label: 'Timeline', value: '1 year 2 months, Apr 2018 to Jun 2019' },
+    { label: 'Responsibilities', value: 'User research, group facilitation and user interface design' },
+    { label: 'Product', value: 'Swipe, a remittance app for the foreign workforce' },
+  ]}
+  sections={sections}
+  next={next}
+  heroSky="remit"
+>
+  <section id="introduction" class="sec">
+    <p class="sn">{n('introduction')}</p>
+    <h2>Introduction</h2>
+    <p class="big">Swipe lets foreign workers send money back home. After nearly twelve months of patches driven by business requests, I started user research to understand why the core flows kept failing.</p>
+    <p>This moved the team from shipping features to solving problems with evidence, ahead of an important client presentation.</p>
+  </section>
+
+  <section id="app-failure" class="sec">
+    <p class="sn">{n('app-failure')}</p>
+    <h2>App Failure After Launch</h2>
+    <p>Research after launch showed that every core function was, in practice, broken.</p>
+    <CardGrid items={failures} min={220} />
+    <div class="takeaway">
+      <b>Root cause</b>
+      <p>Years of business driven patches, never checked with users, had built up a critical mass of UX debt.</p>
+    </div>
+  </section>
+
+  <section id="usability-failure" class="sec">
+    <p class="sn">{n('usability-failure')}</p>
+    <h2>Usability Testing Failure</h2>
+    <p>A usability test of sign up, top up and send put numbers on the problem.</p>
+    <StatCompare items={[
+      { label: 'Severity, 1 to 4', value: '2.9' },
+      { label: 'Completion rate', value: '53%' },
+      { label: 'Time on task', value: '17:48+ min' },
+    ]} />
+    <h3 class="sub">Key pain points uncovered</h3>
+    <CardGrid items={keyPains} min={200} />
+  </section>
+
+  <section id="segments" class="sec">
+    <p class="sn">{n('segments')}</p>
+    <h2>A Tale of Two Segments</h2>
+    <p>Interviews revealed two groups of users with opposite priorities.</p>
+    <Personas items={personas} />
+  </section>
+
+  <section id="core-problem" class="sec">
+    <p class="sn">{n('core-problem')}</p>
+    <h2>Core Problem Defined</h2>
+    <p class="big">The app’s critical flows were failing first time users. Its UX debt had to go before any marketing spend could bring lasting growth.</p>
+    <CardGrid items={goals} min={200} />
+  </section>
+
+  <section id="priority-pain-points" class="sec">
+    <p class="sn">{n('priority-pain-points')}</p>
+    <h2>Priority Pain Points</h2>
+    <p>I sorted the raw findings into groups, then plotted them on an impact effort matrix to rank them by how much they mattered to users and to the business.</p>
+    <Shot src={framerImage('JZQIvFOztrHwOz6DD9pbq6fthw.png')} alt="Ideation boards used to sort and rank the pain points" />
+    <CardGrid items={priorities} columns={2} />
+  </section>
+
+  <section id="opportunities" class="sec">
+    <p class="sn">{n('opportunities')}</p>
+    <h2>From Pain Points to Opportunities</h2>
+    <p>Each challenge was turned into a “how might we” question to spark solutions.</p>
+    <CardGrid items={hmw} min={200} />
+  </section>
+
+  <section id="solution-toolkit" class="sec">
+    <p class="sn">{n('solution-toolkit')}</p>
+    <h2>The Solution Toolkit</h2>
+
+    <h3 class="sub">Merged flow, the flip flow</h3>
+    <p>The flow was flipped, so users enter the amount and recipient first. They sign up and top up only after that.</p>
+    <div class="flows">
+      <div class="flow-row">
+        <p class="flow-name">Traditional flow</p>
+        <ol><li>Sign up</li><li>Top up</li><li>Send</li></ol>
+      </div>
+      <div class="flow-row is-new">
+        <p class="flow-name">New flip flow</p>
+        <ol><li>Send, almost</li><li>Sign up</li><li>Top up</li><li>Complete send</li></ol>
+      </div>
+    </div>
+    <div class="takeaway">
+      <b>Using the sunk cost effect</b>
+      <p>Once users have put effort in up front, they are more likely to finish the steps that follow, like sign up and top up.</p>
+    </div>
+    <Shot src={framerImage('j5jq8zN51XsZfHBx7G3PAA8IiA.png')} alt="Flow chart of the redesigned flip flow" />
+
+    <div class="tools">
+      <div class="tool">
+        <div class="tool-copy">
+          <h3>Optical character recognition</h3>
+          <p>Users scan their ID card instead of typing it in, which cuts manual entry and speeds up forms.</p>
+        </div>
+        <div class="phones"><img src={framerImage('UAgQiiAWrXnv9cnSS2Ms9TD6iA.png')} alt="Screen scanning an ID card with the camera" loading="lazy" decoding="async" /></div>
+      </div>
+      <div class="tool">
+        <div class="tool-copy">
+          <h3>Contextual tips</h3>
+          <p>Tips appear at the right moments through the core flow, giving guidance as users go.</p>
+        </div>
+        <div class="phones">{tips.map((tip) => <img src={framerImage(tip.file)} alt={tip.alt} loading="lazy" decoding="async" />)}</div>
+      </div>
+      <div class="tool">
+        <div class="tool-copy">
+          <h3>Wayfinding</h3>
+          <p>Users can find the nearest cash top up point and get directions there through Google Maps.</p>
+        </div>
+        <div class="phones"><img src={framerImage('pg5IRdMGGwCRXv0PjVBxyxHQyBU.png')} alt="Wayfinding screens showing nearby remittance shops and the route to one on Google Maps" loading="lazy" decoding="async" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="usability-success" class="sec">
+    <p class="sn">{n('usability-success')}</p>
+    <h2>Usability Testing Success</h2>
+    <p>I tested the redesigned core flow with six participants. Every metric improved.</p>
+    <StatCompare items={[
+      { label: 'Severity, 1 to 4', before: '2.9', value: '1.8', change: '38% less severe', better: true },
+      { label: 'Completion rate', before: '53%', value: '90%', change: '37 points higher', better: true },
+      { label: 'Time on task', before: '17:48', value: '12:46', change: '28% faster', better: true },
+    ]} />
+    <div class="feature-row">
+      <div class="takeaway">
+        <b>User success</b>
+        <p>Clearing UX debt led straight to happier users who finished their tasks.</p>
+      </div>
+      <YouTube id="oX_WuFr1L9g" title="Usability test of the redesigned flow" />
+    </div>
+    <Shot src={framerImage('rdKrqyIAlrJ7wlGIEwksVakn34.png')} alt="Participants taking part in the usability test" />
+  </section>
+
+  <section id="pivot" class="sec">
+    <p class="sn">{n('pivot')}</p>
+    <h2>Pivot and Outcome</h2>
+    <h3 class="sub">Strategic pivot</h3>
+    <p>Testing and interviews confirmed two simple facts. White collar users preferred their bank apps for convenience. Blue collar users chose Swipe for its better exchange rates. Their priorities followed their income.</p>
+    <div class="takeaway">
+      <b>Directional change</b>
+      <p>After the presentation to leadership, they realigned the roadmap to focus the team’s stretched resources on blue collar users.</p>
+    </div>
+    <h3 class="sub">Further reading</h3>
+    <ul class="links">
+      {reading.map((r) => <li><a href={r.href} target="_blank" rel="noopener">{r.title}</a></li>)}
+    </ul>
+  </section>
+</CaseStudy>
+
+<style>
+  .flows { display: grid; gap: var(--space-2); margin-top: var(--space-3); }
+  .flow-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: center; gap: var(--space-2); }
+  .flow-name { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .flow-row ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 30px; }
+  .flow-row li { position: relative; font-size: 15px; font-weight: 500; color: var(--text-2); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; }
+  .flow-row li + li::before { content: '\2192' / ''; position: absolute; left: -22px; top: 50%; translate: 0 -50%; color: var(--muted); }
+  .is-new .flow-name { color: var(--accent); }
+  .is-new li { color: var(--text); border-color: var(--accent-line); }
+  .is-new li:first-child { background: var(--accent-soft); }
+
+  .tools { display: grid; gap: var(--gap-card); margin-top: var(--space-4); }
+  .tool { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--space-4); align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  .tool:nth-child(even) .tool-copy { order: 2; }
+  .tool h3 { font-size: 24px; margin-bottom: var(--space-1); }
+  .tool p { font-size: 16px; line-height: 1.6; color: var(--text-2); }
+  .phones { display: flex; justify-content: center; gap: var(--space-2); }
+  .phones img { min-width: 0; flex: 1 1 0; max-width: 220px; height: auto; border-radius: 8px; background: var(--surface-2); }
+  .phones img:only-child { max-width: 460px; }
+
+  @media (max-width: 760px) {
+    .flow-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .tool { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); padding: var(--space-2); }
+    .tool:nth-child(even) .tool-copy { order: 0; }
+  }
+</style>

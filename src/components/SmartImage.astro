@@ -1,0 +1,20 @@
+---
+// One image tag for both kinds of source: local images go through Astro's
+// optimiser, remote ones (still hosted on Framer) load lazily as they are.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+export type ImageSource = ImageMetadata | string;
+interface Props {
+  src: ImageSource;
+  alt: string;
+  sizes?: string;
+  widths?: number[];
+  class?: string;
+  eager?: boolean;
+}
+const { src, alt, sizes = '(max-width: 760px) 100vw, 840px', widths = [480, 840, 1280], class: className, eager = false } = Astro.props;
+---
+{typeof src === 'string'
+  ? <img class={className} src={src} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+  : <Image class={className} src={src} alt={alt} widths={widths} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />}

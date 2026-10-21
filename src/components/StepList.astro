@@ -1,0 +1,50 @@
+---
+// Numbered steps, each with text and an optional picture. On wide screens the
+// picture sits beside the text, swapping sides each step so the eye zigzags.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+export type Step = { title: string; text: string; img?: ImageSource; alt?: string };
+interface Props {
+  items: Step[];
+  /** Pictures stack under the text instead of beside it (for wide diagrams). */
+  stacked?: boolean;
+}
+const { items, stacked = false } = Astro.props;
+---
+<ol class:list={['steps', { stacked }]}>
+  {items.map((step, index) => (
+    <li class:list={{ 'has-img': !!step.img }}>
+      <div class="copy">
+        <span class="num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+        <h3>{step.title}</h3>
+        <p>{step.text}</p>
+      </div>
+      {step.img && (
+        <div class="pic">
+          <SmartImage src={step.img} alt={step.alt ?? ''} sizes="(max-width: 760px) 100vw, 520px" />
+        </div>
+      )}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; gap: var(--gap-card); }
+  li { display: grid; gap: var(--space-3); align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  li.has-img { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+  li.has-img:nth-child(even) .copy { order: 2; }
+  .stacked li.has-img { grid-template-columns: minmax(0, 1fr); }
+  .stacked li.has-img:nth-child(even) .copy { order: 0; }
+  .copy { display: grid; gap: var(--space-1); align-content: start; }
+  .num { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+  h3 { font-size: 22px; line-height: 1.3; }
+  .copy p { font-size: 16px; line-height: 1.6; color: var(--text-2); }
+  .pic :global(img) { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--surface-2); }
+
+  @media (max-width: 760px) {
+    li.has-img { grid-template-columns: minmax(0, 1fr); }
+    li.has-img:nth-child(even) .copy { order: 0; }
+    li { padding: var(--space-2); }
+  }
+</style>

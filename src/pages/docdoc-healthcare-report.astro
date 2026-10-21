@@ -1,0 +1,212 @@
+---
+import CaseStudy from '../layouts/CaseStudy.astro';
+import Personas from '../components/Personas.astro';
+import CardGrid from '../components/CardGrid.astro';
+import type { Card } from '../components/CardGrid.astro';
+import StepList from '../components/StepList.astro';
+import type { Step } from '../components/StepList.astro';
+import StatCompare from '../components/StatCompare.astro';
+import Shot from '../components/Shot.astro';
+import YouTube from '../components/YouTube.astro';
+import { caseLinks } from '../data/site';
+import { framerImage } from '../data/framer-images';
+import { sectionNumber } from '../layouts/sections';
+
+const sections = [
+  { id: 'introduction', title: 'Introduction' },
+  { id: 'summary', title: 'Summary' },
+  { id: 'interviews', title: 'Remote Contextual Interviews' },
+  { id: 'persona', title: 'Persona: Dr. Syima' },
+  { id: 'storyboard', title: 'Storyboard: From Symptom to Specialist' },
+  { id: 'test-plan', title: 'Usability Test Plan' },
+  { id: 'result', title: 'Overall Result' },
+  { id: 'task-analysis', title: 'One of the Task Analyses' },
+  { id: 'challenges', title: 'Challenges and Learnings' },
+];
+const n = sectionNumber(sections);
+
+const report = 'https://drive.google.com/file/d/1kLyTVnEfBHjlJBnLXQcTuIyfJZprxzeE/view';
+
+const goals: Card[] = [
+  { icon: 'bolt', title: 'Raise efficiency' },
+  { icon: 'tool', title: 'Cut costs' },
+];
+
+// The interview pictures sit next to text that says the same thing, so they are decorative.
+const workflow: Step[] = [
+  { title: 'Check the caller', text: 'When someone calls, the member rep checks whether the caller is listed in NetSuite.', img: framerImage('DXcplWQzzukhdUzmdQKw8Ifw.png') },
+  { title: 'Note the needs', text: 'They note the caller’s medical issues and doctor preferences.', img: framerImage('b501hFJIw92V1uN6LWUbl91ypc8.png') },
+  { title: 'Record the appointment', text: 'They enter the details of the appointment discussed on the call.', img: framerImage('STYkvokIukMji8yVic9hVjab3pA.png') },
+  { title: 'Move the data to DocDoc', text: 'NetSuite passes the medical details and doctor preferences to DocDoc, which finds the best specialists.', img: framerImage('SeILZNcYBfR9LKqZS37UxMgZc9s.png') },
+  { title: 'Check the report', text: 'The member rep checks the report for mistakes and makes sure it is accurate.', img: framerImage('gJ36KprP9CgrCEDyOgY68y8.png') },
+  { title: 'Email it to the member', text: 'Once the report is complete, they email it to the member, so they can make an informed choice.', img: framerImage('L75UJfFQHmOYVfYWEV0v6Zdtlg.png') },
+];
+
+const storyboard = [
+  { file: 'OUXv5Bxveuz4cxDalVw1cTHwlA4.png', text: 'Dr. Syima checks that Abdul is in the system. He is, so she starts noting his condition.' },
+  { file: 'KS1gt7fovfMlFgOSbD3UVqvf0H0.png', text: 'At the same time, she checks DocDoc for specialists who can help Abdul, and creates a report.' },
+  { file: 'zpiuhUrlnvTdUl3M9ZpUS9L2U.png', text: 'Abdul reads the report.' },
+  { file: 'Bq8C0d9Yv9SZbx8shRTVsXQkXV4.png', text: 'Dr. Syima calls Abdul to go over the report and help him pick a specialist, date and time.' },
+  { file: '2dI1mST3f0GWve5jcZlzDxd34g.png', text: 'She calls the specialist to book a suitable date and time.' },
+  { file: 'mUT2steaAhVdVJZR2HKwL5w0jI4.png', text: 'Abdul visits the specialist.' },
+];
+
+const plan: Card[] = [
+  { icon: 'users', label: 'Participants and tasks', title: '7 participants, 5 tasks', text: 'Add notes, generate a report, filter specialists and email the PDF.' },
+  { icon: 'target', label: 'Scoring and success', title: '70% pass rate to succeed', text: 'Each task scored pass, partial or fail, and rated on a 7 point Single Ease Question (SEQ) scale. The same 70% applied to the SEQ.' },
+];
+
+const learnings: Card[] = [
+  { icon: 'check', title: 'Smooth process', text: 'Most things went smoothly, and management was open to the new UX process.' },
+  { icon: 'chat', title: 'Unexpected challenges', text: 'I had to persuade an important stakeholder to take part in the interviews and usability testing.' },
+  { icon: 'bars', title: 'Simplifying scores', text: 'The facilitator and observer scores and the participant scores used two different systems, so I turned both into percentages to compare them.' },
+  { icon: 'pending', title: 'Insurance pivot', text: 'The project was paused when the company made a full pivot of its insurtech product to a new priority.' },
+];
+
+const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
+---
+<CaseStudy
+  title="Healthcare Report, a UX case study by Loo Say Hien"
+  kicker="Case study, DocDoc"
+  heading="Every detail scanned, so every report reads clearly."
+  lede="Member reps built doctor discovery reports by bouncing between two apps. I merged the work into one flow inside the DocDoc enterprise app, and tested it with the people who use it every day."
+  meta={[
+    { label: 'Role', value: 'UX Designer, solo designer on the project' },
+    { label: 'Timeline', value: '3 months, Jul to Oct 2021' },
+    { label: 'Responsibilities', value: 'User research and user interface design' },
+    { label: 'Product', value: 'DocDoc enterprise app, Malaysia and Indonesia' },
+  ]}
+  sections={sections}
+  next={next}
+  heroSky="health"
+>
+  <section id="introduction" class="sec">
+    <p class="sn">{n('introduction')}</p>
+    <h2>Introduction</h2>
+    <p class="big">Consumer sales staff opened NetSuite for member data, then DocDoc to build reports. Two apps for one job made the work slow and costly.</p>
+    <p>As the solo designer over three months, I ran interviews across countries, prototyped a report builder inside DocDoc, and tested it with member reps and system analysts.</p>
+  </section>
+
+  <section id="summary" class="sec">
+    <p class="sn">{n('summary')}</p>
+    <h2>Summary</h2>
+    <div class="two-apps">
+      <Shot src={framerImage('z0cDL2KYa9v9KFCgEH03hxs.png')} alt="NetSuite screen with member and doctor records" caption="NetSuite stores and organises data about doctors and members, which consumer sales staff manage." />
+      <Shot src={framerImage('Q8YqO9f8D078Lo27hUohF4bQGs.png')} alt="DocDoc screen for building a doctor discovery report" caption="They then use that data to create doctor discovery reports for members in the DocDoc app." />
+    </div>
+    <h3 class="sub">Problem</h3>
+    <p>Member reps in Malaysia and Indonesia had to bounce between NetSuite and DocDoc to book specialist appointments. It was slow, and paying for both licences added cost.</p>
+    <div class="takeaway">
+      <b>Goal</b>
+      <p>Bring NetSuite’s data entry into the DocDoc enterprise app, so staff can pick matching doctors and email a PDF report to the member, all in one place.</p>
+    </div>
+    <CardGrid items={goals} min={200} />
+    <h3 class="sub">Solution and impact</h3>
+    <p>I ran interviews across countries, prototyped a report builder and validated it with member reps and system analysts, scoring 87% on user satisfaction. The project was then paused, as engineering was limited and the company pivoted to a new insurance product.</p>
+  </section>
+
+  <section id="interviews" class="sec">
+    <p class="sn">{n('interviews')}</p>
+    <h2>Remote Contextual Interviews</h2>
+    <p>To understand how they worked, seven member staff shared their screens with me on Google Meet and walked me through the process.</p>
+    <StepList items={workflow} />
+  </section>
+
+  <section id="persona" class="sec">
+    <p class="sn">{n('persona')}</p>
+    <h2>Persona: Dr. Syima</h2>
+    <p>A member representative who cares about compliance, built from the interviews.</p>
+    <Personas items={[{
+      img: framerImage('mbuNBcuKi8LUtAvAnElcE49yj6g.png'),
+      name: 'Dr. Syima',
+      role: 'Member representative',
+      facts: [
+        { label: 'Daily routine', text: 'Handles member calls every day, manages specialist and member data, keeps data private, and takes medical training.' },
+        { label: 'Goals', text: 'A faster workflow, accurate reports, and happy callers who book appointments.' },
+        { label: 'Personality', text: 'Patient, efficient and proactive. Handles pressure well.' },
+        { label: 'Motivation', text: 'Simpler processes, up to date medical knowledge and happier customers.' },
+      ],
+    }]} />
+  </section>
+
+  <section id="storyboard" class="sec">
+    <p class="sn">{n('storyboard')}</p>
+    <h2>Storyboard: From Symptom to Specialist</h2>
+    <p>Dr. Syima creates a doctor discovery report that lists the specialists who match Abdul’s needs.</p>
+    <ol class="story">
+      {storyboard.map((frame, index) => (
+        <li>
+          <img src={framerImage(frame.file)} alt="" loading="lazy" decoding="async" />
+          <p><span class="story-n">{String(index + 1).padStart(2, '0')}</span>{frame.text}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section id="test-plan" class="sec">
+    <p class="sn">{n('test-plan')}</p>
+    <h2>Usability Test Plan</h2>
+    <p>Seven participants from the member representative and system analyst teams did five tasks in a Figma prototype.</p>
+    <CardGrid items={plan} min={280} />
+    <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
+  </section>
+
+  <section id="result" class="sec">
+    <p class="sn">{n('result')}</p>
+    <h2>Overall Result</h2>
+    <p>The experience was mostly positive. Participants completed most tasks. Adding a dependent was the main issue, but it didn’t stop anyone, and the suggestions were minor.</p>
+    <StatCompare items={[
+      { label: 'Facilitator and observer score', value: '85.68%' },
+      { label: 'User satisfaction rating', value: '87.15%' },
+    ]} />
+  </section>
+
+  <section id="task-analysis" class="sec">
+    <p class="sn">{n('task-analysis')}</p>
+    <h2>One of the Task Analyses</h2>
+    <h3 class="sub">Report generation</h3>
+    <StatCompare items={[
+      { label: 'Facilitator and observer score', value: '61.5%' },
+      { label: 'User satisfaction score', value: '73.33%' },
+    ]} />
+    <h3 class="sub">Issues</h3>
+    <ul class="issues">
+      <li>Some participants looked for a Review button at the bottom of the page.</li>
+      <li>The IC or passport field was missing from the doctor and schedule selection page.</li>
+    </ul>
+    <div class="feature-row">
+      <Shot src={framerImage('D6h5jVrlGVkWzdpxnj6BB7zPp4.png')} alt="Graph of participant responses for the report generation task" />
+      <YouTube id="7kyFGPCXBo0" title="Report generation task in the prototype" />
+    </div>
+    <ul class="links">
+      <li><a href={report} target="_blank" rel="noopener">Read the full usability report for the other tasks</a></li>
+    </ul>
+  </section>
+
+  <section id="challenges" class="sec">
+    <p class="sn">{n('challenges')}</p>
+    <h2>Challenges and Learnings</h2>
+    <CardGrid items={learnings} columns={2} />
+  </section>
+</CaseStudy>
+
+<style>
+  .two-apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); align-items: start; }
+  .two-apps :global(figure) { margin-top: var(--space-3); }
+
+  .story { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-card); }
+  .story li { display: grid; gap: var(--space-2); align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }
+  .story img { width: 100%; height: auto; border-radius: 8px; background: var(--surface-2); }
+  .story p { font-size: 15px; line-height: 1.55; color: var(--text-2); }
+  .story-n { display: block; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+
+  .issues { margin: 0; padding-left: 20px; max-width: 700px; font-size: 17px; line-height: 1.65; color: var(--text-2); }
+  .issues li + li { margin-top: 6px; }
+
+  @media (max-width: 900px) {
+    .story { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 600px) {
+    .two-apps, .story { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

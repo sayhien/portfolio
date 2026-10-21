@@ -1,0 +1,36 @@
+---
+// A real table for research findings. The first cell of each row is its
+// header. Wide tables scroll sideways inside a focusable box on small screens.
+interface Props {
+  caption: string;
+  head: string[];
+  rows: string[][];
+}
+const { caption, head, rows } = Astro.props;
+---
+<div class="table-wrap" tabindex="0" role="region" aria-label={caption}>
+  <table>
+    <caption class="visually-hidden">{caption}</caption>
+    <thead>
+      <tr>{head.map((cell) => <th scope="col">{cell}</th>)}</tr>
+    </thead>
+    <tbody>
+      {rows.map(([first, ...rest]) => (
+        <tr>
+          <th scope="row">{first}</th>
+          {rest.map((cell) => <td>{cell}</td>)}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-wrap { margin-top: var(--space-3); overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15px; line-height: 1.5; }
+  th, td { text-align: left; vertical-align: top; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  tbody tr:last-child > * { border-bottom: 0; }
+  thead th { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
+  tbody th { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: 0.02em; min-width: 150px; }
+  td { color: var(--text-2); }
+</style>

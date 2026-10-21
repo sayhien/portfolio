@@ -1,7 +1,7 @@
 ---
 // Small animated badge that hints at what a case study is about.
 // Decorative only; the card title carries the meaning.
-export type CaseIconKind = 'chat' | 'remit' | 'report';
+export type CaseIconKind = 'chat' | 'remit' | 'report' | 'library' | 'crumb' | 'globe';
 interface Props {
   kind: CaseIconKind;
 }
@@ -33,6 +33,27 @@ const { kind } = Astro.props;
       <rect class="bar b3" x="28" y="15" width="4" height="20" rx="1" />
     </svg>
   )}
+  {kind === 'library' && (
+    <svg viewBox="0 0 48 48">
+      <rect class="block" x="8" y="28" width="14" height="12" rx="2" />
+      <rect class="block" x="26" y="28" width="14" height="12" rx="2" />
+      <rect class="block drop" x="17" y="9" width="14" height="12" rx="2" />
+    </svg>
+  )}
+  {kind === 'crumb' && (
+    <svg viewBox="0 0 48 48">
+      <path class="chev" d="M15 19l5 5-5 5M29 19l5 5-5 5" />
+      <circle class="crumb c1" cx="8" cy="24" r="3.4" />
+      <circle class="crumb c2" cx="24" cy="24" r="3.4" />
+      <circle class="crumb c3" cx="40" cy="24" r="3.4" />
+    </svg>
+  )}
+  {kind === 'globe' && (
+    <svg viewBox="0 0 48 48">
+      <circle class="sheet" cx="24" cy="24" r="16" />
+      <path class="meridian" d="M24 8c-6 5-6 27 0 32M24 8c6 5 6 27 0 32M9 19h30M9 29h30" />
+    </svg>
+  )}
 </span>
 
 <style>
@@ -55,6 +76,19 @@ const { kind } = Astro.props;
   .bar { fill: var(--accent); transform-origin: bottom; animation: grow 2.6s ease-in-out infinite; }
   .b2 { animation-delay: 0.2s; } .b3 { animation-delay: 0.4s; }
   @keyframes grow { 0%, 100% { transform: scaleY(0.4); } 40%, 70% { transform: scaleY(1); } }
+
+
+  .block { fill: var(--surface); stroke: var(--accent); stroke-width: 2.2; }
+  .drop { fill: var(--accent); animation: snap 2.6s ease-in-out infinite; }
+  @keyframes snap { 0%, 15% { transform: translateY(-6px); opacity: 0; } 40%, 85% { transform: translateY(0); opacity: 1; } 100% { opacity: 0; } }
+
+  .chev { fill: none; stroke: var(--line-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .crumb { fill: var(--surface); stroke: var(--accent); stroke-width: 2; animation: here 2.4s ease-in-out infinite; }
+  .c2 { animation-delay: 0.4s; } .c3 { animation-delay: 0.8s; }
+  @keyframes here { 0%, 100% { fill: var(--surface); } 20%, 40% { fill: var(--accent); } }
+
+  .meridian { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; animation: turn 6s linear infinite; }
+  @keyframes turn { to { transform: rotate(360deg); } }
 
   /* Lift slightly when its card is hovered */
   .case-icon { transition: transform 0.3s; }

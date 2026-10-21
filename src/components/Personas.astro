@@ -1,0 +1,63 @@
+---
+// Persona cards in a zigzag: each card spans two half rows and starts one
+// half row below the last, so the eye reads left, right, left, right.
+// A persona can carry goals (a simple list) and labelled facts.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+export type Persona = {
+  img: ImageSource;
+  name: string;
+  role: string;
+  quote?: string;
+  goals?: string[];
+  facts?: { label: string; text: string }[];
+};
+interface Props {
+  items: Persona[];
+}
+const { items } = Astro.props;
+const single = items.length === 1;
+---
+<ul class:list={['personas', { single }]}>
+  {items.map((p, i) => (
+    <li class="persona" style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
+      <SmartImage src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 96px, 160px" />
+      <div class="p-body">
+        <h3>{p.name}</h3>
+        <p class="p-role">{p.role}</p>
+        {p.quote && <p class="p-quote">“{p.quote}”</p>}
+        {p.goals && <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>}
+        {p.facts && (
+          <dl class="facts">
+            {p.facts.map((f) => <div><dt>{f.label}</dt><dd>{f.text}</dd></div>)}
+          </dl>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .personas { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
+  .personas > .persona { grid-row: var(--row) / span 2; grid-column: var(--col); }
+  .personas.single { grid-template-columns: minmax(0, 760px); }
+  .personas.single > .persona { grid-row: auto; grid-column: auto; }
+  .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: var(--space-2); align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }
+  .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; background: var(--surface-2); }
+  .p-body { display: grid; gap: 6px; }
+  .persona h3 { font-size: 22px; }
+  .p-role { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
+  .p-quote { font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--text); margin: 4px 0 6px; padding-left: 12px; border-left: 2px solid var(--accent-line); }
+  .persona ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
+  .persona li + li { margin-top: 3px; }
+  .facts { margin: 6px 0 0; display: grid; gap: 10px; }
+  .facts dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .facts dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text-2); }
+
+  @media (max-width: 700px) {
+    .personas { grid-template-columns: minmax(0, 1fr); row-gap: var(--gap-card); }
+    .personas > .persona { grid-row: auto; grid-column: auto; }
+    .persona { grid-template-columns: 88px minmax(0, 1fr); }
+  }
+</style>

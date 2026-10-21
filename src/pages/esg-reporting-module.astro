@@ -1,11 +1,13 @@
 ---
 import { Image } from 'astro:assets';
 import CaseStudy from '../layouts/CaseStudy.astro';
-import type { NextLink } from '../layouts/CaseStudy.astro';
+import { caseLinks } from '../data/site';
+import { sectionNumber } from '../layouts/sections';
 import YouTube from '../components/YouTube.astro';
 import JourneyMap from '../components/JourneyMap.astro';
 import EsgHierarchy from '../components/EsgHierarchy.astro';
 import Icon from '../components/Icon.astro';
+import Personas from '../components/Personas.astro';
 import EsgProblemList from '../components/EsgProblemList.astro';
 import EsgRequirements from '../components/EsgRequirements.astro';
 import EsgPainPoints from '../components/EsgPainPoints.astro';
@@ -19,7 +21,6 @@ import EarthScene from '../components/EarthScene.astro';
 import type { Hotspot } from '../components/EsgDashboardTour.astro';
 import type { Question } from '../components/EsgQuestions.astro';
 import type { PainPoint } from '../components/EsgPainPoints.astro';
-import { onFirstView, restartClass } from '../components/motion';
 import type { IconName } from '../components/Icon.astro';
 
 import ifrs from '../assets/esg/ifrs-logo.png';
@@ -48,7 +49,7 @@ const sections = [
   { id: 'collaborative-review', title: 'Collaborative Review' },
   { id: 'challenges', title: 'Challenges and Learnings' },
 ];
-const n = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
+const n = sectionNumber(sections);
 
 const personas = [
   { img: helen, name: 'Helen', quote: 'I need diversity and well-being numbers without chasing five spreadsheets.',  role: 'HR Manager', goals: ['Ensure compliance with labor laws', 'Promote diversity', 'Track employee well-being'] },
@@ -168,11 +169,7 @@ const challenges: Challenge[] = [
   },
 ];
 
-const framer = 'https://sayhien.framer.website';
-const next: NextLink[] = [
-  { title: 'AI Chatbot Service', blurb: 'Designed a chatbot page into a clear journey where prospects can test and understand without needing sales.', href: `${framer}/ai-chatbot`, icon: 'chat' },
-  { title: 'Swipe Remittance', blurb: 'Redesigned a high dropoff remittance flow into a simple, intuitive experience users actually want to complete.', href: `${framer}/swipe-remittance-app`, icon: 'remit' },
-];
+const next = caseLinks(['ai-chatbot', 'swipe-remittance-app']);
 ---
 <CaseStudy
   title="ESG Reporting Module, a UX case study by Loo Say Hien"
@@ -228,19 +225,7 @@ const next: NextLink[] = [
     <p>
       Due to time constraints, and as the sole designer, I used AI to generate these personas to guide the design process. The system needed to serve both managers overseeing the entire reporting process and subject matter experts contributing specific data.
     </p>
-    <ul class="personas">
-      {personas.map((p, i) => (
-        <li class="persona" style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
-          <Image src={p.img} alt={`Portrait of ${p.name}, ${p.role}`} widths={[240, 400]} sizes="(max-width: 600px) 96px, 160px" />
-          <div class="p-body">
-            <h3>{p.name}</h3>
-            <p class="p-role">{p.role}</p>
-            <p class="p-quote">“{p.quote}”</p>
-            <ul>{p.goals.map((g) => <li>{g}</li>)}</ul>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <Personas items={personas} />
   </section>
 
   <section id="journey-map" class="sec">
@@ -383,28 +368,6 @@ const next: NextLink[] = [
 </script>
 
 <style>
-  .sec { padding: var(--space-5) 0; scroll-margin-top: 24px; }
-  .sec:first-child { padding-top: 0; }
-  .sn { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--accent); margin-bottom: var(--space-1); }
-  .sec h2 { font-size: clamp(32px, 3.4vw, 46px); margin-bottom: var(--space-2); }
-  .sec > p { color: var(--text-2); font-size: 18px; line-height: 1.7; max-width: 700px; }
-  .sec > p + p { margin-top: var(--space-2); }
-  .sec > p.big { font-family: var(--display); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; color: var(--text); max-width: 780px; letter-spacing: -0.01em; }
-  .sub { font-size: 24px; margin: var(--space-4) 0 var(--space-2); }
-
-
-
-
-
-
-  figure { margin: var(--space-4) 0 0; }
-  figcaption { font-size: 14px; color: var(--muted); margin-top: var(--space-1); }
-
-
-  blockquote { margin: 0 0 var(--space-3); font-family: var(--display); font-size: clamp(22px, 2vw, 27px); line-height: 1.45; max-width: 760px; padding-left: 24px; border-left: 2px solid var(--accent-line); letter-spacing: -0.01em; }
-
-
-
 
   .logos { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
   .logos li { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; }
@@ -412,21 +375,6 @@ const next: NextLink[] = [
   .logos :global(img) { width: 100%; height: auto; }
   .logos p { font-size: 15px; line-height: 1.45; color: var(--text-2); }
   .logos b { color: var(--text); }
-
-  /* Zigzag: each card spans two half rows and starts one half row below the
-     last, so the eye reads left, right, left, right in list order. */
-  .personas { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
-  .personas > .persona { grid-row: var(--row) / span 2; grid-column: var(--col); }
-  .persona { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: var(--space-2); align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }
-  .persona :global(img) { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-  .p-body { display: grid; gap: 6px; }
-  .persona h3 { font-size: 22px; }
-  .p-role { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: 0.02em; }
-  .p-quote { font-family: var(--display); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--text); margin: 4px 0 6px; padding-left: 12px; border-left: 2px solid var(--accent-line); }
-  .persona ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--text-2); }
-  .persona li + li { margin-top: 3px; }
-
-  .hint { font-size: 14px; color: var(--muted); margin-top: var(--space-1); }
 
   .status-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
   .st { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 10px; }
@@ -472,15 +420,11 @@ const next: NextLink[] = [
   .flow dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-2); }
 
   @media (max-width: 1000px) {
-    .sec { scroll-margin-top: 72px; }
-  }
+    }
   @media (max-width: 700px) {
-    .logos, .flow, .personas { grid-template-columns: minmax(0, 1fr); }
-    .personas { row-gap: var(--gap-card); }
-    .personas > .persona { grid-row: auto; grid-column: auto; }
-    :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); }
-    .persona { grid-template-columns: 88px minmax(0, 1fr); }
-    .flow { gap: var(--space-3); }
+    .logos, .flow { grid-template-columns: minmax(0, 1fr); }
+        :global(.chapter-band) { margin-left: calc(var(--gutter) * -1); }
+      .flow { gap: var(--space-3); }
     .challenges li { padding: var(--space-3); }
   }
 </style>

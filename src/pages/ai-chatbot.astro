@@ -1,0 +1,215 @@
+---
+import CaseStudy from '../layouts/CaseStudy.astro';
+import Personas from '../components/Personas.astro';
+import type { Persona } from '../components/Personas.astro';
+import DataTable from '../components/DataTable.astro';
+import CardGrid from '../components/CardGrid.astro';
+import type { Card } from '../components/CardGrid.astro';
+import { caseLinks } from '../data/site';
+import { framerImage } from '../data/framer-images';
+import { sectionNumber } from '../layouts/sections';
+
+const sections = [
+  { id: 'introduction', title: 'Introduction' },
+  { id: 'discovery', title: 'Discovery and Research' },
+  { id: 'personas', title: 'Prospect Personas' },
+  { id: 'tactics', title: 'Psychological Tactics' },
+  { id: 'information-architecture', title: 'Information Architecture' },
+  { id: 'prototype', title: 'Fully Prototyped Solution' },
+  { id: 'metrics', title: 'Success Metrics' },
+  { id: 'outcome', title: 'Project Outcome' },
+];
+const n = sectionNumber(sections);
+
+const james = framerImage('yKYPwWYnu55w2WPMa9dCSugoo.png');
+const tomei = framerImage('Q8pfEiL8zTXJO0rtjbihCEARM.png');
+const christine = framerImage('k0gdMI0j6nTtDGxdm9YYbWT8Hl8.png');
+
+const competitorIssues = [
+  ['Diluted focus', 'Andersen Lab mixes chatbots with unrelated AI services. Oracle bundles them with general AI infrastructure.', 'Prospects ask: “Is a chatbot really what they do best?”'],
+  ['Technical gap', 'Oracle assumes RAG knowledge, Google uses NLP jargon, and ManageEngine shows code snippets.', 'Buyers who are not technical feel left out of the evaluation.'],
+  ['Passive proof', 'All six sites use static screenshots or recorded demos.', 'Prospects have to imagine the product working for them, which is hard work.'],
+  ['Weak social proof', 'Generic “trusted by” logos with no numbers, and case studies that have nothing to do with chatbots. None show real usage.', 'Prospects can’t find companies like theirs, or real results from their peers.'],
+  ['Integration anxiety', 'Vague claims of “seamless integration”. Only Oracle shares architecture details.', 'IT can’t check the technical fit without a sales call.'],
+  ['One size fits all', 'The same content for developers, operations and procurement on every site.', 'Information that doesn’t matter buries what each buyer needs to decide.'],
+];
+
+const personas: Persona[] = [
+  { img: james, name: 'James Daleen', role: 'Chief Technology Officer, the technical validator', facts: [
+    { label: 'Core pain point', text: 'Burned before by AI vendors that needed huge amounts of training data.' },
+    { label: 'Tactic', text: 'Authority and transparency' },
+    { label: 'Design answer', text: 'A “no training data needed” headline, architecture diagrams that expand, and security documents anyone can open.' },
+  ] },
+  { img: tomei, name: 'Tomei Mizasaki', role: 'Head of Customer Support, the business outcome seeker', facts: [
+    { label: 'Core pain point', text: 'Needs to win the CEO over with proof she can show.' },
+    { label: 'Tactic', text: 'Social proof and reciprocity' },
+    { label: 'Design answer', text: 'Video stories from peers with real numbers, and a free sandbox to try.' },
+  ] },
+  { img: christine, name: 'Christine Schulz', role: 'VP Procurement, the risk mitigator', facts: [
+    { label: 'Core pain point', text: 'Hidden costs and the checks needed for compliance.' },
+    { label: 'Tactic', text: 'Loss aversion and scarcity' },
+    { label: 'Design answer', text: 'A clear breakdown of the total cost, and certification badges.' },
+  ] },
+];
+
+const who = { james: { img: james, name: 'James, CTO' }, christine: { img: christine, name: 'Christine, VP Procurement' }, tomei: { img: tomei, name: 'Tomei, Business Outcome Seeker' } };
+const tactics = [
+  {
+    title: 'Authority',
+    what: 'Integrations, security badges, technical details that expand, and certification badges.',
+    for: [who.james, who.christine],
+    why: 'James doubts vendors after past ones overpromised and needed heavy setup. Authority gives him real proof the product is technically sound. Christine needs to know it is compliant and has no hidden risks.',
+  },
+  {
+    title: 'Social Proof',
+    what: 'Peer stories with real numbers, a “Proven Results” section, and a “Trusted by 500+ Companies” logo carousel.',
+    for: [who.james, who.christine, who.tomei],
+    why: 'Every decision maker wants to know: “Does this work for companies like mine?” Logos, stories and hard numbers answer that at once, and take away the fear of being the first to try.',
+  },
+  {
+    title: 'Reciprocity',
+    what: 'A fully interactive demo sandbox, a whitepaper to download, and a security review to book.',
+    for: [who.james, who.christine, who.tomei],
+    why: 'Giving something useful for free makes people want to give back. The sandbox lets each persona try the chatbot their way and get real value before they give us their time or contact details.',
+  },
+];
+
+const pageSections = [
+  ['Hero', 'Value proposition, chatbot animation, logo carousel and a call to action', 'Says what the product is straight away, which fixes the diluted focus.', 'All personas'],
+  ['Social proof', 'Peer videos, case study links and numbers', 'Peer videos with numbers and industry tags build trust quickly.', 'All personas'],
+  ['Capabilities', 'Feature cards with technical details that expand', 'Closes the technical gap for buyers who are not technical.', 'All personas'],
+  ['Use cases', 'A table of use cases across industries', 'Shows each industry its own case, so the page is no longer one size fits all.', 'All personas'],
+  ['Demo sandbox', 'Interactive widget with a scenario picker', 'Prospects test the chatbot in their own context.', 'All personas'],
+  ['Integrations', 'Logos of well known software it works with', 'Removes integration anxiety.', 'James and Christine'],
+  ['Security', 'Certification badges and an architecture preview', 'Removes integration anxiety and builds credibility.', 'James and Christine'],
+  ['Call to action', 'Talk to sales', 'Turns interested prospects into qualified leads.', 'All personas'],
+];
+
+const metrics = [
+  ['Sandbox interaction rate', 'None yet', '40%', 'Share of visitors who try the live chatbot'],
+  ['Testimonials', 'None yet', '25%', 'Clicks on testimonial cards'],
+  ['Page engagement time', '1:30', '2:30', 'Average session length'],
+  ['Bounce rate', '55%', '35%', 'Sessions that leave after one page'],
+];
+
+const outcomes: Card[] = [
+  { icon: 'check', label: 'Delivery', title: 'A working prototype in three weeks', text: 'Delivered a fully interactive, high fidelity prototype in Framer within the three week timeline.' },
+  { icon: 'users', label: 'User research', title: 'Built on evidence', text: 'The redesign answers the six UX issues found across competitors and speaks to all three buyer personas.' },
+  { icon: 'compass', label: 'Self qualifying', title: 'Prospects decide for themselves', text: 'The client now has a page that lets prospects qualify themselves, with clearer information at every step.' },
+];
+
+const next = caseLinks(['docdoc-breadcrumb', 'esg-reporting-module']);
+const prototype = 'https://simplifynext-bot.framer.website/';
+---
+<CaseStudy
+  title="AI Chatbot Service, a UX case study by Loo Say Hien"
+  kicker="Case study, SimplifyNext"
+  heading="When two sides talk, both come away knowing more."
+  lede="Designed an AI chatbot service page from scratch, so prospects can see what it does, try it for themselves, and walk into a sales call already convinced."
+  meta={[
+    { label: 'Role', value: 'UX Consultant, leading the full redesign' },
+    { label: 'Timeline', value: '3 weeks, Feb 2026' },
+    { label: 'Responsibilities', value: 'User research and user interface design' },
+    { label: 'Client', value: 'SimplifyNext, an IT company' },
+  ]}
+  sections={sections}
+  next={next}
+  heroSky="chatbot"
+>
+  <section id="introduction" class="sec">
+    <p class="sn">{n('introduction')}</p>
+    <h2>Introduction</h2>
+    <p class="big">SimplifyNext wanted a new page for their AI chatbot service. Prospects should be able to see what it can do, watch relevant demos, explore use cases, check integrations, and move toward a sales conversation with confidence.</p>
+    <p>I was brought in as a UX consultant to lead the full redesign. Working from their requirements, I did the research, defined the information architecture, created the new user flows, and delivered a complete, interactive prototype ready for development. The product team took it over at the end of the engagement.</p>
+  </section>
+
+  <section id="discovery" class="sec">
+    <p class="sn">{n('discovery')}</p>
+    <h2>Discovery and Research</h2>
+    <p>I compared the chatbot pages of seven leading providers, including Oracle, Google Cloud, Andersen Lab, ManageEngine, HKT Enterprise and SMEs Go Digital. Together with buyer personas and a map of what drives each buyer, this became the base for the design.</p>
+    <h3 class="sub">Six problems the competitors share</h3>
+    <DataTable caption="Six UX problems found across competitor chatbot pages" head={['Issue', 'Evidence', 'Impact on prospects']} rows={competitorIssues} />
+  </section>
+
+  <section id="personas" class="sec">
+    <p class="sn">{n('personas')}</p>
+    <h2>Prospect Personas</h2>
+    <p>Three buyers sign off on a chatbot. For each, I mapped what worries them and the psychological trigger that would answer it.</p>
+    <Personas items={personas} />
+  </section>
+
+  <section id="tactics" class="sec">
+    <p class="sn">{n('tactics')}</p>
+    <h2>Psychological Tactics</h2>
+    <p>Each tactic on the page is there for named buyers, with a clear reason it works.</p>
+    <ul class="tactics">
+      {tactics.map((t) => (
+        <li>
+          <h3>{t.title}</h3>
+          <p class="t-what">{t.what}</p>
+          <div class="t-for">
+            <p class="t-label">For</p>
+            <ul>
+              {t.for.map((p) => <li><img src={p.img} alt="" loading="lazy" decoding="async" />{p.name}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p class="t-label">Why it works</p>
+            <p class="t-why">{t.why}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="information-architecture" class="sec">
+    <p class="sn">{n('information-architecture')}</p>
+    <h2>Information Architecture</h2>
+    <p>One page that moves prospects from first interest, to judging the fit for themselves, to technical confidence.</p>
+    <DataTable caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} />
+    <div class="takeaway">
+      <b>Design principle</b>
+      <p>The same navigation for every prospect, with more depth revealed only when they ask for it.</p>
+    </div>
+  </section>
+
+  <section id="prototype" class="sec">
+    <p class="sn">{n('prototype')}</p>
+    <h2>Fully Prototyped Solution</h2>
+    <p>Try the page below, or <a href={prototype} target="_blank" rel="noopener">open it in a new tab</a>.</p>
+    <figure class="embed">
+      <div class="shot-frame">
+        <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <iframe src={prototype} title="Interactive prototype of the SimplifyNext AI chatbot service page" loading="lazy"></iframe>
+      </div>
+    </figure>
+  </section>
+
+  <section id="metrics" class="sec">
+    <p class="sn">{n('metrics')}</p>
+    <h2>Success Metrics</h2>
+    <p>I gave the client a set of UX metrics to track the new page after launch. The baseline is the average of their other service pages.</p>
+    <DataTable caption="UX metrics with baseline, target and how each is measured" head={['Metric', 'Baseline', 'Target', 'How it is measured']} rows={metrics} />
+  </section>
+
+  <section id="outcome" class="sec">
+    <p class="sn">{n('outcome')}</p>
+    <h2>Project Outcome</h2>
+    <CardGrid items={outcomes} />
+  </section>
+</CaseStudy>
+
+<style>
+  .tactics { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: var(--gap-card); }
+  .tactics > li { display: grid; align-content: start; gap: var(--space-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  .tactics h3 { font-size: 24px; }
+  .t-what { font-size: 16px; line-height: 1.55; color: var(--text); }
+  .t-label { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .t-for ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .t-for li { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text); background: var(--surface-2); border-radius: 999px; padding: 4px 12px 4px 4px; }
+  .t-for img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: var(--line); }
+  .t-why { font-size: 15px; line-height: 1.55; color: var(--text-2); }
+
+  .embed .shot-frame { background: #fff; }
+  .embed iframe { display: block; width: 100%; height: min(78vh, 760px); border: 0; background: #fff; }
+</style>

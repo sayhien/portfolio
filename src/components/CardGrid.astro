@@ -1,0 +1,41 @@
+---
+// A grid of short cards: an optional icon or small label, a title and a line
+// of text. Used for findings, principles, criteria and outcomes.
+import Icon from './Icon.astro';
+import type { IconName } from './Icon.astro';
+
+export type Card = { title: string; text?: string; icon?: IconName; label?: string };
+interface Props {
+  items: Card[];
+  /** Smallest card width before the grid drops a column. */
+  min?: number;
+  /** Numbered cards show 01, 02 ... instead of an icon. */
+  numbered?: boolean;
+  /** A fixed column count on wide screens, to avoid a lone card on the last row. */
+  columns?: number;
+}
+const { items, min = 240, numbered = false, columns } = Astro.props;
+const Tag = numbered ? 'ol' : 'ul';
+---
+<Tag class:list={['cards', { fixed: columns }]} style={`--min:${min}px;--cols:${columns ?? 1}`}>
+  {items.map((card, index) => (
+    <li>
+      {numbered && <span class="num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>}
+      {!numbered && card.icon && <span class="tile" aria-hidden="true"><Icon name={card.icon} size={20} /></span>}
+      {card.label && <p class="label">{card.label}</p>}
+      <h3>{card.title}</h3>
+      {card.text && <p class="text">{card.text}</p>}
+    </li>
+  ))}
+</Tag>
+
+<style>
+  .cards { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min)), 1fr)); gap: var(--gap-card); }
+  @media (min-width: 761px) { .fixed { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); } }
+  li { display: flex; flex-direction: column; gap: var(--space-1); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  .tile { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-bottom: 4px; }
+  .num { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+  .label { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  h3 { font-size: 20px; line-height: 1.3; }
+  .text { font-size: 15px; line-height: 1.55; color: var(--text-2); }
+</style>

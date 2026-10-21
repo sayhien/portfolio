@@ -1,0 +1,33 @@
+---
+// A screenshot or diagram with an optional caption. `frame` puts it in the
+// dark browser frame used across the site; `narrow` keeps tall phone screens
+// from taking over the column.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+interface Props {
+  src: ImageSource;
+  alt: string;
+  caption?: string;
+  frame?: boolean;
+  narrow?: boolean;
+}
+const { src, alt, caption, frame = false, narrow = false } = Astro.props;
+---
+<figure class:list={['shot', { narrow }]}>
+  {frame ? (
+    <div class="shot-frame">
+      <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <SmartImage src={src} alt={alt} />
+    </div>
+  ) : (
+    <SmartImage class="plain" src={src} alt={alt} />
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .shot :global(img) { display: block; width: 100%; height: auto; }
+  .shot :global(img.plain) { border-radius: var(--radius); background: var(--surface); }
+  .narrow { max-width: 420px; }
+</style>

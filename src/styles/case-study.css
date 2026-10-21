@@ -22,8 +22,11 @@
 
 /* Plain reading links, such as further reading lists. */
 .cs-content .links { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-1); }
-.cs-content .links a { display: inline-flex; align-items: center; min-height: 44px; gap: 8px; color: var(--text); font-weight: 500; }
-.cs-content .links a::after { content: '\2197' / ''; color: var(--accent); }
+.cs-content .links a { display: inline-flex; align-items: center; min-height: 44px; gap: 8px; color: var(--text); font-weight: 500; text-decoration: none; transition: color 0.2s; }
+.cs-content .links a::after { content: '\2197' / ''; color: var(--accent); transition: transform 0.2s; }
+/* The arrow already says "opens elsewhere", so the text stays clean; hover and focus change colour and nudge the arrow. */
+.cs-content .links a:hover { color: var(--accent); }
+.cs-content .links a:hover::after { transform: translate(2px, -2px); }
 
 @media (max-width: 1000px) {
   .cs-content .sec { scroll-margin-top: 72px; }

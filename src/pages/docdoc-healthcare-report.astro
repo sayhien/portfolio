@@ -148,7 +148,7 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
     <p class="sn">{n('test-plan')}</p>
     <h2>Usability Test Plan</h2>
     <p>Seven participants from the member representative and system analyst teams did five tasks in a Figma prototype.</p>
-    <div class="side">
+    <div class="side plan-side">
       <CardGrid items={plan} min={280} />
       <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
     </div>
@@ -209,6 +209,8 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
   .side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: var(--space-4); align-items: center; margin-top: var(--space-3); }
   .side > :global(*) { margin-top: 0; }
   .side :global(.cards) { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+  /* The test diagram is shown at three quarters of its column so it does not dominate the cards. */
+  .plan-side :global(figure) { width: 75%; justify-self: center; }
   .analysis { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .analysis .sub:first-child { margin-top: 0; }
   .analysis :global(figure) { margin-top: 0; }
@@ -219,6 +221,7 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
   @media (max-width: 900px) {
     .story { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .side, .analysis { grid-template-columns: minmax(0, 1fr); }
+    .plan-side :global(figure) { width: 100%; }
   }
   @media (max-width: 600px) {
     .two-apps, .story { grid-template-columns: minmax(0, 1fr); }

@@ -43,13 +43,13 @@ const right = projects.filter((_, i) => i % 2 === 1);
   .work-head h2 { font-size: 40px; }
   .work-head p { font-size: 14px; color: var(--muted); }
 
-  /* Two staggered columns, kept to 70% of the full width and centred */
+  /* Two staggered columns, a quarter narrower than before, centred */
   .masonry {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 45px;
     align-items: start;
-    max-width: 1300px; /* two columns of about 630px */
+    max-width: 975px; /* two columns of about 465px */
     margin: 0 auto;
   }
   .col { display: flex; flex-direction: column; gap: 40px; }

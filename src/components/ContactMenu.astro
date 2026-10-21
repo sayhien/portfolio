@@ -1,0 +1,103 @@
+---
+// The Contact item in the header. It opens a small menu with WhatsApp, Email and
+// a copy button. A mail link only works when the visitor has a mail app set up,
+// so the address is always shown and can be copied. Any button with
+// `data-copy-email` (the footer has one) uses the same copy behaviour.
+import { site } from '../data/site';
+---
+<li class="contact" data-contact>
+  <button type="button" class="trigger" aria-expanded="false" aria-controls="contact-panel">
+    Contact
+    <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </button>
+  <div class="panel" id="contact-panel" hidden>
+    <ul>
+      <li><a href={site.whatsappLink} target="_blank" rel="noopener"><span>WhatsApp</span><small>{site.whatsapp}</small></a></li>
+      <li><a href={`mailto:${site.email}`}><span>Email</span><small>{site.email}</small></a></li>
+      <li><button type="button" class="copy" data-copy-email data-address={site.email}>Copy email address</button></li>
+    </ul>
+  </div>
+  <p class="visually-hidden" role="status" data-copy-status></p>
+</li>
+
+<style>
+  .contact { position: relative; }
+  .trigger {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: inherit; font-size: 15px; color: var(--text-2);
+    background: none; border: 0; border-bottom: 1px solid transparent; border-radius: 0;
+    padding: 10px 0; min-height: 44px; cursor: pointer;
+  }
+  .trigger:hover, .trigger[aria-expanded='true'] { color: var(--text); border-bottom-color: var(--accent); }
+  .chevron { transition: transform 0.2s; }
+  .trigger[aria-expanded='true'] .chevron { transform: rotate(180deg); }
+
+  .panel {
+    position: absolute; top: calc(100% + 8px); right: 0; z-index: 5; width: 280px;
+    background: var(--surface); border: 1px solid var(--line-2); border-radius: 12px;
+    padding: 6px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+  .panel[hidden] { display: none; }
+  .panel ul { display: grid; gap: 2px; list-style: none; margin: 0; padding: 0; }
+  .panel a, .copy {
+    display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    min-height: 44px; width: 100%; padding: 8px 12px; border-radius: 8px;
+    font: inherit; font-size: 15px; color: var(--text); text-align: left; text-decoration: none;
+    background: none; border: 0; cursor: pointer;
+  }
+  .panel small { font-size: 13px; color: var(--muted); }
+  .panel a:hover, .copy:hover { background: var(--surface-2); color: var(--accent); }
+  .copy { border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin-top: 4px; color: var(--text-2); }
+
+  @media (max-width: 720px) {
+    /* On phones the menu spans the whole nav row so it can never run off the screen. */
+    .contact { position: static; }
+    .panel { left: 0; right: 0; width: auto; }
+  }
+</style>
+
+<script>
+  const contact = document.querySelector<HTMLElement>('[data-contact]');
+  const trigger = contact?.querySelector<HTMLButtonElement>('.trigger');
+  const panel = contact?.querySelector<HTMLElement>('.panel');
+
+  function setOpen(open: boolean, returnFocus = false) {
+    if (!trigger || !panel) return;
+    trigger.setAttribute('aria-expanded', String(open));
+    panel.hidden = !open;
+    if (!open && returnFocus) trigger.focus();
+  }
+
+  trigger?.addEventListener('click', () => setOpen(panel?.hidden ?? false));
+  contact?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !panel?.hidden) setOpen(false, true);
+  });
+  // Close when focus or a click moves outside the menu.
+  document.addEventListener('click', (event) => {
+    if (contact && !contact.contains(event.target as Node)) setOpen(false);
+  });
+  contact?.addEventListener('focusout', (event) => {
+    if (!contact.contains(event.relatedTarget as Node | null)) setOpen(false);
+  });
+
+  const status = contact?.querySelector<HTMLElement>('[data-copy-status]');
+  const RESET_MS = 2500;
+
+  /** Copy the address, then say so on the button and to screen readers. */
+  async function copyAddress(button: HTMLButtonElement) {
+    const original = button.textContent ?? '';
+    let message = 'Email address copied';
+    try {
+      await navigator.clipboard.writeText(button.dataset.address ?? '');
+    } catch {
+      message = 'Copy failed. Please select the address and copy it.';
+    }
+    button.textContent = message;
+    if (status) status.textContent = message;
+    setTimeout(() => { button.textContent = original; }, RESET_MS);
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((button) => {
+    button.addEventListener('click', () => copyAddress(button));
+  });
+</script>

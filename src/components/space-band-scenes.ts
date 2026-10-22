@@ -207,23 +207,12 @@ uniform float uStarShow; // the current set of stars fading in, holding, then di
 vec3 starTone(float k){ float m = mod(k, 4.); return m < 1. ? MINT : m < 2. ? mix(BLUE, WHITE, .4) : m < 3. ? YELLOW : WHITE; }
 vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 59.), q = rnd(s, 61.);
-  if(s.x < .3){ // a deep field of stars at many distances, so the camera's moves show depth
-    vec3 p = vec3((r.x - .5)*4200., (r.y - .5)*2600., -400. - r.z*3200.);
-    col = r.w < .75 ? WHITE : (r.w < .9 ? BLUE : MINT); a = .1 + .5*q.x*q.x*(.6 + .4*sin(t*(1. + q.y*2.) + q.z*30.));
-    return p;
-  }
-  if(s.x < .5){ // a soft band of nebula behind the figures
-    vec3 p = vec3((r.x - .5)*3600., (r.y - .5)*500. + sin(r.x*6.)*200., -900. - r.z*900.);
-    float cloud = fbm(p*.002 + vec3(0., 0., t*.02));
-    col = mix(BLUE*.6, mix(MINT, YELLOW, .3), cloud); a = .07*smoothstep(.4, .75, cloud); return p;
-  }
-  if(s.x < .78){ // the twelve stars: like the background stars, only a touch brighter, with a faint halo
+  // The page's own star sky shows behind this film, so it only draws the figures.
+  if(s.x < .55){ // the twelve stars: like the background stars, only a touch brighter, with a faint halo
     float k = floor(r.x*12.); vec3 c = uStar[int(k)];
     col = mix(WHITE, starTone(k), .35);
-    if(r.y < .08){ a = .06*uStarShow; gSize = 1.3; return c + ball(q.xyz)*2.5; }
-    if(r.y < .45){ a = .012*(1. - q.x)*uStarShow; return c + ball(q.xyz)*(5. + q.x*12.); }
-    // the rest join the background field
-    col = WHITE; a = .05 + .25*q.x*q.x; return vec3((q.y - .5)*4200., (q.z - .5)*2600., -400. - q.w*3200.);
+    if(r.y < .13){ a = .06*uStarShow; gSize = 1.3; return c + ball(q.xyz)*2.5; }
+    a = .009*(1. - q.x)*uStarShow; return c + ball(q.xyz)*(5. + q.x*12.);
   }
   // The lines that join the stars into a figure, drawn in as each figure forms
   float j = floor(r.x*13.); int ji = int(j);
@@ -238,7 +227,8 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
 // biggest, brightest one sits right in front of a rover, and its robotic arm
 // easily lifts it into the rover's bed: high impact, low effort.
 const CRYSTALS = HEADER + COMMON + `
-const vec3 SHOULDER = vec3(58., 80., 0.), REST = vec3(30., 150., 0.), BED = vec3(-30., 46., 0.);
+// The arm rests folded to one side, so it never has to pass straight over its own base.
+const vec3 SHOULDER = vec3(58., 80., 0.), REST = vec3(58., 150., 70.), BED = vec3(-30., 46., 0.);
 const float UPPER = 88., FORE = 88., PICK = .8, SITES = 9.;
 // Crystal clusters: where they grow, how big they are, and whether they glow.
 vec3 site(float i){
@@ -257,19 +247,20 @@ vec3 handAt(float t){
   if(u < 1.5) return mix(over, c, ease((u - 1.1)/.4));
   if(u < 1.8) return c;
   if(u < 2.4) return mix(c, over, ease((u - 1.8)/.6));
-  if(u < 3.6) return mix(over, drop, ease((u - 2.4)/1.2));
+  if(u < 3.6){ float k = ease((u - 2.4)/1.2); return mix(over, drop, k) + vec3(0., 0., sin(k*PI)*120.); } // swing round the side
   if(u < 4.) return mix(drop, BED + vec3(0., 40., 0.), ease((u - 3.6)/.4));
   if(u < 4.2) return BED + vec3(0., 40., 0.);
   return mix(BED + vec3(0., 40., 0.), REST, ease((u - 4.2)/1.));
 }
 bool gripping(float t){ float u = t - PICK; return u > 1.4 && u < 4.1; }
-// Two segment arm: the elbow keeps both segments their length, bending upward.
+// Two segment arm on a turning base: the base faces the hand, and within that
+// upright plane the elbow always bends upward, so it moves smoothly.
 vec3 elbowFor(vec3 hand){
-  vec3 d = hand - SHOULDER; float len = clamp(length(d), 10., UPPER + FORE - 1.); vec3 dir = normalize(d);
+  vec3 d = hand - SHOULDER; vec2 across = d.xz; float reach = max(length(across), .001); vec2 facing = across/reach;
+  vec2 d2 = vec2(reach, d.y); float len = clamp(length(d2), 10., UPPER + FORE - 1.); vec2 dir = d2/length(d2);
   float along = (UPPER*UPPER - FORE*FORE + len*len)/(2.*len); float lift = sqrt(max(0., UPPER*UPPER - along*along));
-  vec3 side = normalize(cross(dir, vec3(0., 0., 1.)) + vec3(0., .0001, 0.)); vec3 pole = normalize(cross(dir, side));
-  if(pole.y < 0.) pole = -pole;
-  return SHOULDER + dir*along + pole*lift;
+  vec2 e = dir*along + vec2(-dir.y, dir.x)*lift;
+  return SHOULDER + vec3(facing.x*e.x, e.y, facing.y*e.x);
 }
 // Where a cluster's base is: the big one travels with the gripper, then rests in the bed.
 vec3 baseOf(float i, float t){

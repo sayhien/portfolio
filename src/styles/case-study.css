@@ -2,6 +2,8 @@
    layout and scoped to its content column. Page specific parts keep their
    own styles in the page or component. */
 .cs-content .sec { padding: var(--space-5) 0; scroll-margin-top: 24px; }
+/* Sections take focus after a menu click; the ring would outline the whole section. */
+.cs-content .sec[tabindex='-1']:focus { outline: none; }
 .cs-content .sec:first-child { padding-top: 0; }
 .cs-content .sn { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--accent); margin-bottom: var(--space-1); }
 .cs-content .sec h2 { font-size: clamp(32px, 3.4vw, 46px); margin-bottom: var(--space-2); }

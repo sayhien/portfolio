@@ -2,6 +2,7 @@
 // A scene draws only while it is on screen and the page is not paused.
 // Reduced motion shows one finished still frame. The cursor has no effect.
 import { prefersReducedMotion } from './motion';
+import { lookAt, perspective } from './camera-math';
 import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
 import { FRAGMENT, SCENES, vertexSource } from './earth-scenes';
 import type { Camera, EarthMode } from './earth-scenes';
@@ -35,21 +36,8 @@ function fibonacciSphere(i: number, n: number): [number, number, number] {
   return [r * Math.sin(a), y, r * Math.cos(a)];
 }
 
-function perspective(cam: Camera, aspect: number): Float32Array {
-  let tanV = Math.tan((cam.fov * Math.PI) / 360);
-  if (aspect < 1.6) tanV *= Math.min(2, 1.6 / aspect); // keep the scene wide on narrow screens
-  const f = 1 / tanV, near = 10, far = 8000, nf = 1 / (near - far);
-  const [sx, sy] = cam.shift;
-  return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, -sx, -sy, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]);
-}
-
-function lookAt(eye: number[], target: number[]): Float32Array {
-  const sub = (a: number[], b: number[]) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-  const norm = (v: number[]) => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return v.map((x) => x / l); };
-  const cross = (a: number[], b: number[]) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  const dot = (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  const z = norm(sub(eye, target)), x = norm(cross([0, 1, 0], z)), y = cross(z, x);
-  return new Float32Array([x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, eye), -dot(y, eye), -dot(z, eye), 1]);
+function earthLens(cam: Camera, aspect: number): Float32Array {
+  return perspective(aspect, { shift: cam.shift, fov: cam.fov, far: 8000 });
 }
 
 function uploadParticles(gl: WebGLRenderingContext, program: WebGLProgram, count: number, surface: number) {
@@ -117,7 +105,7 @@ export function startEarth(host: HTMLElement, canvas: HTMLCanvasElement, mode: E
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniformMatrix4fv(loc.proj, false, perspective(cam, canvas.width / Math.max(1, canvas.height)));
+    gl.uniformMatrix4fv(loc.proj, false, earthLens(cam, canvas.width / Math.max(1, canvas.height)));
     gl.uniformMatrix4fv(loc.view, false, lookAt(cam.eye, cam.target));
     gl.uniform3fv(loc.eye, cam.eye);
     gl.uniform1f(loc.t, t);

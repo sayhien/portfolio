@@ -1,7 +1,8 @@
 ---
 // Home page hero: the headline over Saturn, then a scroll-driven flight through
 // the rings into Earth. The canvas is decorative; the headline and intro are
-// real text and always readable. Without graphics support the hero is simply
+// real text and always readable. A real button sits on top of the floating
+// alien saucer, so mouse, touch and keyboard users can all say hello. Without graphics support the hero is simply
 // the text over the star sky.
 interface Props {
   eyebrow: string;
@@ -17,14 +18,18 @@ const { eyebrow, heading, intro } = Astro.props;
       <p class="eyebrow">{eyebrow}</p>
       <h1>{heading}</h1>
       <p class="space-intro">{intro}</p>
-      <p class="space-hint" data-space-hint aria-hidden="true">Scroll to travel to Earth</p>
+      <p class="space-hint" data-space-hint aria-hidden="true">Scroll to travel to Earth, or say hi to the alien</p>
     </div>
   </div>
+  <button type="button" class="alien-hello is-away" data-alien-hello>
+    <span class="alien-label">Say hello to the alien</span>
+  </button>
+  <p class="alien-bubble" data-alien-bubble role="status"></p>
 </section>
 
 <style>
   /* The tall section gives the flight its scroll distance; the copy stays pinned. */
-  .space-hero { position: relative; height: 208vh; }
+  .space-hero { position: relative; height: 223vh; }
   .space-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
   .space-canvas.is-off { visibility: hidden; }
   .space-sticky { position: sticky; top: 0; height: 100vh; display: grid; align-content: center; z-index: 1; }
@@ -40,6 +45,32 @@ const { eyebrow, heading, intro } = Astro.props;
   .space-intro { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 520px; }
   .space-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }
   .space-hero.no-space .space-hint { display: none; }
+
+  /* The hello button and speech bubble follow the saucer, which lives on the fixed canvas. */
+  .alien-hello {
+    position: fixed; left: 0; top: 0; width: 56px; height: 56px; z-index: 3;
+    border: 0; border-radius: 50%; background: transparent; cursor: pointer; padding: 0;
+  }
+  .alien-hello.is-away, .alien-bubble.is-away { visibility: hidden; }
+  .alien-hello:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .alien-label {
+    position: absolute; left: 50%; top: 100%; transform: translate(-50%, 6px); white-space: nowrap;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text);
+    background: rgba(15, 18, 22, 0.85); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 10px;
+    opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  }
+  .alien-hello.near-right .alien-label { left: auto; right: 0; transform: translateY(6px); }
+  .alien-hello:hover .alien-label, .alien-hello:focus-visible .alien-label { opacity: 1; }
+  .alien-bubble {
+    position: fixed; left: 0; top: 0; z-index: 3; max-width: 240px; margin: 0;
+    font-family: var(--display); font-size: 16px; line-height: 1.35; color: var(--on-accent);
+    background: var(--accent); border-radius: 16px 16px 16px 4px; padding: 10px 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); pointer-events: none;
+    opacity: 0; translate: var(--bx, 0) var(--by, 0); scale: 0.85; transform-origin: left bottom;
+    transition: opacity 0.2s, scale 0.25s;
+  }
+  .alien-bubble.is-on { opacity: 1; scale: 1; }
+  .alien-bubble:empty { display: none; }
 
   @media (max-width: 760px) {
     .space-sticky { align-content: start; padding-top: 32px; }
@@ -57,20 +88,58 @@ const { eyebrow, heading, intro } = Astro.props;
 </style>
 
 <script>
-  import { startSpaceHero } from './space-hero';
+  import { COPY_FADE_END, startSpaceHero } from './space-hero';
+  import type { SaucerSpot } from './space-hero';
+  import { greetingDeck, sayGreeting } from './alien-greetings';
 
   const section = document.querySelector<HTMLElement>('[data-space-hero]');
   const canvas = section?.querySelector<HTMLCanvasElement>('[data-space-canvas]');
-  if (section && canvas) {
+  const button = section?.querySelector<HTMLButtonElement>('[data-alien-hello]');
+  const bubble = section?.querySelector<HTMLElement>('[data-alien-bubble]');
+
+  if (section && canvas && button && bubble) {
     const copy = section.querySelector<HTMLElement>('.space-sticky');
+    let heroInView = true;
     // The headline fades out early in the flight, as Saturn slides away.
-    const onProgress = (p: number) => copy?.style.setProperty('--copy', String(1 - Math.min(1, p / 0.14)));
-    if (!startSpaceHero(section, canvas, onProgress)) {
+    const onProgress = (p: number) => copy?.style.setProperty('--copy', String(1 - Math.min(1, p / COPY_FADE_END)));
+    const onSaucer = (spot: SaucerSpot) => {
+      const away = !spot.visible || !heroInView;
+      button.classList.toggle('is-away', away);
+      bubble.classList.toggle('is-away', away);
+      if (away) return;
+      button.style.width = button.style.height = `${spot.size}px`;
+      button.style.transform = `translate(${spot.x - spot.size / 2}px, ${spot.y - spot.size / 2}px)`;
+      // Keep the bubble and the label on screen, even when the saucer floats near an edge.
+      const edge = 12, bubbleX = Math.min(spot.x + spot.size * 0.3, window.innerWidth - bubble.offsetWidth - edge);
+      bubble.style.setProperty('--bx', `${Math.max(edge, bubbleX)}px`);
+      bubble.style.setProperty('--by', `calc(${spot.y - spot.size * 0.45}px - 100%)`);
+      button.classList.toggle('near-right', spot.x > window.innerWidth * 0.6);
+    };
+
+    const hero = startSpaceHero(section, canvas, { onProgress, onSaucer });
+    if (!hero) {
       section.classList.add('no-space');
       canvas.remove();
+      button.remove();
     } else {
-      // The canvas is fixed, so hide it once the hero has scrolled away.
-      new IntersectionObserver(([entry]) => canvas.classList.toggle('is-off', !entry.isIntersecting)).observe(section);
+      // The canvas is fixed, so hide it (and the saucer's button) once the hero has scrolled away.
+      new IntersectionObserver(([entry]) => {
+        heroInView = entry.isIntersecting;
+        canvas.classList.toggle('is-off', !heroInView);
+        if (!heroInView) { button.classList.add('is-away'); bubble.classList.add('is-away'); }
+      }).observe(section);
+
+      const nextGreeting = greetingDeck();
+      let hideTimer = 0;
+      button.addEventListener('click', () => {
+        const greeting = nextGreeting();
+        const seconds = sayGreeting(greeting);
+        bubble.textContent = greeting.text; // before greet(), so the bubble is measured with its new words
+        bubble.classList.add('is-on');
+        hero.greet();
+        window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => bubble.classList.remove('is-on'), Math.max(2800, seconds * 1000 + 1200));
+      });
     }
   }
 </script>

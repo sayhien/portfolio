@@ -5,10 +5,11 @@
 import { prefersReducedMotion } from './motion';
 import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
 import { FRAGMENT, SKY_SHADERS, VERTEX_MAIN } from './case-sky-scenes';
+import { lookAt, perspective } from './camera-math';
+import type { Vec3 } from './camera-math';
 
 export type CaseSkyName = keyof typeof SKY_SHADERS;
 
-type Vec3 = [number, number, number];
 type Camera = { eye: Vec3; target: Vec3; shift: [number, number] };
 
 const MAX_DPR = 1.5;
@@ -36,22 +37,6 @@ const SKIES: Record<CaseSkyName, { count: number; camera: (t: number) => Camera;
     },
   },
 };
-
-function perspective(shift: [number, number], aspect: number): Float32Array {
-  let tanV = Math.tan((42 * Math.PI) / 360);
-  if (aspect < 1.6) tanV *= Math.min(2, 1.6 / aspect);
-  const f = 1 / tanV, near = 10, far = 9000, nf = 1 / (near - far);
-  return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, -shift[0], -shift[1], (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]);
-}
-
-function lookAt(eye: Vec3, target: Vec3): Float32Array {
-  const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-  const norm = (v: Vec3): Vec3 => { const l = Math.hypot(...v) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
-  const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-  const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  const z = norm(sub(eye, target)), x = norm(cross([0, 1, 0], z)), y = cross(z, x);
-  return new Float32Array([x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, eye), -dot(y, eye), -dot(z, eye), 1]);
-}
 
 /** Start a sky on a canvas. Returns false if this browser cannot draw it. */
 export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name: CaseSkyName): boolean {
@@ -92,7 +77,7 @@ export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name:
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniformMatrix4fv(loc.uProj, false, perspective(shift, aspect));
+    gl.uniformMatrix4fv(loc.uProj, false, perspective(aspect, { shift }));
     gl.uniformMatrix4fv(loc.uView, false, lookAt(cam.eye, cam.target));
     gl.uniform3fv(loc.uEye, cam.eye);
     gl.uniform1f(loc.uT, t);

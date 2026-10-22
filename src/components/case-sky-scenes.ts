@@ -2,8 +2,9 @@
 // thousands of glowing particles on the graphics card, the same approach as
 // earth-scenes.ts and space-hero-scene.ts. The renderer and the moving
 // cameras live in case-sky.ts.
+import { SAUCER_GLSL } from './saucer-shader';
 
-const HEADER = `
+export const HEADER = `
 precision highp float;
 attribute vec4 aSeed;
 uniform mat4 uProj, uView;
@@ -36,19 +37,7 @@ float hidden(vec3 p, vec3 C, float R){
   return (th > 0. && th < L - R*.01) ? 1. : 0.;
 }
 vec2 project(vec3 p){ vec4 c = uProj*uView*vec4(p, 1.); return c.xy/c.w; }
-// An alien saucer made of particles: a disc, a glass dome, a mint alien,
-// blinking yellow and orange lights, and a beam when it is working.
-vec3 saucer(vec4 r, float t, float beam, float wave, out vec3 col, out float a){
-  vec3 p;
-  if(r.x < .42){ float ang=r.y*TAU; float rad=mix(.25,1.,sqrt(r.z)); p=vec3(cos(ang)*rad*22., (r.w-.5)*(1.-rad*.8)*8., sin(ang)*rad*22.); col=mix(GREY,WHITE,r.w); a=.2; }
-  else if(r.x < .56){ vec3 n=sph(r.yz); n.y=abs(n.y); p=n*10.5+vec3(0.,2.,0.); col=BLUE; a=.1; }
-  else if(r.x < .76){ p=ball(r.yzw)*5.2+vec3(0.,6.,0.); col=MINT; a=.55; }
-  else if(r.x < .8){ float v=r.y; float sw=sin(t*9.)*wave; p=vec3(4.+v*7., 6.+v*(4.+sw*6.), 0.); col=MINT; a=wave; }
-  else if(r.x < .83){ p=vec3(0., 11.+r.y*5., 0.); col=MINT; a=.8; if(r.y>.8){ p=vec3(0.,17.,0.)+ball(r.zwy)*1.6; col=YELLOW; a=1.; } }
-  else if(r.x < .93){ float k=floor(r.y*10.); float ang=k/10.*TAU; p=vec3(cos(ang)*20.5,0.,sin(ang)*20.5)+ball(r.zwy)*1.6; col=mod(k+floor(t*4.),2.)<1.?YELLOW:ORANGE; a=.85; }
-  else { float v=r.y; float ang=r.z*TAU; float rr=v*13.*sqrt(r.w); p=vec3(cos(ang)*rr,-4.-v*48.,sin(ang)*rr); col=YELLOW; a=beam*.45*(1.-v); }
-  return rotX(p, .3);
-}
+${SAUCER_GLSL}
 `;
 
 export const VERTEX_MAIN = `
@@ -84,7 +73,7 @@ void main(){
   gl_FragColor = vec4(vCol*a, a);
 }`;
 
-const COMMON = `
+export const COMMON = `
 float hash3(vec3 p){ return fract(sin(dot(p, vec3(127.1,311.7,74.7)))*43758.5453); }
 float vnoise(vec3 p){
   vec3 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);

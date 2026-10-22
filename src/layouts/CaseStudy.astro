@@ -244,21 +244,80 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     progress.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
   };
 
-  links.forEach((a) => a.addEventListener('click', () => {
-    setCurrent(a.hash.slice(1));
+  // Pictures above a section may still be loading while the page glides to it,
+  // and each one pushes the section further down. After a menu click, start
+  // loading those pictures at once, then keep nudging the section back to the
+  // top until the reader scrolls on their own or a few seconds pass.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const CHECK_MS = 150, WATCH_MS = 8000, TOLERANCE_PX = 4;
+  let lockedId: string | null = null;
+  let checkTimer = 0;
+
+  function releaseLock() {
+    lockedId = null;
+    window.clearInterval(checkTimer);
+  }
+
+  function glideTo(target: HTMLElement) {
+    target.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function loadPicturesAbove(target: HTMLElement) {
+    document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+      if (img.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING) img.loading = 'eager';
+    });
+  }
+
+  /** How far the section is from where it should rest at the top. */
+  function driftOf(target: HTMLElement) {
+    const offset = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    return Math.abs(target.getBoundingClientRect().top - offset);
+  }
+
+  const atBottom = () => window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 1;
+
+  function scrollToSection(target: HTMLElement) {
+    releaseLock();
+    lockedId = target.id;
+    loadPicturesAbove(target);
+    glideTo(target);
+    const started = performance.now();
+    let lastY = window.scrollY;
+    checkTimer = window.setInterval(() => {
+      if (performance.now() - started > WATCH_MS) return releaseLock();
+      const moving = Math.abs(window.scrollY - lastY) >= 1;
+      lastY = window.scrollY;
+      // A short last section rests lower when the page ends, so only nudge when there is room.
+      if (!moving && !atBottom() && driftOf(target) > TOLERANCE_PX) glideTo(target);
+    }, CHECK_MS);
+  }
+
+  ['wheel', 'touchstart', 'keydown'].forEach((type) => window.addEventListener(type, releaseLock, { passive: true }));
+
+  links.forEach((a) => a.addEventListener('click', (event) => {
+    const target = document.getElementById(a.hash.slice(1));
+    if (!target) return;
+    event.preventDefault();
+    history.pushState(null, '', a.hash);
+    setCurrent(target.id);
     if (narrow.matches && toc) toc.open = false;
+    scrollToSection(target);
+    // Move keyboard focus to the section too, as a normal in-page link would.
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
   }));
 
   const sections = Array.from(byId.keys())
     .map((id) => document.getElementById(id))
     .filter(Boolean) as HTMLElement[];
   const onScroll = () => {
+    updateProgress();
+    if (lockedId) { setCurrent(lockedId); return; }
     let current = sections[0]?.id;
     for (const s of sections) {
       if (s.getBoundingClientRect().top <= window.innerHeight * 0.3) current = s.id;
     }
     if (current) setCurrent(current);
-    updateProgress();
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();

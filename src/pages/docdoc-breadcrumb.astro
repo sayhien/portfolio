@@ -1,5 +1,6 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
+import SpaceBand from '../components/SpaceBand.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import StepList from '../components/StepList.astro';
@@ -30,6 +31,12 @@ const options = [
   { title: 'Menu', badge: 'Participants’ favourite', text: 'Users click an ellipsis to open a menu of the hidden crumbs. Most participants liked it for looking clean and minimal. But Angular Material, which we follow, has no such pattern and no technical documentation for it, so engineering saw it as risky to build.', file: 'VGixQMbk72UrO2ylzmSKmCuGqKc.gif', alt: 'Animation of the menu idea: an ellipsis opens a list of hidden crumbs' },
   { title: 'Reveal trail', badge: 'Engineering’s favourite', chosen: true, text: 'Clicking an ellipsis reveals the hidden crumbs in place. This matched Atlassian’s documented pattern, so engineering could build it with confidence.', file: 'rUshRODZTWVCNwyDiOw1Tjc7OQ.gif', alt: 'Animation of the reveal trail idea: clicking the ellipsis shows the hidden crumbs inline' },
   { title: 'Horizontal scrollbar', text: 'Users click and drag a horizontal scrollbar to see crumbs hidden off to the right.', file: 'RX5i0jCxGWURojufS3anT61UfsU.gif', alt: 'Animation of the horizontal scrollbar idea' },
+];
+
+const matrixCaptions = [
+  { t: 0, text: 'Ideas drifting' },
+  { t: 3, text: 'Sorted by impact and effort' },
+  { t: 8.5, text: 'High impact, low effort: the breadcrumb' },
 ];
 
 const learnings: Card[] = [
@@ -78,6 +85,7 @@ const next = caseLinks(['docdoc-library', 'esg-reporting-module']);
     <h2>Impact Effort Matrix</h2>
     <p>We explored many ideas so we wouldn’t fall for the first one. After three days of brainstorming, we placed every idea in FigJam on an impact effort grid.</p>
     <p>Most of us kept coming back to a breadcrumb trail. Our hunch: users already expect a row of links, and the app was mature enough that breadcrumbs would feel natural, not tacked on.</p>
+    <SpaceBand name="clouds" kicker="Impact effort matrix" line="Every idea drifted to its corner. The one with high impact and low effort burned brightest: the breadcrumb." captions={matrixCaptions} />
     <Shot src={framerImage('lsw1F0IFDv8YcUofeOZPaNgKjs.jpg')} alt="The team’s impact effort matrix in FigJam, with ideas placed by impact and effort" />
   </section>
 

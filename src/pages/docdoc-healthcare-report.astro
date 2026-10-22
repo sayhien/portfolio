@@ -1,5 +1,6 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
+import SpaceBand from '../components/SpaceBand.astro';
 import Personas from '../components/Personas.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
@@ -54,6 +55,13 @@ const storyboard = [
 const plan: Card[] = [
   { icon: 'users', label: 'Participants and tasks', title: '7 participants, 5 tasks', text: 'Add notes, generate a report, filter specialists and email the PDF.' },
   { icon: 'target', label: 'Scoring and success', title: '70% pass rate to succeed', text: 'Each task scored pass, partial or fail, and rated on a 7 point Single Ease Question (SEQ) scale. The same 70% applied to the SEQ.' },
+];
+
+// When the craft passes each ring in the film (see space-band.ts).
+const ringCaptions = [
+  { t: 0, text: 'One course, five tasks' },
+  ...[3.7, 5.9, 7.3, 8.6, 10.9].map((t, index) => ({ t, text: `Task ${String(index + 1).padStart(2, '0')} of 05 cleared` })),
+  { t: 12, text: 'Course complete' },
 ];
 
 const learnings: Card[] = [
@@ -152,6 +160,7 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
       <CardGrid items={plan} min={280} />
       <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
     </div>
+    <SpaceBand name="rings" kicker="Usability test plan" line="One course, five tasks. Each ring lights up as the craft clears it, like a participant finishing a task." captions={ringCaptions} />
   </section>
 
   <section id="result" class="sec">

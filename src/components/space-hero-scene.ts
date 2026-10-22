@@ -3,6 +3,7 @@
 // into Earth's clouds. Same approach as earth-scenes.ts: every particle's
 // place is worked out on the graphics card from a few random numbers.
 // The camera and renderer live in space-hero.ts.
+import { SAUCER_GLSL } from './saucer-shader';
 
 export const VERTEX = `
 precision highp float;
@@ -13,6 +14,10 @@ uniform sampler2D uLand;
 uniform mat4 uProj, uView;
 uniform vec3 uEye, uE;
 uniform float uT, uDpr, uSizeRef, uFog, uNear, uEnter, uTiltX, uTiltZ, uScroll, uP;
+// uPull is the swoosh's strength (0 to 1 and back), uSwoosh how far through it we are.
+uniform float uPull, uSwoosh;
+// The alien saucer: where it floats, how big it is, and how much it is waving.
+uniform vec3 uSaucer; uniform float uSaucerScale, uWave;
 varying vec3 vCol; varying float vA; varying float vSz;
 float gSize; float gScreen;
 uniform float uAspect;
@@ -39,6 +44,7 @@ float vnoise(vec3 p){
   return mix(a, b, f.z);
 }
 float fbm(vec3 p){ return .55*vnoise(p) + .3*vnoise(p*2.1) + .15*vnoise(p*4.3); }
+${SAUCER_GLSL}
 float hidden(vec3 p, vec3 C, float R){
   vec3 d = p - uEye; float Ln = length(d); d /= Ln;
   vec3 oc = uEye - C; float b = dot(oc, d); float c = dot(oc, oc) - R*R*.985;
@@ -98,21 +104,40 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
     a *= keep;
     return vec3(r.x*2. - 1., y*2. - 1., 0.);
   }
-  // The swoosh: streaks of light spiral past the edges of the screen as we are pulled into Earth
-  if(s.x < .16){
+  // The swoosh, in three layers of light as we are pulled into Earth:
+  // streaks spiralling past the edges, rings of light rushing outward, and fine sparks.
+  if(s.x < .155){
     gScreen = 1.;
-    float pull = sin(PI*clamp((uP - .554)/.44, 0., 1.));
-    float lane = floor(r.x*180.); float ang = lane/180.*TAU + (q.y - .5)*.012; float u = fract(h1(lane*3.7) + t*.9 + uP*6.);
-    float rad = .15 + u*u*1.6; float len = (.04 + .5*pull)*rad;
+    float lane = floor(r.x*260.); float ang = lane/260.*TAU + (q.y - .5)*.012; float u = fract(h1(lane*3.7) + t*.9 + uSwoosh*7.);
+    float rad = .12 + u*u*1.8; float len = (.05 + .65*uPull)*rad;
     float along = r.z;
-    float rr = rad - along*len; float spin = (1. - u)*1.4*pull;
-    col = q.z < .5 ? mix(WHITE, BLUE, q.w) : MINT;
-    a = pull*(.5 + 1.2*u)*(1. - along*.6);
-    gSize = 1. + 1.5*u*pull;
+    float rr = rad - along*len; float spin = (1. - u)*1.6*uPull;
+    float tone = h1(lane*1.3);
+    col = tone < .45 ? mix(WHITE, BLUE, q.w) : (tone < .9 ? MINT : GOLD);
+    a = uPull*(.5 + 1.3*u)*(1. - along*.6);
+    gSize = 1. + 1.8*u*uPull;
     return vec3(cos(ang + spin)*rr/uAspectS(), sin(ang + spin)*rr, 0.);
   }
+  if(s.x < .175){
+    gScreen = 1.;
+    float k = floor(r.x*9.); float u = fract(t*.55 + k/9. + uSwoosh*4.);
+    float rad = .04 + u*u*u*2.2; float ang = r.y*TAU;
+    col = mod(k, 3.) < 1. ? MINT : (mod(k, 3.) < 2. ? BLUE : WHITE);
+    a = uPull*.55*(1. - u)*smoothstep(0., .15, u)*(.6 + .4*sin(ang*6. + t*3.));
+    gSize = 1. + uPull*u;
+    return vec3(cos(ang)*rad/uAspectS(), sin(ang)*rad, 0.);
+  }
+  if(s.x < .2){
+    gScreen = 1.;
+    float u = fract(q.x + t*(.6 + q.y*.9) + uSwoosh*5.); float ang = r.y*TAU;
+    float rad = .02 + u*u*1.7;
+    col = q.z < .6 ? WHITE : (q.z < .85 ? MINT : GOLD);
+    a = uPull*(.3 + 1.2*u)*step(.35, q.w);
+    gSize = 1. + 2.2*u*u*uPull;
+    return vec3(cos(ang)*rad/uAspectS(), sin(ang)*rad, 0.);
+  }
   // Saturn: soft bands, lit from one side
-  if(s.x < .28){
+  if(s.x < .31){
     gSize = 1.7;
     vec3 n = sph(s.yz); vec3 p = n*SR;
     float band = .5 + .5*sin(n.y*20. + sin(n.y*7. + 1.)*1.2);
@@ -136,20 +161,25 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
     float x = mix(2.85, 3.8, sqrt(r.x)); float ang = r.y*TAU;
     col = MINT; a = .07*keep; return ringPlane(vec3(cos(ang)*x*SR, (r.z-.5)*20., sin(ang)*x*SR));
   }
-  // Thin orbit lines sweeping past, each with a mint dot travelling along it
+  // Thin orbit lines sweeping past
   if(s.x < .55){
     float k = floor(r.x*4.); float rad = SR*(3.1 + k*1.05); float ang = r.y*TAU;
     vec3 base = rotZ(rotX(vec3(cos(ang)*rad, 0., sin(ang)*rad*.92), .55 + k*.06), .35);
-    if(r.z < .06){ float da = t*(.06 - k*.01) + k*1.7; base = rotZ(rotX(vec3(cos(da)*rad, 0., sin(da)*rad*.92), .55 + k*.06), .35) + ball(r.yzw)*16.; col = MINT; a = keep; gSize = 1.6; return base; }
     col = mix(WHITE, MINT, .4); a = .2*keep; return base;
   }
   // Far planets in the background
-  if(s.x < .56){
+  if(s.x < .555){
     float k = floor(r.x*3.);
     vec3 C = k < .5 ? vec3(-6200., 2200., -7800.) : k < 1.5 ? vec3(7200., -1700., -9500.) : vec3(-1200., 3600., -12000.);
     float R = k < .5 ? 200. : k < 1.5 ? 160. : 260.;
     vec3 n = sph(r.yz); float lit = max(0., dot(n, L));
     col = (k < .5 ? ORANGE : k < 1.5 ? BLUE : mix(BLUE, WHITE, .5))*(.35 + .8*lit); a = (.3 + .7*lit)*keep; return C + n*R;
+  }
+  // The alien saucer floating near Saturn. It spins slowly and waves when clicked.
+  if(s.x < .565){
+    vec3 sp = saucer(r, t, 0., uWave, col, a);
+    sp = rotX(rotY(sp, t*.5), sin(t*.7)*.12);
+    gSize = 1.5; a = min(1., a*1.8)*keep; return uSaucer + sp*uSaucerScale;
   }
   // Earth: its air and its moon (the surface is drawn above)
   vec3 n = sph(s.yz); vec3 spun = rotY(n, t*.03);

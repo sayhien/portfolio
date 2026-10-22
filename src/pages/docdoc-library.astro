@@ -1,5 +1,6 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
+import SpaceBand from '../components/SpaceBand.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import StepList from '../components/StepList.astro';
@@ -41,6 +42,9 @@ const expansion: Step[] = [
   { title: 'Card variant creation', text: 'I created several card variants with their properties in the design library, then checked them against the testing criteria.', img: framerImage('tuYWn3kzqkleFtAZ1U1jHdBEShA.png'), alt: 'Card variants in the design library' },
   { title: 'Design integration and testing', text: 'I placed the card in the design flow and tested it with other components in different layouts. This showed where it could improve.', img: framerImage('jQi8RN4XfbyUVFSGzmZZAMb7vI.png'), alt: 'The card inside a full page layout' },
 ];
+
+// The zodiac film shows a new figure every 6 seconds, in a 24 second round.
+const figureCaptions = ['Leo', 'Scorpius', 'Gemini', 'Sagittarius'].map((name, index) => ({ t: index * 6 + 1.3, text: `Same 12 stars · ${name}` }));
 
 const creation: Card[] = [
   { icon: 'layers', title: 'Alignment', text: 'Does the component fit the DocDoc design system, both technically and visually?' },
@@ -140,6 +144,7 @@ const next = caseLinks(['docdoc-healthcare-report', 'docdoc-breadcrumb']);
     <h2>Component Creation Criteria</h2>
     <p>I set up criteria so every new component was useful, efficient and consistent with the design system.</p>
     <CardGrid items={creation} columns={3} />
+    <SpaceBand name="zodiac" kicker="Why the criteria matter" line="The same twelve stars make Leo, Scorpius, Gemini and Sagittarius. Well made components work the same way: one set, many layouts." captions={figureCaptions} loop={24} />
   </section>
 
   <section id="card-criteria" class="sec">

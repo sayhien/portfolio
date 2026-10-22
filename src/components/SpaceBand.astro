@@ -1,0 +1,114 @@
+---
+// A short space film in the middle of a case study, explaining one idea.
+// Use as <SpaceBand name="station" kicker="..." line="..." captions={[...]} />.
+// The film is decorative; the kicker and line are real text and say the idea
+// in words. Captions follow the story on screen but are hidden from screen
+// readers, since they only label what the picture shows.
+import type { BandName } from './space-band';
+
+type Caption = { t: number; text: string };
+interface Props {
+  name: BandName;
+  kicker: string;
+  line: string;
+  captions?: Caption[];
+  /** For films that repeat, the length of one round in seconds, so the captions repeat too. */
+  loop?: number;
+}
+const { name, kicker, line, captions = [], loop } = Astro.props;
+---
+<figure class="band" data-space-band={name} data-captions={JSON.stringify(captions)} data-loop={loop}>
+  <canvas aria-hidden="true"></canvas>
+  <p class="band-now" aria-hidden="true" data-band-now></p>
+  <button type="button" class="band-replay" data-band-replay hidden>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.5v2.8h2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    Replay
+  </button>
+  <figcaption class="band-copy">
+    <span class="band-kicker">{kicker}</span>
+    <span class="band-line">{line}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .band { position: relative; margin: var(--space-4) 0 0; height: 540px; overflow: hidden; border-radius: var(--radius); }
+  canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none;
+    /* all four edges melt into the page */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-composite: intersect;
+  }
+  .band-copy {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: var(--space-5) var(--space-3) var(--space-3);
+    display: grid; gap: 6px; pointer-events: none;
+    background: linear-gradient(to top, rgba(15, 18, 22, 0.88) 20%, rgba(15, 18, 22, 0));
+  }
+  .band-kicker { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .band-line { font-family: var(--display); font-size: clamp(20px, 2.1vw, 27px); line-height: 1.3; letter-spacing: -0.01em; color: var(--text); max-width: 620px; text-wrap: balance; }
+  .band-now {
+    position: absolute; top: var(--space-2); left: var(--space-3); margin: 0;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--text);
+    background: rgba(15, 18, 22, 0.7); border: 1px solid var(--line-2); border-radius: 999px; padding: 6px 12px;
+    transition: opacity 0.3s;
+  }
+  .band-now:empty { opacity: 0; }
+  .band-replay {
+    position: absolute; top: var(--space-2); right: var(--space-3); min-height: 44px; min-width: 44px;
+    display: inline-flex; align-items: center; gap: 6px; padding: 0 14px;
+    font: inherit; font-size: 14px; color: var(--text); cursor: pointer;
+    background: rgba(15, 18, 22, 0.7); border: 1px solid var(--line-2); border-radius: 999px;
+  }
+  .band-replay:hover { border-color: var(--accent); color: var(--accent); }
+  .band-replay[hidden] { display: none; }
+  /* Without graphics the band is just its words on a quiet panel. */
+  .band.no-film { height: auto; background: var(--surface); border: 1px solid var(--line); }
+  .band.no-film .band-copy { position: static; background: none; padding: var(--space-3); }
+  @media (max-width: 760px) {
+    .band { height: 440px; }
+    .band-copy { padding: var(--space-4) var(--space-2) var(--space-2); }
+    .band-now { left: var(--space-2); max-width: calc(100% - 140px); border-radius: 14px; }
+    .band-replay { right: var(--space-2); }
+  }
+</style>
+
+<script>
+  import { startSpaceBand } from './space-band';
+  import type { BandName } from './space-band';
+  import { prefersReducedMotion } from './motion';
+
+  type Caption = { t: number; text: string };
+
+  /** The caption for a moment in the film: the last one whose time has come. */
+  const captionAt = (captions: Caption[], t: number) => captions.filter((c) => c.t <= t).pop()?.text ?? '';
+
+  document.querySelectorAll<HTMLElement>('[data-space-band]').forEach((band) => {
+    const canvas = band.querySelector('canvas');
+    const now = band.querySelector<HTMLElement>('[data-band-now]');
+    const replay = band.querySelector<HTMLButtonElement>('[data-band-replay]');
+    let captions: Caption[] = [];
+    try {
+      captions = JSON.parse(band.dataset.captions ?? '[]');
+    } catch (error) {
+      console.warn('Space band captions could not be read', error);
+    }
+    let shown = '';
+    const loop = Number(band.dataset.loop) || 0;
+    const onTime = (t: number) => {
+      const text = captionAt(captions, loop ? t % loop : t);
+      if (now && text !== shown) { now.textContent = text; shown = text; }
+    };
+    const film = canvas ? startSpaceBand(band, canvas, band.dataset.spaceBand as BandName, onTime) : null;
+    if (!film) {
+      canvas?.remove();
+      now?.remove();
+      band.classList.add('no-film');
+      return;
+    }
+    if (replay && !prefersReducedMotion()) {
+      replay.hidden = false;
+      replay.addEventListener('click', () => film.replay());
+    }
+  });
+</script>

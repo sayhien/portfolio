@@ -33,12 +33,6 @@ const options = [
   { title: 'Horizontal scrollbar', text: 'Users click and drag a horizontal scrollbar to see crumbs hidden off to the right.', file: 'RX5i0jCxGWURojufS3anT61UfsU.gif', alt: 'Animation of the horizontal scrollbar idea' },
 ];
 
-const matrixCaptions = [
-  { t: 0, text: 'Ideas drifting' },
-  { t: 3, text: 'Sorted by impact and effort' },
-  { t: 8.5, text: 'High impact, low effort: the breadcrumb' },
-];
-
 const learnings: Card[] = [
   { icon: 'code', title: 'From sketch to CTO pushback', text: 'Check technical limits before usability testing, or the option users love may not be one engineering can ship. Keep the design simple enough for developers to build quickly.' },
   { icon: 'users', title: 'From silos to reconnection', text: 'We usually work fast and apart, so product managers, designers and engineers rarely brainstorm or rank ideas together. Worried we were drifting, I invited everyone in. One morning in FigJam brought notes, debate and laughter, and we left feeling like one team again.' },
@@ -81,11 +75,11 @@ const next = caseLinks(['docdoc-library', 'esg-reporting-module']);
   </section>
 
   <section id="matrix" class="sec">
+    <SpaceBand name="clouds" />
     <p class="sn">{n('matrix')}</p>
     <h2>Impact Effort Matrix</h2>
     <p>We explored many ideas so we wouldn’t fall for the first one. After three days of brainstorming, we placed every idea in FigJam on an impact effort grid.</p>
     <p>Most of us kept coming back to a breadcrumb trail. Our hunch: users already expect a row of links, and the app was mature enough that breadcrumbs would feel natural, not tacked on.</p>
-    <SpaceBand name="clouds" kicker="Impact effort matrix" line="Every idea drifted to its corner. The one with high impact and low effort burned brightest: the breadcrumb." captions={matrixCaptions} />
     <Shot src={framerImage('lsw1F0IFDv8YcUofeOZPaNgKjs.jpg')} alt="The team’s impact effort matrix in FigJam, with ideas placed by impact and effort" />
   </section>
 

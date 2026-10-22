@@ -8,16 +8,16 @@ export type Greeting = { text: string; base: number; notes: number[]; voice: Voi
 
 /** Notes are semitones above the base pitch, one per syllable. */
 export const GREETINGS: Greeting[] = [
-  { text: 'Hello, Earthling!', base: 330, notes: [0, 5, -2, 3, 9], voice: 'chirp' },
-  { text: 'Greetings from the stars!', base: 260, notes: [0, 4, 7, 4, 9, 12], voice: 'warble' },
-  { text: 'Beep boop! Welcome!', base: 220, notes: [12, 0, 7, 0, 12], voice: 'robot' },
-  { text: 'We come in peace.', base: 196, notes: [0, 3, 5, 3, -2], voice: 'bubble' },
-  { text: 'Take me to your designer!', base: 294, notes: [0, 2, 4, 2, 7, 5, 12], voice: 'warble' },
-  { text: 'Ooh, a human! Hi there!', base: 349, notes: [7, 0, 4, 9, 14, 12], voice: 'chirp' },
-  { text: 'Your pixels look perfectly aligned.', base: 247, notes: [0, 4, 2, 7, 5, 9, 12, 7], voice: 'robot' },
-  { text: 'Hello from three galaxies away!', base: 233, notes: [0, 7, 12, 7, 3, 10, 5, 0], voice: 'bubble' },
-  { text: 'Nice work, human! Keep scrolling!', base: 311, notes: [5, 0, 9, 4, 12, 7, 14, 12], voice: 'chirp' },
-  { text: 'See you in orbit!', base: 262, notes: [12, 7, 4, 0, 7, 19], voice: 'warble' },
+  { text: 'Hello, Earthling! Nine years of design? Impressive.', base: 330, notes: [0, 5, -2, 3, 9, 7, 12], voice: 'chirp' },
+  { text: 'We scanned this site. Every pixel has a reason.', base: 260, notes: [0, 4, 7, 4, 9, 12, 7], voice: 'warble' },
+  { text: 'Beep boop! Research first, pixels second. Smart human.', base: 220, notes: [12, 0, 7, 0, 12, 7, 5, 12], voice: 'robot' },
+  { text: 'We hear you turn dense data into calm screens.', base: 196, notes: [0, 3, 5, 3, 7, 5, -2], voice: 'bubble' },
+  { text: 'Take me to your designer. He listens to users.', base: 294, notes: [0, 2, 4, 2, 7, 5, 12], voice: 'warble' },
+  { text: 'Accessible, tested and consistent. We approve!', base: 349, notes: [7, 0, 4, 9, 14, 12], voice: 'chirp' },
+  { text: 'On our planet we love a good design system too.', base: 247, notes: [0, 4, 2, 7, 5, 9, 12, 7], voice: 'robot' },
+  { text: 'Mission report: strong user experience skills detected.', base: 233, notes: [0, 7, 12, 7, 3, 10, 5, 0], voice: 'bubble' },
+  { text: 'We crossed three galaxies for work this clear.', base: 311, notes: [5, 0, 9, 4, 12, 7, 14], voice: 'chirp' },
+  { text: 'Enterprise apps, made simple? Our mothership is taking notes.', base: 262, notes: [12, 7, 4, 0, 7, 19, 12, 16], voice: 'warble' },
 ];
 
 const SYLLABLE_S = 0.15, GAP_S = 0.035, LOUDNESS = 0.16;

@@ -36,23 +36,23 @@ const { items, stacked = false } = Astro.props;
 </ol>
 
 <style>
-  .rail { --node: 44px; position: relative; list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-5); }
+  .rail { --node: 36px; position: relative; list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-5); }
   /* The track (before) and its glowing fill (after) run from the first node's centre to the last one's. */
   .rail::before, .rail::after {
     content: ''; position: absolute; left: calc(var(--node) / 2 - 1px); top: calc(var(--node) / 2); bottom: var(--track-end, 0px); width: 2px;
   }
   .rail::before { background: var(--line-2); }
-  .rail::after { background: linear-gradient(var(--accent), var(--accent-line)); transform-origin: top; transform: scaleY(var(--rail, 1)); box-shadow: 0 0 12px var(--accent-soft); }
+  .rail::after { background: var(--accent-line); transform-origin: top; transform: scaleY(var(--rail, 1)); }
   .step { position: relative; display: grid; grid-template-columns: var(--node) minmax(0, 1fr); column-gap: var(--space-3); align-items: start; }
+  /* A quiet node: an outlined circle with its number. Reached steps take the accent outline. */
   .node {
     position: relative; z-index: 1; width: var(--node); height: var(--node); border-radius: 50%;
-    display: grid; place-items: center; font-family: var(--mono); font-size: 13px; font-weight: 500;
-    color: var(--on-accent); background: var(--accent); border: 2px solid var(--accent);
-    box-shadow: 0 0 0 6px var(--accent-soft), 0 0 22px rgba(110, 231, 183, 0.35);
-    transition: background 0.4s, color 0.4s, box-shadow 0.4s, border-color 0.4s;
+    display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 500;
+    color: var(--accent); background: var(--bg); border: 1px solid var(--accent-line);
+    transition: color 0.4s, border-color 0.4s;
   }
-  /* Before the reader reaches a step, its node waits unlit on the track. */
-  .rail.is-live .step:not(.is-reached) .node { color: var(--muted); background: var(--bg); border-color: var(--line-2); box-shadow: none; }
+  /* Before the reader reaches a step, its node waits in the track's grey. */
+  .rail.is-live .step:not(.is-reached) .node { color: var(--muted); border-color: var(--line-2); }
   .body { display: grid; gap: var(--space-3); align-items: center; padding-top: 6px; }
   .has-img .body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
   .has-img:nth-child(even) .copy { order: 2; }
@@ -66,9 +66,9 @@ const { items, stacked = false } = Astro.props;
   .pic :global(img) { display: block; width: 100%; height: auto; border-radius: 8px; background: var(--surface-2); }
 
   @media (max-width: 760px) {
-    .rail { --node: 36px; gap: var(--space-4); }
+    .rail { --node: 32px; gap: var(--space-4); }
     .step { column-gap: var(--space-2); }
-    .node { font-size: 12px; }
+    .node { font-size: 11px; }
     .has-img .body { grid-template-columns: minmax(0, 1fr); }
     .has-img:nth-child(even) .copy { order: 0; }
   }

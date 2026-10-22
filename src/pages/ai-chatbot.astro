@@ -89,12 +89,6 @@ const pageSections = [
   ['Call to action', 'Talk to sales', 'Turns interested prospects into qualified leads.', 'All personas'],
 ];
 
-// The station film docks one module per page section, 1.25 seconds apart (see space-band-scenes.ts).
-const dockCaptions = [
-  ...pageSections.map(([section], index) => ({ t: 1.5 + index * 1.25, text: `Docking ${String(index + 1).padStart(2, '0')} of 08 · ${section}` })),
-  { t: 12.4, text: 'All eight sections in place. The page is live.' },
-];
-
 const sectionIcons: IconName[] = ['spark', 'users', 'tool', 'building', 'flask', 'link', 'shield', 'mail'];
 
 const metrics = [
@@ -177,10 +171,10 @@ const prototype = 'https://simplifynext-bot.framer.website/';
   </section>
 
   <section id="page-structure" class="sec">
+    <SpaceBand name="station" />
     <p class="sn">{n('page-structure')}</p>
     <h2>Page Structure</h2>
     <p>The information architecture for one page: it moves prospects from first interest, to judging the fit for themselves, to technical confidence.</p>
-    <SpaceBand name="station" kicker="Page structure" line="Eight sections dock in the order a prospect meets them, until the whole page lights up." captions={dockCaptions} />
     <DataTable caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} icons={sectionIcons} />
     <div class="takeaway">
       <b>Design principle</b>

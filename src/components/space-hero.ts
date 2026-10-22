@@ -24,8 +24,8 @@ const BASE_FOV = 42;
 
 // Scroll progress milestones. The swoosh into Earth is the last half of the
 // scroll, and the work section rises over its tail (see index.astro).
-export const COPY_FADE_END = 0.123;
-const THROUGH_RINGS = 0.281, EARTH_FILLS = 0.486, ENTER_FROM = 0.652, SWOOSH_END = 0.99;
+export const COPY_FADE_END = 0.112;
+const THROUGH_RINGS = 0.256, EARTH_FILLS = 0.443, ENTER_FROM = 0.623, SWOOSH_END = 0.99;
 
 const rotX = ([x, y, z]: Vec3, a: number): Vec3 => [x, Math.cos(a) * y - Math.sin(a) * z, Math.sin(a) * y + Math.cos(a) * z];
 const rotZ = ([x, y, z]: Vec3, a: number): Vec3 => [Math.cos(a) * x - Math.sin(a) * y, Math.sin(a) * x + Math.cos(a) * y, z];

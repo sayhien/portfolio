@@ -57,13 +57,6 @@ const plan: Card[] = [
   { icon: 'target', label: 'Scoring and success', title: '70% pass rate to succeed', text: 'Each task scored pass, partial or fail, and rated on a 7 point Single Ease Question (SEQ) scale. The same 70% applied to the SEQ.' },
 ];
 
-// When the craft passes each ring in the film (see space-band.ts).
-const ringCaptions = [
-  { t: 0, text: 'One course, five tasks' },
-  ...[3.7, 5.9, 7.3, 8.6, 10.9].map((t, index) => ({ t, text: `Task ${String(index + 1).padStart(2, '0')} of 05 cleared` })),
-  { t: 12, text: 'Course complete' },
-];
-
 const learnings: Card[] = [
   { icon: 'check', title: 'Smooth process', text: 'Most things went smoothly, and management was open to the new UX process.' },
   { icon: 'chat', title: 'Unexpected challenges', text: 'I had to persuade an important stakeholder to take part in the interviews and usability testing.' },
@@ -153,6 +146,7 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
   </section>
 
   <section id="test-plan" class="sec">
+    <SpaceBand name="rings" />
     <p class="sn">{n('test-plan')}</p>
     <h2>Usability Test Plan</h2>
     <p>Seven participants from the member representative and system analyst teams did five tasks in a Figma prototype.</p>
@@ -160,7 +154,6 @@ const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
       <CardGrid items={plan} min={280} />
       <Shot src={framerImage('XoGTTvGvGIyvsXWJWSFWCoQZDk.png')} alt="Diagram of how information flows between the facilitator, the participant and the tasks during the test" />
     </div>
-    <SpaceBand name="rings" kicker="Usability test plan" line="One course, five tasks. Each ring lights up as the craft clears it, like a participant finishing a task." captions={ringCaptions} />
   </section>
 
   <section id="result" class="sec">

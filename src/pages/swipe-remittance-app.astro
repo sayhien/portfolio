@@ -58,9 +58,6 @@ const goals: Card[] = [
   { icon: 'badge', title: 'Restore trust' },
 ];
 
-// The meteor film shows one wave per pain point, 3.2 seconds apart, each brighter than the last.
-const waveCaptions = (cards: Card[]) => [...cards].reverse().map((card, index) => ({ t: 1 + index * 3.2, text: `Wave ${index + 1} of 4 · ${card.title}` }));
-
 const priorities: Card[] = [
   { icon: 'listcog', title: 'Excessive and intrusive fields', text: 'Forms asked for personal details the task didn’t need, which added friction and privacy worries.' },
   { icon: 'compass', title: 'Vague wayfinding', text: 'Users struggled to find cash top up outlets, with poor instructions and no visual guide.' },
@@ -150,11 +147,11 @@ const next = caseLinks(['esg-reporting-module', 'docdoc-healthcare-report']);
   </section>
 
   <section id="priority-pain-points" class="sec">
+    <SpaceBand name="meteors" />
     <p class="sn">{n('priority-pain-points')}</p>
     <h2>Priority Pain Points</h2>
     <p>I sorted the raw findings into groups, then plotted them on an impact effort matrix to rank them by how much they mattered to users and to the business.</p>
     <Shot src={framerImage('JZQIvFOztrHwOz6DD9pbq6fthw.png')} alt="Ideation boards used to sort and rank the pain points" />
-    <SpaceBand name="meteors" kicker="Priority pain points" line="Four pain points, each burning brighter than the last. The brightest ranked highest." captions={waveCaptions(priorities)} />
     <CardGrid items={priorities} columns={2} />
   </section>
 

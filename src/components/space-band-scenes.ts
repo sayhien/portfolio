@@ -89,44 +89,58 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
 }`;
 
 // ---------------------------------------------------------------- Remittance, priority pain points
-// Four meteors cross the night sky one after another, each brighter than the
-// last. Each enters far off on the right and sweeps left towards us, speeding
-// up, growing and brightening, then fades away.
+// A swarm of meteorites sweeps from right to left and crashes into a planet.
+// Most are dull rocks that leave a small puff. Four of them, the priority pain
+// points, burn brightly on the way in and flash as they hit.
 const METEORS = HEADER + COMMON + `
-const float FIRST = .8, GAP = 1.8, LIFE = 2.8;
-float hills(float x, float z){ return (fbm(vec3(x*.0016, 0., z*.0016))*150. - 10.)*(1. + 3.*smoothstep(-500., -5000., z)); }
+const vec3 PLANET = vec3(-650., -60., -300.);
+const float PLANET_R = 320., ROCKS = 28.;
+bool isPriority(float m){ return m < 4.; }
+float startOf(float m){ return isPriority(m) ? 1.5 + m*1.7 : .3 + h1(m*3.7)*7.; }
+float travelOf(float m){ return 2.7 - h1(m*5.3)*.6; }
+vec3 launchOf(float m){ return vec3(1500. + h1(m*1.9)*500., (h1(m*2.7) - .5)*700., -300. + (h1(m*4.1) - .5)*900.); }
+vec3 hitNormal(float m){ return normalize(vec3(1., (h1(m*6.1) - .5)*1.3, (h1(m*7.9) - .5)*1.3)); }
 vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 41.), q = rnd(s, 43.);
-  if(s.x < .18){ // stars across the dome of the sky
-    vec3 n = sph(vec2(.5 + r.x*.5, r.y)); n.y = abs(n.y);
-    col = r.z < .8 ? WHITE : BLUE; a = (.12 + .5*r.w*r.w)*(.6 + .4*sin(t*(1. + q.x*2.) + q.y*30.));
-    return n*6000.;
+  if(s.x < .14){ col = r.z < .8 ? WHITE : BLUE; a = .1 + .4*r.w*r.w; return sph(r.xy)*(5000. + r.z*2000.); }
+  if(s.x < .46) return world(r, PLANET, PLANET_R, t*.04, 2., CREAM*.3, BLUE*.55, col, a);
+  if(s.x < .5){ // its thin air, brightest on the lit edge
+    vec3 n = sph(r.xy); vec3 p = PLANET + n*PLANET_R*(1.01 + r.z*r.z*.05);
+    col = mix(BLUE, MINT, r.w); a = .06*(1. - r.z)*(1. - .9*hidden(p, PLANET, PLANET_R)); return p;
   }
-  if(s.x < .42){ // rolling hills: a ridge faintly lit by the sky, and warm lights of homes
-    float x = (r.x - .5)*9000., z = -300. - r.y*r.y*6000.; float y = hills(x, z);
-    float home = step(.993, q.x), ridge = step(.45, r.w), far = smoothstep(-500., -5000., z);
-    col = home > .5 ? YELLOW : mix(DEEP, mix(BLUE, MINT, .4), far);
-    a = home > .5 ? .7*(.7 + .3*sin(t*2. + q.y*40.)) : (ridge > .5 ? .14 + .2*far : .04);
-    return vec3(x, ridge > .5 ? y : y*r.w*2., z);
+  float m = floor(r.x*ROCKS); bool hot = isPriority(m);
+  float start = startOf(m), travel = travelOf(m), u = (t - start)/travel;
+  vec3 from = launchOf(m), hit = PLANET + hitNormal(m)*PLANET_R;
+  if(s.x < .86){ // the rocks and their trails, speeding up as they fall in
+    if(u < 0. || u > 1.){ a = 0.; col = WHITE; return vec3(0.); }
+    float v = mix(u, u*u, .55);
+    if(r.y < .5){ // the rock itself: a lumpy cluster, glowing only for the four that matter
+      float size = hot ? 9. : 3. + h1(m*8.3)*4.;
+      vec3 p = mix(from, hit, v) + ball(q.xyz)*size*(.75 + .25*sin(q.w*20.));
+      col = hot ? mix(YELLOW, WHITE, q.x*.6) : mix(GREY*.6, CREAM*.5, q.x);
+      a = hot ? .5 + .5*u : .14; gSize = hot ? 1.4 : 1.; return p;
+    }
+    float back = (r.y - .5)*2.*(hot ? .22 : .06); // the trail behind it, long for the bright ones
+    vec3 p = mix(from, hit, max(0., v - back)) + ball(q.xyz)*(hot ? 1. + back*30. : 1.);
+    col = hot ? mix(YELLOW, ORANGE, back*5.) : GREY*.5;
+    a = (hot ? .55*(.4 + .6*u) : .06)*(1. - (r.y - .5)*2.); return p;
   }
-  if(s.x < .46){ // a soft glow along the horizon
-    col = mix(BLUE, MINT, r.z); a = .12*(1. - r.w);
-    return vec3((r.x - .5)*9000., 30. + r.w*r.w*500., -5200. - r.y*400.);
+  // What happens on impact: a bright flash, sparks and a glowing crater for the four, a small puff for the rest
+  float e = t - start - travel;
+  vec3 n = hitNormal(m); vec3 tg = normalize(cross(n, vec3(0., 1., 0.))), bt = cross(n, tg);
+  if(e < 0. || e > (hot ? 3.5 : .8)){ a = 0.; col = WHITE; return vec3(0.); }
+  if(!hot){ col = CREAM*.6; a = .12*exp(-e*5.); return hit + (n*.6 + sph(q.xy)*.5)*(4. + e*40.)*q.z; }
+  if(r.y < .35){ // sparks thrown up and outward
+    vec3 dir = normalize(n*1.2 + sph(q.xy)*.9); col = mix(YELLOW, ORANGE, q.z);
+    a = .8*exp(-e*2.5); return hit + dir*(20. + e*150.*q.w);
   }
-  float m = floor(r.x*4.); float u = (t - FIRST - m*GAP)/LIFE;
-  if(u < 0. || u > 1.){ a = 0.; col = WHITE; return vec3(0.); }
-  float power = .45 + m*.22, fade = 1. - smoothstep(.78, 1., u);
-  vec3 from = vec3(1700., 650. + h1(m*3.1)*300., -2600. + h1(m*7.3)*400.);
-  vec3 to = vec3(-1300., 40. + h1(m*5.7)*160., 480.);
-  float v = u*u; // it speeds up as it goes
-  float glow = (.3 + .9*u)*power*fade;
-  col = mix(mix(WHITE, YELLOW, .25), mix(ORANGE, BLUE, h1(m)), r.y);
-  if(r.y < .07 && q.w > .5){ a = .22*glow; return mix(from, to, v) + ball(q.xyz)*(6. + 46.*u*u*power); } // the glow around its head, swelling as it nears
-  float trail = r.y*(.03 + .14*u); // the trail stretches as it speeds up
-  vec3 p = mix(from, to, max(0., v - trail));
-  a = 1.2*glow*(1. - r.y)*(1. - r.y);
-  gSize = r.y < .04 ? 1.2 + 3.*u*power : 1. + u*.6;
-  return p + ball(q.xyz)*(1. + r.y*(4. + 14.*u));
+  if(r.y < .7){ // a ring of light racing across the surface
+    float ang = q.x*TAU, spread = .02 + e*.18;
+    vec3 dir = normalize(n*cos(spread) + (tg*cos(ang) + bt*sin(ang))*sin(spread));
+    col = mix(WHITE, YELLOW, q.y); a = .6*exp(-e*1.6); return PLANET + dir*PLANET_R*1.01;
+  }
+  col = mix(ORANGE, YELLOW, q.y); a = .7*exp(-e*.9); // the crater, glowing and slowly fading
+  return hit + ball(q.xyz)*12.;
 }`;
 
 // ---------------------------------------------------------------- Healthcare report, usability test plan
@@ -135,37 +149,40 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
 const RINGS = HEADER + COMMON + `
 uniform float uCraftU;
 const float RING_R = 74.;
-vec3 pathAt(float u){ return vec3(mix(-1000., 1000., u), sin(u*TAU)*140. + sin(u*17.)*12., -sin(u*PI*1.3)*380. + 120.); }
+vec3 pathAt(float u){ return vec3(mix(-1000., 1000., u), sin(u*TAU)*140., -sin(u*PI*1.3)*380. + 120.); }
+vec3 tangentAt(float u){ return normalize(pathAt(u + .003) - pathAt(u - .003)); }
 float ringU(float i){ return .14 + i*.18; }
 vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 47.), q = rnd(s, 53.);
-  if(s.x < .14){ col = WHITE; a = .3; return dust(r, t*.3); }
-  if(s.x < .7){ // the five rings, dim until the craft passes through, then lit for good
+  if(s.x < .14){ col = WHITE; a = .25; return dust(r, t*.3); }
+  if(s.x < .66){ // the five rings: dim, lit as the craft passes through, then dim again
     float i = floor(r.x*5.); float ru = ringU(i); vec3 c = pathAt(ru);
-    vec3 tg = normalize(pathAt(ru + .005) - pathAt(ru - .005));
-    vec3 sd = normalize(cross(tg, vec3(0.,1.,0.))); vec3 up = cross(sd, tg);
+    vec3 tg = tangentAt(ru); vec3 sd = normalize(cross(tg, vec3(0.,1.,0.))); vec3 up = cross(sd, tg);
     float passed = uCraftU - ru; float lit = passed >= 0. ? exp(-passed*12.) : smoothstep(-.05, 0., passed);
     float ang = r.y*TAU + t*(.25 + i*.05); float rad = RING_R*(1. + (r.z - .5)*.08);
-    float burst = passed > 0. ? exp(-passed*60.) : 0.;
-    rad += burst*60.*r.w;
-    col = mix(BLUE*.8, MINT, lit); a = mix(.07, .26, lit)*(.6 + .4*step(.5, fract(r.y*24.)));
-    gSize = 1. + lit*.6;
+    col = mix(BLUE*.7, MINT, lit); a = mix(.016, .24, lit)*(.6 + .4*step(.5, fract(r.y*24.)));
+    gSize = 1. + lit*.5;
     return c + (sd*cos(ang) + up*sin(ang))*rad;
   }
-  if(s.x < .78){ // the course drawn as a faint dotted line
-    float u = r.x; vec3 p = pathAt(u);
-    col = BLUE*.6; a = .06*step(.6, fract(u*160.)); return p + ball(r.yzw)*2.;
+  if(s.x < .7){ // the course as a very faint dotted line
+    float u = r.x; col = BLUE*.6; a = .03*step(.6, fract(u*160.)); return pathAt(u) + ball(r.yzw)*2.;
   }
-  if(s.x < .86){ // the engine trail right behind the craft
-    float v = r.x*r.x*.08; vec3 p = pathAt(max(0., uCraftU - v)) - vec3(0., 6., 0.);
-    col = mix(YELLOW, MINT, r.x); a = .45*(1. - r.x)*step(.001, uCraftU); return p + ball(r.yzw)*(2. + r.x*14.);
+  if(s.x < .9){ // two long, thin contrails, like a fighter jet's
+    if(uCraftU < .001){ a = 0.; col = WHITE; return vec3(0.); }
+    float v = r.x*.26; float u = max(0., uCraftU - v);
+    vec3 tg = tangentAt(u); vec3 sd = normalize(cross(tg, vec3(0.,1.,0.)));
+    float engine = step(.5, r.y)*2. - 1.;
+    vec3 p = pathAt(u) + sd*engine*(9. + r.x*10.) - vec3(0., 4., 0.);
+    col = mix(WHITE, mix(MINT, BLUE, r.x), min(1., r.x*2.5));
+    a = .3*pow(1. - r.x, 1.6); gSize = 1.;
+    return p + ball(q.xyz)*(.5 + r.x*3.);
   }
-  vec3 here = pathAt(uCraftU), ahead = normalize(pathAt(uCraftU + .01) - here);
+  vec3 here = pathAt(uCraftU), ahead = tangentAt(uCraftU);
   vec3 sp = saucer(q, t, 0., 0., col, a);
   float heading = atan(ahead.x, ahead.z);
   sp = rotY(rotX(sp, -ahead.y*.8), heading - PI*.5);
-  gSize = 1.1; a *= .45;
-  return here + sp*2.4;
+  gSize = 1.; a *= .26;
+  return here + sp*1.9;
 }`;
 
 // ---------------------------------------------------------------- Design library, component creation criteria
@@ -188,57 +205,127 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
     float cloud = fbm(p*.002 + vec3(0., 0., t*.02));
     col = mix(BLUE*.6, mix(MINT, YELLOW, .3), cloud); a = .07*smoothstep(.4, .75, cloud); return p;
   }
-  if(s.x < .78){ // the twelve stars: a bright core, a soft halo and, for some, light spikes
+  if(s.x < .78){ // the twelve stars: like the background stars, only a touch brighter, with a faint halo
     float k = floor(r.x*12.); vec3 c = uStar[int(k)];
-    col = starTone(k);
-    if(r.y < .35){ a = 1.; gSize = 1.6; return c + ball(q.xyz)*7.; }
-    if(r.y < .8){ a = .22*(1. - q.x); return c + ball(q.xyz)*(10. + q.x*30.); }
-    float arm = floor(q.y*2.); float len = (q.x - .5)*44.*(mod(k, 3.) < 1. ? 1. : .6);
-    a = .5*(1. - abs(q.x - .5)*2.); return c + (arm < .5 ? vec3(len, 0., 0.) : vec3(0., len, 0.));
+    col = mix(WHITE, starTone(k), .35);
+    if(r.y < .08){ a = .06; gSize = 1.3; return c + ball(q.xyz)*2.5; }
+    if(r.y < .45){ a = .012*(1. - q.x); return c + ball(q.xyz)*(5. + q.x*12.); }
+    // the rest join the background field
+    col = WHITE; a = .05 + .25*q.x*q.x; return vec3((q.y - .5)*4200., (q.z - .5)*2600., -400. - q.w*3200.);
   }
   // The lines that join the stars into a figure, drawn in as each figure forms
   float j = floor(r.x*13.); int ji = int(j);
   float v = r.y; float show = uSegShow[ji];
   vec3 p = mix(uSegA[ji], uSegB[ji], v*min(1., show*1.6));
-  col = mix(MINT, WHITE, .3); a = .55*clamp(show, 0., 1.)*step(.25, fract(v*40.));
+  col = mix(MINT, WHITE, .3); a = .25*clamp(show, 0., 1.)*step(.25, fract(v*40.));
   return p + ball(q.xyz)*1.2;
 }`;
 
 // ---------------------------------------------------------------- Breadcrumb, impact effort matrix
-// Ideas drift as space dust, gather into four clouds, one for each corner of the
-// impact effort grid, and the high impact, low effort cloud ignites into a star.
-const CLOUDS = HEADER + COMMON + `
-const float GATHER = 2.2, GATHER_TIME = 4.5, AXES = 3., IGNITE = 8.5;
-vec3 corner(float k){ return vec3(k < 1.5 ? -230. : 230., mod(k, 2.) < .5 ? 150. : -150., 0.); }
+// Crystals glow on a moon's surface. A rover's robotic arm easily picks up the
+// two bright ones close by (high impact, low effort) and drops them in its bed.
+// A bright one far off on a ridge stays out of reach (high impact, high effort),
+// and dull ones are left where they lie.
+const CRYSTALS = HEADER + COMMON + `
+const vec3 SHOULDER = vec3(25., 66., -22.), REST = vec3(5., 118., -22.);
+const float UPPER = 72., FORE = 72., PICK_GAP = 4.2, FIRST_PICK = .6;
+vec3 site(float i){
+  return i < .5 ? vec3(70., 0., -112.) : i < 1.5 ? vec3(-35., 0., -128.) : i < 2.5 ? vec3(430., 62., -420.) :
+         i < 3.5 ? vec3(130., 0., 150.) : i < 4.5 ? vec3(-210., 0., 95.) : i < 5.5 ? vec3(-390., 0., -270.) : vec3(310., 0., 210.);
+}
+bool bright(float i){ return i < 2.5; }
+float ground(vec2 xz){ float d = length(xz - vec2(430., -420.)); return fbm(vec3(xz*.004, 0.))*26. - 8. + 70.*exp(-d*d/26000.); }
+vec3 bedSpot(float i){ return vec3(-28. - i*26., 52., 0.); }
+// Where the hand is during one pick: reach, grip, lift, swing over the bed, let go, fold back.
+vec3 handDuring(float i, float u){
+  vec3 c = site(i) + vec3(0., 22., 0.), over = c + vec3(0., 70., 0.), drop = bedSpot(i) + vec3(0., 62., 0.);
+  if(u < 1.) return mix(REST, over, ease(u));
+  if(u < 1.35) return mix(over, c, ease((u - 1.)/.35));
+  if(u < 1.6) return c;
+  if(u < 2.1) return mix(c, over, ease((u - 1.6)/.5));
+  if(u < 3.) return mix(over, drop, ease((u - 2.1)/.9));
+  if(u < 3.2) return drop;
+  return mix(drop, REST, ease((u - 3.2)/.8));
+}
+vec3 handAt(float t){
+  for(int k = 0; k < 2; k++){ float u = t - FIRST_PICK - float(k)*PICK_GAP; if(u >= 0. && u < 4.) return handDuring(float(k), u); }
+  return REST;
+}
+// Two segment arm: find the elbow so both segments keep their length, bending upward.
+vec3 elbowFor(vec3 hand){
+  vec3 d = hand - SHOULDER; float len = clamp(length(d), 10., UPPER + FORE - 1.); vec3 dir = normalize(d);
+  float along = (UPPER*UPPER - FORE*FORE + len*len)/(2.*len); float lift = sqrt(max(0., UPPER*UPPER - along*along));
+  vec3 side = normalize(cross(dir, vec3(0., 1., 0.)) + vec3(.0001)); vec3 pole = normalize(cross(side, dir));
+  return SHOULDER + dir*along + pole*lift;
+}
+// Where a crystal is: on the ground, in the gripper, falling into the bed, or resting there.
+vec3 crystalAt(float i, float t, out float held){
+  held = 0.;
+  if(i > 1.5) return site(i);
+  float u = t - FIRST_PICK - i*PICK_GAP;
+  if(u < 1.5) return site(i);
+  if(u < 3.2){ held = 1.; return handAt(t) - vec3(0., 22., 0.); }
+  float fall = ease((u - 3.2)/.35);
+  return mix(bedSpot(i) + vec3(0., 40., 0.), bedSpot(i), fall);
+}
+vec3 box(vec4 q, vec3 lo, vec3 hi){ // particles on the faces of a box
+  vec3 p = mix(lo, hi, q.xyz); float f = floor(q.w*3.);
+  float side = step(.5, fract(q.w*3.));
+  if(f < .5) p.x = mix(lo.x, hi.x, side); else if(f < 1.5) p.y = mix(lo.y, hi.y, side); else p.z = mix(lo.z, hi.z, side);
+  return p;
+}
 vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 67.), q = rnd(s, 71.);
-  if(s.x < .1){ col = WHITE; a = .14; return dust(r, t*.4); }
-  if(s.x < .14){ // the two axes of the grid, impact up and effort across
-    float show = ease((t - AXES)/1.5); float v = (r.x - .5)*2.;
-    vec3 p = r.y < .5 ? vec3(v*460.*show, 0., 0.) : vec3(0., v*320.*show, 0.);
-    col = mix(BLUE, WHITE, .3); a = .14*show*step(.4, fract(v*30.)); return p + vec3(0., 0., -20.);
+  if(s.x < .08){ vec3 n = sph(r.xy); n.y = abs(n.y); col = WHITE; a = .1 + .35*r.z*r.z; return n*5000.; } // stars over the horizon
+  if(s.x < .42){ // the moon's surface, lit softly by the bright crystals near it
+    vec2 xz = (r.xy - .5)*2600.; float y = ground(xz); vec3 p = vec3(xz.x, y, xz.y);
+    float spill = 0.;
+    for(int k = 0; k < 3; k++){ float held; vec3 c = crystalAt(float(k), t, held); float d = length(p - c); spill += exp(-d*d/5000.)*(1. - held); }
+    // a fine grid of dust in rows, so the ground reads as a surface
+    float row = step(.55, fract(xz.x*.05 + fbm(vec3(xz*.01, 1.))*2.));
+    col = mix(mix(GREY*.6, BLUE*.5, r.z), MINT, min(1., spill)); a = (.1 + .1*row) + .35*min(1., spill);
+    a *= 1. - smoothstep(900., 1300., length(xz));
+    return p;
   }
-  // The dust: each speck belongs to one of the four corners, set by its own random number
-  float k = floor(r.x*4.); vec3 c = corner(k);
-  vec3 loose = vec3((r.y - .5)*1600., (r.z - .5)*900., (r.w - .5)*1400.);
-  loose += vec3(sin(t*.3 + q.x*9.), cos(t*.25 + q.y*9.), sin(t*.2 + q.z*9.))*60.;
-  float g = ease((t - GATHER - q.w*1.5)/GATHER_TIME);
-  // each cloud is a soft ball, densest in the middle, turning slowly
-  vec3 dir = rotY(sph(q.xy), t*(.12 + q.w*.18));
-  vec3 cloud = c + dir*(8. + 140.*pow(q.z, 1.7))*vec3(1., .75, 1.);
-  vec3 p = mix(loose, cloud, g);
-  float ig = ease((t - IGNITE)/1.2);
-  col = mix(mix(BLUE, WHITE, q.w*.4), MINT, g*.5); a = .13 + .07*g;
-  if(k > .5){ a *= 1. - .55*ig; return p; } // the other three dim as the chosen one ignites
-  // The chosen cloud falls inward and ignites: a hot core, light spikes, and a flash of sparks
-  p = mix(p, c + (p - c)*.13, ig);
-  float core = 1. - smoothstep(0., 12., length(p - c));
-  col = mix(col, mix(YELLOW, WHITE, core), ig); a = mix(a, .1 + .32*core, ig);
-  float flash = t > IGNITE ? exp(-(t - IGNITE)*1.4) : 0.;
-  if(q.y > .93){ p = c + sph(q.zw)*(20. + max(0., t - IGNITE)*160.); a = .4*flash; col = YELLOW; }
-  else if(q.y > .88){ float len = (q.x - .5)*2.*170.*ig; p = c + (q.w < .5 ? vec3(len, 0., 0.) : vec3(0., len, 0.)); a = .25*ig*(1. - abs(q.x - .5)*2.); col = mix(YELLOW, WHITE, .5); }
-  return p;
+  if(s.x < .6){ // the rover: chassis, cab, open bed and six wheels
+    col = mix(GREY, WHITE, r.w*.4); a = .07;
+    if(r.x < .3) return box(q, vec3(-75., 18., -34.), vec3(75., 46., 34.));
+    if(r.x < .45) return box(q, vec3(40., 46., -30.), vec3(75., 76., 30.));
+    if(r.x < .65){ vec3 p = box(q, vec3(-75., 46., -34.), vec3(20., 68., 34.)); if(p.y > 67.) p.y = 46.; return p; }
+    if(r.x < .9){ // wheels
+      float w = floor(q.x*6.); float wx = -52. + mod(w, 3.)*52., wz = w < 2.5 ? 40. : -40.; float ang = q.y*TAU;
+      float rr = q.z < .7 ? 17. : 17.*q.z; col = GREY*.5; a = .1;
+      return vec3(wx + cos(ang)*rr, 17. + sin(ang)*rr, wz + (q.w - .5)*8.);
+    }
+    if(r.x < .95){ col = YELLOW; a = .5; return vec3(76., 56., (step(.5, q.x)*2. - 1.)*20.) + ball(q.yzw)*3.; } // headlights
+    col = MINT; a = .5; return vec3(60., 80. + q.x*24., 0.) + ball(q.yzw)*1.5; // antenna with a light
+  }
+  if(s.x < .68){ // the robotic arm and its gripper
+    vec3 hand = handAt(t), elbow = elbowFor(hand);
+    col = mix(CREAM, WHITE, r.w); a = .05;
+    if(r.x < .42) return mix(SHOULDER, elbow, r.y) + ball(q.xyz)*4.;
+    if(r.x < .8) return mix(elbow, hand, r.y) + ball(q.xyz)*3.;
+    if(r.x < .9){ col = YELLOW; a = .45; return (r.y < .5 ? elbow : SHOULDER) + ball(q.xyz)*3.; }
+    float claw = floor(r.y*3.); float ang = claw/3.*TAU; float grip = 0.;
+    for(int k = 0; k < 2; k++){ float u = t - FIRST_PICK - float(k)*PICK_GAP; if(u > 1.3 && u < 3.1) grip = 1.; }
+    vec3 out_ = vec3(cos(ang), 0., sin(ang))*mix(9., 4., grip);
+    return hand + out_ - vec3(0., r.z*16., 0.);
+  }
+  // The crystals: tall, faceted, glowing. Bright ones shine mint and white, dull ones barely glow.
+  float i = floor(r.x*7.); float held; vec3 c = crystalAt(i, t, held);
+  bool lit = bright(i); float h = lit ? 34. : 20., w = lit ? 11. : 7.;
+  if(r.y < .7){
+    float cluster = floor(q.w*3.); vec3 off = cluster < .5 ? vec3(0.) : vec3((cluster - 1.5)*12., 0., (q.x - .5)*10.);
+    float sc = cluster < .5 ? 1. : .55; float v = q.y*2. - 1.; float ang = floor(q.z*6.)/6.*TAU + q.x*1.05;
+    vec3 p = c + off + vec3(cos(ang)*w*(1. - abs(v))*sc, (v + 1.)*h*.5*sc, sin(ang)*w*(1. - abs(v))*sc);
+    col = lit ? mix(MINT, WHITE, q.x*.45) : mix(BLUE*.6, CREAM*.4, q.x); a = lit ? .18 : .06; gSize = lit ? 1.2 : 1.;
+    return p;
+  }
+  // a soft glow around each bright crystal, with a few drifting sparkles
+  if(!lit){ a = 0.; col = WHITE; return c; }
+  col = mix(MINT, WHITE, q.y); a = .03 + .06*step(.97, q.x)*(.5 + .5*sin(t*4. + q.y*30.));
+  return c + vec3(0., 16., 0.) + ball(q.xyz)*(18. + q.w*40.);
 }`;
 
-export const BAND_SHADERS = { station: STATION, meteors: METEORS, rings: RINGS, zodiac: ZODIAC, clouds: CLOUDS };
+export const BAND_SHADERS = { station: STATION, meteors: METEORS, rings: RINGS, zodiac: ZODIAC, crystals: CRYSTALS };
 export type BandName = keyof typeof BAND_SHADERS;

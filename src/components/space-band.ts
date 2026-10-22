@@ -33,8 +33,8 @@ function turning(target: Vec3, radius: number, height: number, speed: number, fo
 }
 
 // ---------------------------------------------------------------- Checkpoint rings: the craft's course
-/** How far along the course the craft is: half eased, half steady, so it never rushes. Matches uCraftU in the shader. */
-const craftU = (t: number) => { const x = Math.min(1, Math.max(0, (t - 1) / 12.5)); return 0.02 + 0.96 * (0.5 * smooth(x) + 0.5 * x); };
+/** How far along the course the craft is: mostly a steady glide, gently eased at the ends. Feeds uCraftU in the shader. */
+const craftU = (t: number) => { const x = Math.min(1, Math.max(0, (t - 0.5) / 7.5)); return 0.02 + 0.96 * (0.25 * smooth(x) + 0.75 * x); };
 
 const ringsExtra: Extra = (gl, program) => {
   const loc = gl.getUniformLocation(program, 'uCraftU');
@@ -103,14 +103,10 @@ const zodiacExtra: Extra = (gl, program) => {
 
 const BANDS: Record<BandName, BandDef> = {
   station: { count: 130000, story: 14.5, still: 15, far: 16000, fog: 12000, camera: turning([0, -20, 0], 820, 250, 0.035, 46, 0, -0.7) },
-  meteors: {
-    count: 120000, story: 10, still: 7.6, far: 12000, fog: 12000,
-    // looking up at the sky from the ground, panning very slowly
-    camera: (clock) => ({ eye: [0, 60, 900], target: [Math.sin(clock * 0.04) * 160, 300, -600], fov: 56 }),
-  },
-  rings: { count: 110000, story: 15, still: 9, far: 9000, fog: 5000, camera: turning([0, 0, 0], 1350, 420, 0.03, 46, 0, 0.2) },
+  meteors: { count: 120000, story: 11.5, still: 7.8, far: 12000, fog: 12000, camera: turning([-150, 0, -300], 1350, 180, 0.05, 48, 0.3) },
+  rings: { count: 110000, story: 9, still: 5.2, far: 9000, fog: 5000, camera: turning([0, 0, 0], 1350, 420, 0.03, 46, 0, 0.2) },
   zodiac: { count: 90000, story: ZODIAC_STORY, still: 3.4, far: 9000, fog: 6000, camera: turning([0, 50, 60], 1100, 60, 0.05, 46, 0.35) },
-  clouds: { count: 120000, story: 11.5, still: 11, far: 9000, fog: 4000, camera: turning([0, 0, 0], 1150, 150, 0.05, 46, 0.4) },
+  crystals: { count: 120000, story: 9.5, still: 2.6, far: 9000, fog: 4000, camera: turning([10, 40, -50], 430, 150, 0.05, 48, 0.45, -0.5) },
 };
 const EXTRAS: Partial<Record<BandName, Extra>> = { zodiac: zodiacExtra, rings: ringsExtra };
 

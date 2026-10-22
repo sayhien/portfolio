@@ -61,32 +61,34 @@ const FIGURES: Figure[] = [
     lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 0], [1, 7], [7, 2], [0, 8], [3, 9], [9, 10], [10, 4]],
   },
 ];
-const FIGURE_S = 6, MORPH_S = 1.6, DRAW_FROM = 1.3, DRAW_S = 1.4, LINE_FADE_S = 0.7, MAX_LINES = 13;
+const FIGURE_S = 6, APPEAR_S = 0.8, DRAW_FROM = 0.9, DRAW_S = 1.4, DIM_FROM = 4.8, DIM_S = 0.9, MAX_LINES = 13;
 const ZODIAC_STORY = FIGURES.length * FIGURE_S - 0.01;
 const starDepth = (star: number, figure: number) => ((Math.sin(star * 12.9898 + figure * 78.233) * 43758.5453) % 1) * 260;
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
+/** Each figure has its own set of stars. They never move: they appear, the lines join them, then they dim away. */
 function starPlaces(t: number): Vec3[] {
-  const now = Math.floor(t / FIGURE_S) % FIGURES.length, prev = (now + FIGURES.length - 1) % FIGURES.length;
-  const k = smooth((t % FIGURE_S) / MORPH_S);
-  return FIGURES[now].points.map((point, star) => {
-    const before = FIGURES[prev].points[star];
-    const a: Vec3 = [before[0] * 430, before[1] * 300, starDepth(star, prev)], b: Vec3 = [point[0] * 430, point[1] * 300, starDepth(star, now)];
-    return t < MORPH_S ? b : [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
-  });
+  const now = Math.floor(t / FIGURE_S) % FIGURES.length;
+  return FIGURES[now].points.map(([x, y], star) => [x * 430, y * 300, starDepth(star, now)]);
 }
 
-/** How much of each figure's lines are drawn: they draw in one by one, and fade before the next figure (but not after the last). */
-function lineShow(t: number, lineCount: number): Float32Array {
+/** How visible the current set of stars is: fading in, holding, then dimming away (the last set stays while the scene rests). */
+function starShow(t: number): number {
   const index = Math.floor(t / FIGURE_S), local = t % FIGURE_S, last = index === FIGURES.length - 1;
-  const fade = last ? 0 : Math.min(1, Math.max(0, (local - (FIGURE_S - LINE_FADE_S)) / LINE_FADE_S));
-  const drawn = Math.min(1, Math.max(0, (local - DRAW_FROM) / DRAW_S)) * (1 - fade);
+  return clamp01(local / APPEAR_S) * (last ? 1 : 1 - clamp01((local - DIM_FROM) / DIM_S));
+}
+
+/** How much of each line is drawn: the lines draw in one by one once the stars have appeared. */
+function lineShow(t: number, lineCount: number): Float32Array {
+  const drawn = clamp01(((t % FIGURE_S) - DRAW_FROM) / DRAW_S);
   const show = new Float32Array(MAX_LINES);
-  for (let line = 0; line < lineCount; line++) show[line] = Math.min(1, Math.max(0, drawn * lineCount - line * 0.6));
+  for (let line = 0; line < lineCount; line++) show[line] = clamp01(drawn * lineCount - line * 0.6);
   return show;
 }
 
 const zodiacExtra: Extra = (gl, program) => {
-  const star = gl.getUniformLocation(program, 'uStar'), segA = gl.getUniformLocation(program, 'uSegA'), segB = gl.getUniformLocation(program, 'uSegB'), show = gl.getUniformLocation(program, 'uSegShow');
+  const names = ['uStar', 'uSegA', 'uSegB', 'uSegShow', 'uStarShow'];
+  const [star, segA, segB, show, starsOn] = names.map((name) => gl.getUniformLocation(program, name));
   return (time) => {
     const t = Math.min(time, ZODIAC_STORY); // the last figure stays while the scene rests
     const places = starPlaces(t), figure = FIGURES[Math.floor(t / FIGURE_S) % FIGURES.length];
@@ -96,6 +98,7 @@ const zodiacExtra: Extra = (gl, program) => {
     gl.uniform3fv(segA, a);
     gl.uniform3fv(segB, b);
     gl.uniform1fv(show, lineShow(t, figure.lines.length));
+    gl.uniform1f(starsOn, starShow(t));
   };
 };
 
@@ -106,7 +109,7 @@ const BANDS: Record<BandName, BandDef> = {
   meteors: { count: 120000, story: 11.5, still: 7.8, far: 12000, fog: 12000, camera: turning([-150, 0, -300], 1350, 180, 0.05, 48, 0.3) },
   rings: { count: 110000, story: 9, still: 5.2, far: 9000, fog: 5000, camera: turning([0, 0, 0], 1350, 420, 0.03, 46, 0, 0.2) },
   zodiac: { count: 90000, story: ZODIAC_STORY, still: 3.4, far: 9000, fog: 6000, camera: turning([0, 50, 60], 1100, 60, 0.05, 46, 0.35) },
-  crystals: { count: 120000, story: 9.5, still: 2.6, far: 9000, fog: 4000, camera: turning([10, 40, -50], 430, 150, 0.05, 48, 0.45, -0.5) },
+  crystals: { count: 120000, story: 6.4, still: 1.2, far: 9000, fog: 4000, camera: turning([90, 45, 0], 400, 140, 0.05, 48, 0.4, 0.95) },
 };
 const EXTRAS: Partial<Record<BandName, Extra>> = { zodiac: zodiacExtra, rings: ringsExtra };
 

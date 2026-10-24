@@ -1,7 +1,7 @@
 ---
 // The footer meadow: a moonlit hillside drawn in specks of light, with a bee
 // to say hello to. The canvas is decorative; the button gives keyboard and
-// screen reader users the same little moment. The default slot holds the copyright, shown with the hello button on a strip at the very bottom;
+// screen reader users the same little moment. The default slot holds the copyright, shown with the hello button at the foot of the meadow;
 // `line` is the footer tagline, set in the night sky above the hills, and the
 // `links` slot holds the footer links just under it.
 interface Props {
@@ -16,21 +16,26 @@ const { line } = Astro.props;
       {line && <p class="garden-line">{line}</p>}
       <slot name="links" />
     </div>
-  </div>
-  <div class="wrap garden-bar">
-    <slot />
-    <button type="button" class="garden-hello" data-garden-hello>Say hello to the bee</button>
+    <div class="wrap garden-bar">
+      <slot />
+      <button type="button" class="garden-hello" data-garden-hello>Say hello to the bee</button>
+    </div>
   </div>
 </div>
 
 <style>
   .garden-band { position: relative; }
-  /* The strip at the very bottom of the page. */
+  /* The copyright and the hello button sit at the foot of the meadow, each on a small
+     dark glass label so the text stays readable over the bright grass, day or night. */
   .garden-bar {
-    position: relative; z-index: 1;
-    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 24px;
-    padding-top: 8px; padding-bottom: 12px; font-size: 14px; color: var(--muted);
-    background: var(--night); border-top: 1px solid var(--line);
+    position: absolute; z-index: 2; left: 0; right: 0; bottom: 14px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px;
+    font-size: 14px; pointer-events: none;
+  }
+  .garden-bar > :global(*) {
+    pointer-events: auto; margin: 0; color: var(--text);
+    background: rgba(11, 14, 17, 0.72); border-radius: 999px; padding: 6px 14px;
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   }
   .garden { position: relative; height: 780px; margin-top: 16px; }
   .garden canvas {
@@ -50,11 +55,12 @@ const { line } = Astro.props;
   /* Without the meadow, the tagline and links still show on the plain page. */
   .garden.no-garden { height: auto; margin-top: 0; padding: var(--space-5) 0; }
   .garden.no-garden canvas { display: none; }
-  .garden.no-garden .garden-over { position: static; }
+  .garden.no-garden .garden-over, .garden.no-garden .garden-bar { position: static; }
+  .garden.no-garden .garden-bar { margin-top: var(--space-4); }
   .garden-band:has(.no-garden) .garden-hello { display: none; }
   .garden-hello {
-    font: inherit; color: var(--text-2); background: none; border: 0; cursor: pointer;
-    min-height: 44px; padding: 0 2px; text-decoration: underline; text-underline-offset: 4px;
+    font: inherit; border: 0; cursor: pointer;
+    min-height: 44px; text-decoration: underline; text-underline-offset: 4px;
   }
   .garden-hello:hover { color: var(--accent); }
   @media (max-width: 700px) { .garden { height: 880px; } .garden-over { top: 64px; gap: var(--space-3); } }

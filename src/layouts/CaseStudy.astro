@@ -27,7 +27,7 @@ interface Props {
 const { title, kicker, heading, lede, meta, sections, next = [], heroScene, heroSky } = Astro.props;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
-<Base title={title} description={lede}>
+<Base title={title} description={lede} revealHeader>
   <article>
     <div class="hero-zone">
     {heroScene && <EarthScene mode={heroScene} layout="background" />}
@@ -119,7 +119,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     column-gap: 64px;
     align-items: start;
   }
-  .toc-wrap { position: sticky; top: 32px; }
+  /* The side menu moves down while the floating header is showing (see header-reveal.ts). */
+  .toc-wrap { position: sticky; top: calc(32px + var(--nav-offset, 0px)); transition: top 0.3s ease; }
   .toc summary {
     font-family: var(--mono);
     font-size: 11px;
@@ -172,7 +173,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .cs-body { grid-template-columns: minmax(0, 1fr); }
     .toc-wrap {
-      top: 0;
+      top: var(--nav-offset, 0px);
       z-index: 20;
       background: var(--bg);
       margin: 0 calc(var(--gutter) * -1) 24px;
@@ -301,6 +302,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     const target = document.getElementById(a.hash.slice(1));
     if (!target) return;
     event.preventDefault();
+    window.dispatchEvent(new CustomEvent('header:hold', { detail: 1800 })); // keep the header out of the way while gliding
     history.pushState(null, '', a.hash);
     setCurrent(target.id);
     if (narrow.matches && toc) toc.open = false;

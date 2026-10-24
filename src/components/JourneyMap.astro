@@ -16,7 +16,6 @@ const rows: { key: string; label: string }[] = [
   { key: 'desc', label: 'Description' },
   { key: 'actors', label: 'Actors' },
   { key: 'tools', label: 'Tools' },
-  { key: 'meetings', label: 'Meetings' },
   { key: 'pain', label: 'Pain points' },
   { key: 'opportunities', label: 'Opportunities' },
 ];
@@ -87,12 +86,6 @@ const toolIcons: Record<string, IconName> = {
             <h4 class="row-label">Tools</h4>
             <ul class="chips tools">{splitList(stage.tools).map((tool) => <li><Icon name={toolIcons[tool] ?? 'tool'} size={14} />{tool}</li>)}</ul>
           </div>
-          <div class="cell">
-            <h4 class="row-label">Meetings</h4>
-            {stage.meetings === 'None'
-              ? <p class="none">No meeting</p>
-              : <ul class="chips meet"><li><Icon name={stage.meetingIcon ?? 'calendar'} size={14} />{stage.meetings}</li></ul>}
-          </div>
           <div class="cell pain">
             <h4 class="row-label">{labelOf('pain').label}</h4>
             <ul class="marks">{stage.painPoints.map((item) => <li><Icon name="alert" size={15} />{item}</li>)}</ul>
@@ -145,13 +138,13 @@ const toolIcons: Record<string, IconName> = {
   .jm-grid {
     display: grid;
     grid-template-columns: var(--label-w) repeat(8, var(--col-w));
-    grid-template-rows: repeat(7, auto);
+    grid-template-rows: repeat(6, auto);
     width: max-content;
   }
 
   /* Sticky row labels */
   .jm-labels {
-    grid-row: 1 / span 7;
+    grid-row: 1 / span 6;
     display: grid; grid-template-rows: subgrid;
     position: sticky; left: 0; z-index: 2;
     background: var(--surface);
@@ -169,7 +162,7 @@ const toolIcons: Record<string, IconName> = {
   .lab-opportunities { color: var(--opp-ink); }
 
   /* Stage columns */
-  .stage { grid-row: 1 / span 7; display: grid; grid-template-rows: subgrid; scroll-snap-align: start; border-right: 1px solid var(--line); }
+  .stage { grid-row: 1 / span 6; display: grid; grid-template-rows: subgrid; scroll-snap-align: start; border-right: 1px solid var(--line); }
   .stage:last-child { border-right: 0; }
   .cell { padding: 18px 20px; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--text-2); }
   .row-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -187,9 +180,6 @@ const toolIcons: Record<string, IconName> = {
   .desc :global(img) { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 6px; }
   .desc p { color: var(--text); }
 
-  .none { color: var(--muted); font-style: italic; }
-  .meet li { border-radius: 10px; }
-  .meet :global(svg) { flex: none; }
   .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
   .chips li { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1.3; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px 4px 8px; color: var(--text); }
   .chips :global(svg) { color: var(--accent); }

@@ -33,19 +33,19 @@ const competitorIssues = [
   ['Passive proof', 'All six sites use static screenshots or recorded demos.', 'Prospects have to imagine the product working for them, which is hard work.'],
   ['Weak social proof', 'Generic “trusted by” logos with no numbers, and case studies that have nothing to do with chatbots. None show real usage.', 'Prospects can’t find companies like theirs, or real results from their peers.'],
   ['Integration anxiety', 'Vague claims of “seamless integration”. Only Oracle shares architecture details.', 'IT can’t check the technical fit without a sales call.'],
-  ['One size fits all', 'The same content for developers, operations and procurement on every site.', 'Information that doesn’t matter buries what each buyer needs to decide.'],
+  ['Same page for every buyer', 'Developers, operations and procurement all get the same content.', 'Each buyer has to dig through details meant for someone else to find what they need to decide.'],
 ];
 
 const issueIcons: IconName[] = ['target', 'code', 'video', 'users', 'link', 'layers'];
 
 const personas: Persona[] = [
-  { img: james, name: 'James Daleen', role: 'Chief Technology Officer, the technical validator', quote: 'Every vendor says setup is easy, until they ask for a year of training data.', facts: [
-    { label: 'Core pain point', text: 'Burned before by AI vendors that needed huge amounts of training data.' },
+  { img: james, name: 'James Daleen', role: 'Chief Technology Officer, the technical validator', facts: [
+    { label: 'Core pain point', text: 'Past AI vendors promised a quick setup, then needed months of his team’s data.' },
     { label: 'Tactic', text: 'Authority and transparency' },
     { label: 'Design answer', text: 'A “no training data needed” headline, architecture diagrams that expand, and security documents anyone can open.' },
   ] },
   { img: tomei, name: 'Tomei Mizasaki', role: 'Head of Customer Support, the business outcome seeker', quote: 'I need proof my CEO can see in one meeting.', facts: [
-    { label: 'Core pain point', text: 'Needs to win the CEO over with proof she can show.' },
+    { label: 'Core pain point', text: 'Needs clear results he can show his CEO to win approval.' },
     { label: 'Tactic', text: 'Social proof and reciprocity' },
     { label: 'Design answer', text: 'Video stories from peers with real numbers, and a free sandbox to try.' },
   ] },

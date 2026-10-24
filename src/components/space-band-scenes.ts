@@ -229,30 +229,46 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
 const CRYSTALS = HEADER + COMMON + `
 // The arm rests folded to one side, so it never has to pass straight over its own base.
 const vec3 SHOULDER = vec3(58., 80., 0.), REST = vec3(58., 150., 70.), BED = vec3(-30., 46., 0.);
-const float UPPER = 88., FORE = 88., PICK = .8, SITES = 9.;
-// Crystal clusters: where they grow, how big they are, and whether they glow.
+const float UPPER = 88., FORE = 88., PICK = .8, SITES = 12.;
+// The pick, in seconds after PICK: reach, grip, three ever harder tugs, the crystal pops free, then into the bed.
+const float GRIP = 1.5, POP = 3.3, LIFTED = 3.5, OVER = 4.1, SWUNG = 5.3, LOWERED = 5.7, LET_GO = 5.9, FOLDED = 6.9;
+// Crystal clusters: where they grow, how big they are, and whether they glow. Several big ones crowd the front.
 vec3 site(float i){
-  return i < .5 ? vec3(185., 0., 12.) : i < 1.5 ? vec3(-160., 0., 130.) : i < 2.5 ? vec3(70., 0., -170.) : i < 3.5 ? vec3(320., 0., -210.) :
-         i < 4.5 ? vec3(-310., 0., -190.) : i < 5.5 ? vec3(260., 0., 230.) : i < 6.5 ? vec3(-60., 0., 250.) : i < 7.5 ? vec3(-420., 0., 60.) : vec3(450., 0., 40.);
+  return i < .5 ? vec3(185., 0., 12.) : i < 1.5 ? vec3(215., 0., -80.) : i < 2.5 ? vec3(150., 0., 100.) : i < 3.5 ? vec3(285., 0., 45.) :
+         i < 4.5 ? vec3(-160., 0., 130.) : i < 5.5 ? vec3(70., 0., -170.) : i < 6.5 ? vec3(320., 0., -210.) : i < 7.5 ? vec3(-310., 0., -190.) :
+         i < 8.5 ? vec3(260., 0., 230.) : i < 9.5 ? vec3(-60., 0., 250.) : i < 10.5 ? vec3(-420., 0., 60.) : vec3(450., 0., 40.);
 }
-float sizeOf(float i){ return i < .5 ? 62. : 18. + h1(i*4.7)*22.; }
-bool glows(float i){ return i < .5 || h1(i*9.1) > .55; }
+float sizeOf(float i){ return i < .5 ? 62. : i < 1.5 ? 50. : i < 2.5 ? 46. : i < 3.5 ? 40. : 18. + h1(i*4.7)*22.; }
+bool glows(float i){ return i < 3.5 || h1(i*9.1) > .55; }
 float ground(vec2 xz){ return fbm(vec3(xz*.004, 0.))*24. - 8.; }
-// Where the hand is: reach over the crystal, grip it, lift, swing back over the cab, lower it into the bed, fold away.
+// The three tugs: each a short heave, stronger than the last. Returns how far the hand lifts.
+float tug(float u){
+  if(u < GRIP || u > POP) return 0.;
+  float k = floor((u - GRIP)/.6), f = fract((u - GRIP)/.6);
+  return (5. + k*4.)*max(0., sin(PI*f));
+}
+// The ground trembles a little while the arm strains, and shakes when the crystal tears free.
+float tremor(float t){
+  float u = t - PICK, e = u - POP;
+  float strain = tug(u) > 0. ? .8*sin(u*55.) : 0.;
+  return strain + (e > 0. ? 5.*exp(-e*3.5)*sin(e*38.) : 0.);
+}
+// Where the hand is through the pick.
 vec3 handAt(float t){
-  vec3 c = site(0.) + vec3(0., 34., 0.), over = c + vec3(-20., 80., 0.), drop = BED + vec3(0., 70., 0.);
+  vec3 c = site(0.) + vec3(0., 34., 0.), over = c + vec3(-20., 80., 0.), drop = BED + vec3(0., 70., 0.), low = BED + vec3(0., 40., 0.);
   float u = t - PICK;
   if(u < 0.) return REST;
   if(u < 1.1) return mix(REST, over, ease(u/1.1));
-  if(u < 1.5) return mix(over, c, ease((u - 1.1)/.4));
-  if(u < 1.8) return c;
-  if(u < 2.4) return mix(c, over, ease((u - 1.8)/.6));
-  if(u < 3.6){ float k = ease((u - 2.4)/1.2); return mix(over, drop, k) + vec3(0., 0., sin(k*PI)*120.); } // swing round the side
-  if(u < 4.) return mix(drop, BED + vec3(0., 40., 0.), ease((u - 3.6)/.4));
-  if(u < 4.2) return BED + vec3(0., 40., 0.);
-  return mix(BED + vec3(0., 40., 0.), REST, ease((u - 4.2)/1.));
+  if(u < GRIP) return mix(over, c, ease((u - 1.1)/(GRIP - 1.1)));
+  if(u < POP) return c + vec3(0., tug(u), 0.);
+  if(u < LIFTED) return mix(c, c + vec3(0., 30., 0.), 1. - pow(1. - (u - POP)/(LIFTED - POP), 3.)); // it pops free
+  if(u < OVER) return mix(c + vec3(0., 30., 0.), over, ease((u - LIFTED)/(OVER - LIFTED)));
+  if(u < SWUNG){ float k = ease((u - OVER)/(SWUNG - OVER)); return mix(over, drop, k) + vec3(0., 0., sin(k*PI)*120.); } // swing round the side
+  if(u < LOWERED) return mix(drop, low, ease((u - SWUNG)/(LOWERED - SWUNG)));
+  if(u < LET_GO) return low;
+  return mix(low, REST, ease((u - LET_GO)/(FOLDED - LET_GO)));
 }
-bool gripping(float t){ float u = t - PICK; return u > 1.4 && u < 4.1; }
+bool gripping(float t){ float u = t - PICK; return u > GRIP - .1 && u < LET_GO - .1; }
 // Two segment arm on a turning base: the base faces the hand, and within that
 // upright plane the elbow always bends upward, so it moves smoothly.
 vec3 elbowFor(vec3 hand){
@@ -262,12 +278,15 @@ vec3 elbowFor(vec3 hand){
   vec2 e = dir*along + vec2(-dir.y, dir.x)*lift;
   return SHOULDER + vec3(facing.x*e.x, e.y, facing.y*e.x);
 }
-// Where a cluster's base is: the big one travels with the gripper, then rests in the bed.
+// Where a cluster's base is. The big one barely budges while it is tugged, tears
+// free, rides in the gripper, then rests in the bed. Everything on the ground trembles.
 vec3 baseOf(float i, float t){
-  if(i > .5) return site(i);
+  vec3 shake = vec3(0., tremor(t), 0.);
+  if(i > .5) return site(i) + shake;
   float u = t - PICK;
-  if(u < 1.5) return site(0.);
-  if(u < 4.1) return handAt(t) - vec3(0., 34., 0.);
+  if(u < GRIP) return site(0.);
+  if(u < POP) return site(0.) + vec3(sin(u*31.)*1.5, tug(u)*.25, 0.);
+  if(u < LET_GO) return handAt(t) - vec3(0., 34., 0.);
   return BED;
 }
 // One quartz point: a six sided column with a pointed tip, tilted out of the ground.
@@ -290,7 +309,11 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
   vec4 r = rnd(s, 67.), q = rnd(s, 71.);
   if(s.x < .07){ vec3 n = sph(r.xy); n.y = abs(n.y); col = WHITE; a = .1 + .35*r.z*r.z; return n*5000.; } // stars over the horizon
   if(s.x < .4){ // the moon's surface in faint rows of dust, lit softly around the big crystal
-    vec2 xz = (r.xy - .5)*2600.; float y = ground(xz); vec3 p = vec3(xz.x, y, xz.y);
+    vec2 xz = (r.xy - .5)*2600.; float y = ground(xz) + tremor(t)*exp(-length(xz - site(0.).xz)/400.); vec3 p = vec3(xz.x, y, xz.y);
+    if(r.w > .97){ // a puff of dust bursts from the hole as the crystal tears free
+      float e = t - PICK - POP; col = mix(GREY, CREAM, q.x)*.8; a = e > 0. && e < 1.6 ? .22*exp(-e*2.2) : 0.;
+      return site(0.) + normalize(vec3(q.x - .5, .8 + q.y, q.z - .5))*(10. + max(0., e)*90.*q.w) - vec3(0., max(0., e)*max(0., e)*30., 0.);
+    }
     float row = step(.55, fract(xz.x*.05 + fbm(vec3(xz*.01, 1.))*2.));
     vec3 big = baseOf(0., t); float d = length(p - big); float spill = exp(-d*d/9000.);
     col = mix(mix(GREY*.6, BLUE*.5, r.z), MINT, spill); a = (.1 + .1*row + .3*spill)*(1. - smoothstep(900., 1300., length(xz)));

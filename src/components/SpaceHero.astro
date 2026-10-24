@@ -22,7 +22,7 @@ const { eyebrow, heading, intro } = Astro.props;
     </div>
   </div>
   <button type="button" class="alien-hello is-away" data-alien-hello>
-    <span class="alien-label">Say hello to the alien</span>
+    <span class="visually-hidden">Say hello to the alien</span>
   </button>
   <p class="alien-bubble" data-alien-bubble role="status"></p>
 </section>
@@ -53,14 +53,6 @@ const { eyebrow, heading, intro } = Astro.props;
   }
   .alien-hello.is-away, .alien-bubble.is-away { visibility: hidden; }
   .alien-hello:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-  .alien-label {
-    position: absolute; left: 50%; top: 100%; transform: translate(-50%, 6px); white-space: nowrap;
-    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--text);
-    background: rgba(15, 18, 22, 0.85); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 10px;
-    opacity: 0; transition: opacity 0.2s; pointer-events: none;
-  }
-  .alien-hello.near-right .alien-label { left: auto; right: 0; transform: translateY(6px); }
-  .alien-hello:hover .alien-label, .alien-hello:focus-visible .alien-label { opacity: 1; }
   /* A quiet speech bubble: a dark glass panel with soft text, so the moment stays playful but calm. */
   .alien-bubble {
     position: fixed; left: 0; top: 0; z-index: 3; max-width: 230px; margin: 0;
@@ -114,7 +106,6 @@ const { eyebrow, heading, intro } = Astro.props;
       const edge = 12, bubbleX = Math.min(spot.x + spot.size * 0.3, window.innerWidth - bubble.offsetWidth - edge);
       bubble.style.setProperty('--bx', `${Math.max(edge, bubbleX)}px`);
       bubble.style.setProperty('--by', `calc(${spot.y - spot.size * 0.45}px - 100%)`);
-      button.classList.toggle('near-right', spot.x > window.innerWidth * 0.6);
     };
 
     const hero = startSpaceHero(section, canvas, { onProgress, onSaucer });

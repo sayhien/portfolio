@@ -216,15 +216,26 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 </style>
 
 <script>
-  // Opening a case study from a link always starts at the top, unless the link
-  // points to a section. Back and forward keep the reader's place.
+  // Opening a case study from a link always starts at the very top, on the hero,
+  // unless the link points to a section. Back and forward keep the reader's place.
+  // Late layout changes (fonts, pictures) can nudge the page, so the top is
+  // re-applied until the page has loaded or the reader scrolls by themselves.
   const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
   if (!location.hash && navigation?.type !== 'back_forward') {
     history.scrollRestoration = 'manual';
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    // When the site is shown inside a frame (such as a preview window), the frame's
-    // own container may keep its old scroll position, so bring the page's top into view there too.
-    if (window.self !== window.top) document.documentElement.scrollIntoView({ block: 'start', behavior: 'instant' });
+    const goToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Inside a frame (such as a preview window) the frame's own container may keep its old position.
+      if (window.self !== window.top) document.documentElement.scrollIntoView({ block: 'start', behavior: 'instant' });
+    };
+    const stopKeepingTop = () => {
+      ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((name) => window.removeEventListener(name, stopKeepingTop));
+      window.removeEventListener('load', goToTop);
+    };
+    goToTop();
+    window.addEventListener('load', goToTop, { once: true });
+    window.addEventListener('pageshow', (event) => { if (!event.persisted) goToTop(); }, { once: true });
+    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((name) => window.addEventListener(name, stopKeepingTop, { passive: true, once: true }));
   }
 
   const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a'));

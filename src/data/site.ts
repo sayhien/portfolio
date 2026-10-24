@@ -6,6 +6,7 @@ import remittanceThumb from '../assets/project-remittance.jpg';
 import healthcareThumb from '../assets/project-healthcare-report.jpg';
 import libraryThumb from '../assets/project-design-library.jpg';
 import breadcrumbThumb from '../assets/project-breadcrumb.jpg';
+import fourLeavesThumb from '../assets/four-leaves/after-home.webp';
 
 export const site = {
   name: 'Loo Say Hien',
@@ -124,9 +125,13 @@ export const projects: Project[] = [
   },
   {
     slug: 'four-leaves',
+    nextBlurb: 'Brought cake ordering to the front of a bakery website and told the story behind the ingredients.',
     title: 'Four Leaves',
-    blurb: 'A concept redesign of the Four Leaves bakery website.',
-    tags: ['Concept redesign', 'Website'],
+    blurb: 'A concept redesign of a Singapore bakery website. Cake ordering was hidden on a second site, so I moved it to the front, added the story behind the ingredients and made the points scheme easy to value.',
+    tags: ['Concept redesign', 'Website', 'Double Diamond'],
+    href: 'four-leaves/',
+    thumb: fourLeavesThumb,
+    thumbAlt: 'The redesigned Four Leaves home page with a green scalloped header, a baker’s film and an Order a cake button',
     tint: '#1c2b36',
     ratio: 0.62,
   },

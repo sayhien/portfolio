@@ -111,7 +111,7 @@ const BANDS: Record<BandName, BandDef> = {
   meteors: { count: 120000, story: 11.5, still: 7.8, far: 12000, fog: 12000, camera: turning([-150, 0, -300], 1350, 180, 0.05, 48, 0.3) },
   rings: { count: 110000, story: 9, still: 5.2, far: 9000, fog: 5000, camera: turning([0, 0, 0], 1350, 420, 0.03, 46, 0, 0.2) },
   zodiac: { count: 50000, story: ZODIAC_STORY, still: 3.4, far: 9000, fog: 6000, camera: turning([0, 50, 60], 1100, 60, 0.05, 46, 0.35) },
-  crystals: { count: 120000, story: 8.2, still: 4.4, far: 9000, fog: 4000, camera: turning([90, 45, 0], 400, 140, 0.05, 48, 0.4, 0.95) },
+  crystals: { count: 150000, story: 17.5, still: 6.2, far: 9000, fog: 4000, camera: turning([90, 45, 0], 400, 140, 0.05, 48, 0.4, 0.95) },
 };
 const EXTRAS: Partial<Record<BandName, Extra>> = { zodiac: zodiacExtra, rings: ringsExtra };
 

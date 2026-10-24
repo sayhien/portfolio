@@ -25,8 +25,8 @@ const { line } = Astro.props;
 
 <style>
   .garden-band { position: relative; }
-  /* The copyright and the hello button sit at the foot of the meadow, each on a small
-     dark glass label so the text stays readable over the bright grass, day or night. */
+  /* The copyright and the hello button sit at the foot of the meadow. A soft dark
+     shadow behind the letters keeps them readable over the grass, day or night. */
   .garden-bar {
     position: absolute; z-index: 2; left: 0; right: 0; bottom: 14px;
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px;
@@ -34,8 +34,7 @@ const { line } = Astro.props;
   }
   .garden-bar > :global(*) {
     pointer-events: auto; margin: 0; color: var(--text);
-    background: rgba(11, 14, 17, 0.72); border-radius: 999px; padding: 6px 14px;
-    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.95), 0 1px 6px rgba(0, 0, 0, 0.85), 0 0 14px rgba(0, 0, 0, 0.7);
   }
   .garden { position: relative; height: 780px; margin-top: 16px; }
   .garden canvas {

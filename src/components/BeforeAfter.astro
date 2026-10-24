@@ -1,0 +1,55 @@
+---
+// A before and after pair. The "before" side takes any markup in its slot (a
+// simple redraw, or a screenshot passed as `beforeImg`), the "after" side shows
+// a screenshot. Both sides are labelled in words, so colour is never the only cue,
+// and they stack on small screens.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+interface Props {
+  title: string;
+  /** The usability rule or idea this pair is about. */
+  rule: string;
+  beforeAlt: string;
+  beforeNote: string;
+  beforeImg?: ImageSource;
+  afterImg: ImageSource;
+  afterAlt: string;
+  afterNote: string;
+}
+const { title, rule, beforeAlt, beforeNote, beforeImg, afterImg, afterAlt, afterNote } = Astro.props;
+---
+<div class="pair">
+  <header class="pair-head">
+    <h3>{title}</h3>
+    <p class="pair-rule">{rule}</p>
+  </header>
+  <div class="pair-grid">
+    <div class="side">
+      <p class="tag">Before</p>
+      {beforeImg
+        ? <SmartImage class="pair-img" src={beforeImg} alt={beforeAlt} />
+        : <div class="redraw" role="img" aria-label={beforeAlt}><div aria-hidden="true"><slot name="before" /></div></div>}
+      <p class="note">{beforeNote}</p>
+    </div>
+    <div class="side">
+      <p class="tag tag-after">After</p>
+      <SmartImage class="pair-img" src={afterImg} alt={afterAlt} sizes="(max-width: 900px) 100vw, 480px" widths={[480, 840, 1280]} />
+      <p class="note">{afterNote}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pair { margin-top: var(--space-4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  .pair-head h3 { font-size: 22px; }
+  .pair-rule { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 6px; }
+  .pair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-3); }
+  .side { display: grid; grid-template-rows: auto 1fr auto; gap: 10px; align-content: start; }
+  .tag { justify-self: start; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 12px; }
+  .tag-after { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+  .note { font-size: 15px; line-height: 1.55; color: var(--muted); }
+  .pair :global(.pair-img) { width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--line-2); }
+  .redraw { border: 1px dashed var(--line-2); border-radius: 8px; background: var(--surface-2); padding: var(--space-2); min-height: 220px; display: grid; align-content: center; }
+  @media (max-width: 900px) { .pair-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

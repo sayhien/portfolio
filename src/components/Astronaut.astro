@@ -4,9 +4,8 @@
 // lowering to reflect the garden, a wave goodbye as space pulls him away, then
 // a swoosh down to Earth that lands on the garden. It is purely decorative, so
 // it is hidden from screen readers. Without graphics support it is removed.
-import face from '../assets/astronaut-face.png';
 ---
-<section class="farewell" data-farewell data-face={face.src} aria-hidden="true">
+<section class="farewell" data-farewell aria-hidden="true">
   <div class="farewell-sticky">
     <canvas data-farewell-canvas></canvas>
   </div>
@@ -28,5 +27,5 @@ import face from '../assets/astronaut-face.png';
 
   const section = document.querySelector<HTMLElement>('[data-farewell]');
   const canvas = section?.querySelector<HTMLCanvasElement>('[data-farewell-canvas]');
-  if (section && canvas && !startAstronaut(section, canvas, section.dataset.face ?? '')) section.remove();
+  if (section && canvas && !startAstronaut(section, canvas)) section.remove();
 </script>

@@ -4,6 +4,8 @@ import SpaceBand from '../components/SpaceBand.astro';
 import Personas from '../components/Personas.astro';
 import type { Persona } from '../components/Personas.astro';
 import DataTable from '../components/DataTable.astro';
+import PageMap from '../components/PageMap.astro';
+import type { Sketch } from '../components/PageMap.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import { caseLinks } from '../data/site';
@@ -90,6 +92,7 @@ const pageSections = [
 ];
 
 const sectionIcons: IconName[] = ['spark', 'users', 'tool', 'building', 'flask', 'link', 'shield', 'mail'];
+const sectionSketches: Sketch[] = ['hero', 'videos', 'cards', 'rows', 'chat', 'logos', 'badges', 'button'];
 
 const metrics = [
   ['Sandbox interaction rate', 'None yet', '40%', 'Share of visitors who try the live chatbot'],
@@ -175,7 +178,7 @@ const prototype = 'https://simplifynext-bot.framer.website/';
     <p class="sn">{n('page-structure')}</p>
     <h2>Page Structure</h2>
     <p>The information architecture for one page: it moves prospects from first interest, to judging the fit for themselves, to technical confidence.</p>
-    <DataTable caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} icons={sectionIcons} />
+    <PageMap caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} icons={sectionIcons} sketches={sectionSketches} />
     <div class="takeaway">
       <b>Design principle</b>
       <p>The same navigation for every prospect, with more depth revealed only when they ask for it.</p>

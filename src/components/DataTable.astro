@@ -23,7 +23,7 @@ if (icons && icons.length !== rows.length) throw new Error(`DataTable "${caption
     </thead>
     <tbody>
       {rows.map(([first, ...rest], index) => (
-        <tr style={`--n:${index}`}>
+        <tr style={`--n:${index}`} data-row={index}>
           <th scope="row">
             {icons ? <span class="row-head"><span class="tile" aria-hidden="true"><Icon name={icons[index]} size={18} /></span>{first}</span> : first}
           </th>

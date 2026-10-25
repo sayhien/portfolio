@@ -5,16 +5,15 @@
 import { prefersReducedMotion } from './motion';
 import { animateWhileVisible, buildProgram, uploadAttribute } from './webgl-helpers';
 import { lookAt, perspective } from './camera-math';
-import { cameraAt, END, HIT, hitPoint, LOOP, PADS, ROCKET_FRAGMENT, ROCKET_VERTEX, SMALL_SIZE, SMALL_START, SPEED, STILL_TIME, TURNS } from './rocket-scene';
+import { cameraAt, END, HIT, hitPoint, LOOP, PADS, PIERCE, ROCKET_FRAGMENT, ROCKET_VERTEX, SMALL_SIZE, SMALL_START, SPEED, STILL_TIME, TURNS } from './rocket-scene';
 
 const PARTICLES = 140000;
 const PHONE_PARTICLES = 85000;
 const MAX_DPR = 1.5;
 const FADE_IN = 0.6;
-const FLASH_FADE = 0.5;
 const SIZE_REFERENCE = 70;
 
-export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, flash: HTMLElement, pauseButton: HTMLButtonElement): boolean {
+export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, pauseButton: HTMLButtonElement): boolean {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
   if (!gl) return false;
   let program: WebGLProgram;
@@ -31,12 +30,14 @@ export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, fla
   for (let i = 0; i < seeds.length; i++) seeds[i] = Math.random();
   uploadAttribute(gl, program, 'aSeed', seeds, 4);
 
-  const names = ['uProj', 'uView', 'uEye', 'uT', 'uDpr', 'uSizeRef', 'uHit', 'uPad', 'uTurn', 'uSmallStart', 'uSmallSize'];
+  const names = ['uProj', 'uView', 'uEye', 'uT', 'uDpr', 'uSizeRef', 'uHit', 'uPad', 'uTurn', 'uSmallStart', 'uSmallSize', 'uPierce', 'uPierceT'];
   const uniform = Object.fromEntries(names.map((name) => [name, gl.getUniformLocation(program, name)]));
   gl.uniform3fv(uniform.uPad, new Float32Array(PADS.flat()));
   gl.uniform3fv(uniform.uTurn, new Float32Array(TURNS.flat()));
   gl.uniform1fv(uniform.uSmallStart, new Float32Array(SMALL_START));
   gl.uniform1fv(uniform.uSmallSize, new Float32Array(SMALL_SIZE));
+  gl.uniform3fv(uniform.uPierce, new Float32Array(PIERCE.flatMap((pierce) => pierce.at)));
+  gl.uniform1fv(uniform.uPierceT, new Float32Array(PIERCE.map((pierce) => pierce.time)));
   gl.uniform1f(uniform.uSizeRef, SIZE_REFERENCE);
   gl.uniform3fv(uniform.uHit, hitPoint());
   gl.enable(gl.BLEND);
@@ -51,9 +52,8 @@ export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, fla
     const width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
     if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
     const t = Math.min(time, END), camera = cameraAt(t);
-    // Fade in as each loop starts; at the hit, a white flash and the film cuts out until the next loop.
+    // Fade in as each loop starts; when the falling stage reaches the camera the film cuts to dark until the next loop.
     canvas.style.opacity = String(time > HIT ? 0 : Math.min(1, time / FADE_IN));
-    flash.style.opacity = String(time > HIT ? Math.max(0, 1 - (time - HIT) / FLASH_FADE) : 0);
     gl.viewport(0, 0, width, height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);

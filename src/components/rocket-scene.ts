@@ -8,10 +8,11 @@ import type { Vec3 } from './camera-math';
 
 // Times are story seconds; the film plays them SPEED times faster.
 export const SPEED = 1.15;
-export const SMALL_START = [-3.2, -2.3, -1.4, -0.6, 0.4];
+export const SMALL_START = [-5.6, -4.6, -3.6, -2.2, -0.8];
 export const SMALL_SIZE = [0.55, 1.35, 0.8, 1.7, 1.0];
 const SMALL_FLIGHT = 8;
-const BIG_T0 = 3.2, BIG_DUR = 8, BIG_NEAR = 230, BIG_FAR = 560;
+const SHAKE = 0.3; // how strongly the camera shakes
+const BIG_T0 = 3.2, BIG_DUR = 8;
 const SEPARATE_AT = 8.8, DROP_S = 2.3;
 export const HIT = SEPARATE_AT + DROP_S;
 export const END = HIT + 0.05;
@@ -28,12 +29,28 @@ const onSphere = (x: number, z: number): Vec3 => [x, Math.sqrt(EARTH_R * EARTH_R
 export const PADS: Vec3[] = [onSphere(-1200, -1500), onSphere(-500, -900), onSphere(150, -2000), onSphere(800, -1100), onSphere(1400, -2200)];
 export const TURNS: Vec3[] = ([[-0.6, 0, 0.8], [-0.2, 0, 1], [0.1, 0, 1], [0.5, 0, 0.9], [0.8, 0, 0.6]] as Vec3[]).map(norm);
 
+const DOME_R = EARTH_R + 1800;
+const EARTH_C: Vec3 = [0, -EARTH_R, 0];
+function smallPath(index: number, progress: number): Vec3 {
+  const up = norm(sub(PADS[index], EARTH_C));
+  return add(add(PADS[index], scale(up, 2300 * progress ** 2)), scale(TURNS[index], 900 * progress ** 3));
+}
+/** Where and when each small rocket breaks through the dome, found by halving the search. */
+export const PIERCE = PADS.map((_, index) => {
+  let low = 0, high = 1.4;
+  for (let step = 0; step < 40; step++) {
+    const middle = (low + high) / 2;
+    if (length(sub(smallPath(index, middle), EARTH_C)) < DOME_R) low = middle; else high = middle;
+  }
+  return { at: smallPath(index, low), time: SMALL_START[index] + low * SMALL_FLIGHT };
+});
+
 const between = (value: number, from: number, to: number) => Math.min(1, Math.max(0, (value - from) / (to - from)));
 
-/** How far along its path the big rocket is: it rises into view, then pulls away faster and faster. */
+/** How far along its path the big rocket is: it always rises and speeds up steadily, never pausing. */
 function bigTravel(t: number) {
-  const progress = between(t, BIG_T0, BIG_T0 + BIG_DUR), away = Math.max(0, (progress - 0.45) / 0.55);
-  return BIG_NEAR * ease(progress / 0.45) + BIG_FAR * away * away;
+  const progress = between(t, BIG_T0, BIG_T0 + BIG_DUR);
+  return 300 * progress + 490 * progress ** 3;
 }
 const bigBase = (t: number): Vec3 => add(BIG_FROM, scale(BIG_DIR, bigTravel(t)));
 
@@ -51,7 +68,7 @@ export type RocketCamera = { eye: Vec3; target: Vec3; roll: number; fov: number 
 /** The camera watches the small rockets, follows the big one, then stays on the falling stage. It shakes when the rocket is close. */
 export function cameraAt(t: number): RocketCamera {
   const big = bigBase(t);
-  const watchSmall: Vec3 = [0, 520 + 300 * ease(between(t, 0, 3)), -900];
+  const watchSmall: Vec3 = [0, 1080 + 160 * ease(between(t, 0, 3)), -900]; // looking a little up, so the dome is in view
   const follow = ease(between(t, BIG_T0 + 0.2, BIG_T0 + 1.8));
   let target = mix(mix(watchSmall, add(big, scale(BIG_DIR, 40)), follow), big, ease(between(t, BIG_T0 + 2, BIG_T0 + 4.5)));
   const stage = add(dropBase(t), scale(BIG_DIR, STAGE_CENTRE));
@@ -60,7 +77,7 @@ export function cameraAt(t: number): RocketCamera {
   const nearness = Math.max(0, 1 - Math.max(0, length(sub(big, EYE)) - 60) / 260);
   const since = t - SEPARATE_AT, jolt = since > 0 ? Math.exp(-since * 3) : 0;
   const incoming = since > 0 ? Math.pow(Math.min(1, since / DROP_S), 3) : 0;
-  const amount = 2.4 * nearness * nearness + 1.6 * jolt + 3.5 * incoming;
+  const amount = SHAKE * (2.4 * nearness * nearness + 1.6 * jolt + 3.5 * incoming);
   const shake = [Math.sin(t * 47) + Math.sin(t * 71) * 0.5, Math.sin(t * 53 + 1) + Math.sin(t * 83) * 0.5, Math.sin(t * 61 + 2) * 0.6].map((v) => v * amount) as Vec3;
   return { eye: add(EYE, shake), target: add(target, scale(shake, 0.6)), roll: Math.sin(t * 37) * amount * 0.004, fov: 46 };
 }
@@ -71,17 +88,18 @@ attribute vec4 aSeed;
 uniform mat4 uProj, uView; uniform vec3 uEye;
 uniform float uT, uDpr, uSizeRef;
 uniform vec3 uPad[5], uTurn[5]; uniform float uSmallStart[5], uSmallSize[5];
-varying vec3 vCol; varying float vA;
+varying vec3 vCol; varying float vA, vSoft;
+float gSoft;
 const float PI = 3.14159265, TAU = 6.2831853;
 const vec3 MINT = vec3(.43,.91,.72), BLUE = vec3(.49,.71,1.), WHITE = vec3(.94,.95,.96), DEEP = vec3(.16,.59,.5), GREY = vec3(.55,.6,.66);
-const vec3 YELLOW = vec3(1.,.85,.45), ORANGE = vec3(1.,.5,.2), CREAM = vec3(.96,.94,.88), INK = vec3(.08,.09,.11);
+const vec3 YELLOW = vec3(1.,.85,.45), ORANGE = vec3(1.,.5,.2), CREAM = vec3(.96,.94,.88), INK = vec3(.08,.09,.11), PINK = vec3(1.,.55,.62);
 const vec3 SUN = vec3(-.6,.5,.62), EARTH_C = vec3(0.,-6000.,0.);
 const float EARTH_R = 6000.;
 const float BIG_T0 = ${BIG_T0.toFixed(2)}, BIG_DUR = ${BIG_DUR.toFixed(2)}, SEPARATE_AT = ${SEPARATE_AT.toFixed(2)}, DROP_S = ${DROP_S.toFixed(2)}, SMALL_FLIGHT = ${SMALL_FLIGHT.toFixed(2)};
 uniform vec3 uHit;
 const vec3 BIG_FROM = vec3(${BIG_FROM.join(',')}), BIG_DIR = vec3(${BIG_DIR.map((v) => v.toFixed(5)).join(',')});
-const float BIG_NEAR = ${BIG_NEAR.toFixed(2)}, BIG_FAR = ${BIG_FAR.toFixed(2)}, BIG_H = 130., BIG_R = 7.;
-float gSize;
+const float BIG_H = 130., BIG_R = 7.;
+float gSize, gMax;
 float h1(float n){ return fract(sin(n*12.9898+4.1414)*43758.5453); }
 vec4 rnd(vec4 s, float k){ return vec4(h1(s.x*91.7+k), h1(s.y*57.3+k*1.7), h1(s.z*33.1+k*2.3), h1(s.w*77.9+k*3.1)); }
 vec3 sph(vec2 r){ float z = r.x*2. - 1.; float a = r.y*TAU; float q = sqrt(max(0., 1. - z*z)); return vec3(q*cos(a), z, q*sin(a)); }
@@ -90,8 +108,17 @@ void frame(vec3 axis, out vec3 side, out vec3 up){ side = normalize(cross(axis, 
 vec3 rotAbout(vec3 v, vec3 k, float a){ return v*cos(a) + cross(k, v)*sin(a) + k*dot(k, v)*(1. - cos(a)); }
 
 // ---------------------------------------------------------------- the big rocket's path
-float bigTravel(float t){ float g = clamp((t - BIG_T0)/BIG_DUR, 0., 1.), away = max(0., (g - .45)/.55); return BIG_NEAR*ease(g/.45) + BIG_FAR*away*away; }
+float bigTravel(float t){ float g = clamp((t - BIG_T0)/BIG_DUR, 0., 1.); return 300.*g + 490.*g*g*g; }
 vec3 bigBase(float t){ return BIG_FROM + BIG_DIR*bigTravel(t); }
+
+
+// ---------------------------------------------------------------- the top of the atmosphere
+const float DOME_R = EARTH_R + 1800.;  // a shell above the rockets
+uniform vec3 uPierce[5]; uniform float uPierceT[5]; // where and when each small rocket breaks through it
+// How much of a point the camera sees: rockets rise out of the haze below and look dimmer beyond the dome, in space.
+float visibility(vec3 p){
+  return smoothstep(120., 420., p.y)*(1. - .45*smoothstep(DOME_R - 20., DOME_R + 60., length(p - EARTH_C)));
+}
 
 // ---------------------------------------------------------------- one rocket
 // The outline from the engine skirt (0) to the nose (1): a wide first stage, a tapered
@@ -171,23 +198,37 @@ vec3 smallPath(int i, float f){
 }
 float smallValue(int i, float a0, float a1, float a2, float a3, float a4){ return i == 0 ? a0 : i == 1 ? a1 : i == 2 ? a2 : i == 3 ? a3 : a4; }
 
+vec3 dropBaseAt(float since){
+  vec3 sepBase = bigBase(SEPARATE_AT); float fall = clamp(since/DROP_S, 0., 1.);
+  return mix(sepBase + BIG_DIR*30.*sin(fall*PI), uHit, pow(fall, 2.2));
+}
+
 vec3 scene(vec4 s, out vec3 col, out float a){
   vec4 r = rnd(s, 5.), q = rnd(s, 11.);
   float t = uT;
-  if(s.x < .03){ col = WHITE; a = .12 + .45*r.w*r.w; return uEye + sph(r.yz)*9000.; } // stars
-  if(s.x < .25){ // Earth, crowded on the side facing the camera
-    // the dots crowd round the launch area the camera looks at, and thin out towards the horizon
-    vec3 toEye = normalize(uEye - EARTH_C), centre = normalize(vec3(0., EARTH_R, -1300.)), side = normalize(cross(centre, vec3(1.,0.,0.))), up2 = cross(side, centre);
-    float cr = .42*sqrt(r.y)*(.35 + .65*r.w), ca = r.z*TAU;
-    vec3 n = r.x < .12 ? sph(r.yz) : normalize(centre*cos(cr) + (side*cos(ca) + up2*sin(ca))*sin(cr));
-    vec3 p = EARTH_C + n*EARTH_R;
-    float land = step(.5, .5 + .5*sin(n.x*9. + sin(n.z*7.)*2.)*sin(n.z*8. + n.y*5.));
-    float cloud = step(.72, .5 + .5*sin(n.x*23. + n.z*17. + sin(n.y*13.)*3. + t*.05));
-    col = mix(mix(BLUE*.35, DEEP*.7, .4), MINT*.85, land); col = mix(col, WHITE, cloud*.7);
-    float rim = 1. - abs(dot(n, normalize(uEye - p)));
-    col = mix(col, BLUE, pow(rim, 3.)*.8);
-    a = 1.6*(.25 + .35*land + .45*cloud + .6*pow(rim, 4.))*step(0., dot(n, toEye) - EARTH_R/length(uEye - EARTH_C) + .02);
-    return p;
+  if(s.x < .03){ // stars, only above the horizon
+    vec3 d = sph(r.yz); col = WHITE; a = (.12 + .45*r.w*r.w)*smoothstep(.02, .2, d.y); return uEye + d*9000.; }
+  if(s.x < .25){ // the dome: the top of the atmosphere, drawn as a faint grid so its curve reads
+      vec3 centre = normalize(vec3(0., DOME_R, -1300.)), side = normalize(cross(centre, vec3(1.,0.,0.))), up2 = cross(side, centre);
+      float onLine = step(.15, q.w); // most dots sit on grid lines, the rest are a faint haze between them
+      float cr = 1.1*(onLine > .5 ? r.y : sqrt(r.y)), ca = r.z*TAU; // the haze spreads evenly, the lines keep their dots close
+      if(onLine > .5){ if(q.y < .45) cr = (floor(r.y*14.) + .5)/14.*1.1; else ca = floor(r.z*28.)/28.*TAU; }
+      vec3 n = normalize(centre*cos(cr) + (side*cos(ca) + up2*sin(ca))*sin(cr));
+      vec3 p = EARTH_C + n*DOME_R;
+      float ripple = 0.;
+      for(int i = 0; i < 5; i++){
+        float age = uT - (i == 0 ? uPierceT[0] : i == 1 ? uPierceT[1] : i == 2 ? uPierceT[2] : i == 3 ? uPierceT[3] : uPierceT[4]);
+        vec3 at = i == 0 ? uPierce[0] : i == 1 ? uPierce[1] : i == 2 ? uPierce[2] : i == 3 ? uPierce[3] : uPierce[4];
+        float d = length(p - at), ring = 520.*age;
+        ripple += step(0., age)*exp(-age*.6)*(exp(-pow((d - ring)/80., 2.)) + 2.*exp(-d*d/(70.*70.))*exp(-age*2.5));
+      }
+      p += n*60.*ripple; // the shell bulges outwards as the ripple passes
+      float graze = 1. - abs(dot(n, normalize(uEye - p)));
+      float above = smoothstep(.0, .12, (p.y - uEye.y)/length(p - uEye)); // the dome meets the horizon softly
+      col = mix(BLUE, MINT, .45) + WHITE*min(1., ripple);
+      a = above*(onLine*(.35 + .4*graze + 1.2*ripple) + (1. - onLine)*(.035 + .12*ripple));
+      gSize = onLine > .5 ? 50. + 40.*q.z : 600.; gMax = onLine > .5 ? 5. : 40.; gSoft = 1. - onLine;
+      return p;
   }
   if(s.x < .37){ // five small rockets of different sizes, each with a flame and a smoke trail
     int i = int(floor(r.x*5.));
@@ -211,9 +252,7 @@ vec3 scene(vec4 s, out vec3 col, out float a){
   float separated = step(SEPARATE_AT, t);
   float since = max(0., t - SEPARATE_AT);
   // Where the first stage is once it has broken away: it slows, drifts back and tumbles.
-  vec3 sepBase = bigBase(SEPARATE_AT), sepVel = (bigBase(SEPARATE_AT + .05) - sepBase)/.05;
-  float fall = clamp(since/DROP_S, 0., 1.);
-  vec3 dropBase = mix(sepBase + axis*30.*sin(fall*PI), uHit, pow(fall, 2.2));
+  vec3 dropBase = dropBaseAt(since);
   vec3 tumbleAxis = normalize(cross(axis, vec3(0.,0.,1.)));
   if(s.x < .73){
     vec3 n; float stage; vec3 local = rocketPoint(r, BIG_H, BIG_R, 1., n, col, stage);
@@ -251,16 +290,19 @@ vec3 scene(vec4 s, out vec3 col, out float a){
 }
 
 void main(){
-  gSize = 1.;
+  gSize = 1.; gMax = 6.; gSoft = 0.;
   vec3 col; float a;
   vec3 p = scene(aSeed, col, a);
+  if(aSeed.x >= .25) a *= visibility(p);
   vec4 vp = uView*vec4(p, 1.);
   gl_Position = uProj*vp;
   float d = max(-vp.z, 1.);
-  gl_PointSize = clamp(1.3*uDpr*(uSizeRef/d)*gSize, 1.1*uDpr, 6.*uDpr);
-  vCol = col; vA = min(1., a*min(1., (1.3*uSizeRef/d)/1.1 + .35));
+  gl_PointSize = clamp(1.3*uDpr*(uSizeRef/d)*gSize, 1.1*uDpr, gMax*uDpr);
+  vCol = col; vSoft = gSoft; vA = min(1., gSoft > .5 ? a : a*min(1., (1.3*uSizeRef/d)/1.1 + .35)); // soft puffs keep their strength far away
 }`;
 export const ROCKET_FRAGMENT = `
 precision mediump float;
-varying vec3 vCol; varying float vA;
-void main(){ float r = length(gl_PointCoord - .5); if(r > .5) discard; float a = smoothstep(.5, .15, r)*vA; gl_FragColor = vec4(vCol*a, a); }`;
+varying vec3 vCol; varying float vA, vSoft;
+void main(){ float r = length(gl_PointCoord - .5); if(r > .5) discard;
+  float a = (vSoft > .5 ? exp(-r*r*14.) : smoothstep(.5, .15, r))*vA; gl_FragColor = vec4(vCol*a, a); }`;
+

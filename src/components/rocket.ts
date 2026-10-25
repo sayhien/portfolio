@@ -1,5 +1,5 @@
 // The rocket film above the footer. It plays by itself and loops, only while
-// it is on screen, and a button lets the visitor pause it. The story and
+// it is on screen. The story and
 // shaders are in rocket-scene.ts. With reduced motion it starts paused on one
 // still frame. Returns false when graphics are not available.
 import { prefersReducedMotion } from './motion';
@@ -13,7 +13,7 @@ const MAX_DPR = 1.5;
 const FADE_IN = 0.6;
 const SIZE_REFERENCE = 70;
 
-export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, pauseButton: HTMLButtonElement): boolean {
+export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement): boolean {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
   if (!gl) return false;
   let program: WebGLProgram;
@@ -45,7 +45,7 @@ export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, pau
 
   const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
   let time = prefersReducedMotion() ? STILL_TIME : 0;
-  let paused = prefersReducedMotion();
+  const paused = prefersReducedMotion(); // with reduced motion the film stays on one frame
   let needsDraw = true;
 
   const draw = () => {
@@ -64,10 +64,6 @@ export function startRocket(section: HTMLElement, canvas: HTMLCanvasElement, pau
     gl.uniform1f(uniform.uDpr, dpr);
     gl.drawArrays(gl.POINTS, 0, count);
   };
-
-  const showButtonState = () => { pauseButton.textContent = paused ? 'Play animation' : 'Pause animation'; };
-  pauseButton.addEventListener('click', () => { paused = !paused; needsDraw = true; showButtonState(); });
-  showButtonState();
 
   animateWhileVisible(section, (dt) => {
     if (paused && !needsDraw) return;

@@ -1,26 +1,21 @@
 ---
 // The rocket film between the page and the footer garden: rockets climbing
 // into the top of the atmosphere, then a big one rushes past and its first
-// stage falls onto the camera. It plays by itself, is decorative, and can be paused. Without
+// stage falls onto the camera. It plays by itself and is decorative. Without
 // graphics support the whole section is removed.
 ---
 <section class="launch" data-launch aria-label="Rocket launch animation">
   <canvas data-launch-canvas aria-hidden="true"></canvas>
-  <button type="button" class="launch-pause" data-launch-pause>Pause animation</button>
 </section>
 
 <style>
-  .launch { position: relative; height: 60vh; min-height: 320px; overflow: hidden; }
-  .launch canvas { width: 100%; height: 100%; display: block; }
-  .launch-pause {
-    position: absolute; top: var(--space-2, 16px); right: var(--space-2, 16px);
-    min-height: 44px; padding: 0 16px; border-radius: 999px;
-    font: 500 14px var(--display, system-ui); color: var(--text); background: rgba(23, 27, 33, 0.85);
-    border: 1px solid var(--line); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); cursor: pointer;
-    opacity: 0.55; transition: opacity 0.2s;
+  /* Room above, and soft top and bottom edges so the film fades in and out instead of being cut off. */
+  .launch { position: relative; height: 60vh; min-height: 320px; margin-top: calc(var(--space-5) * 2); overflow: hidden; }
+  .launch canvas {
+    width: 100%; height: 100%; display: block;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
   }
-  .launch-pause:hover, .launch-pause:focus-visible { opacity: 1; }
-  .launch-pause:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 
 <script>
@@ -28,6 +23,5 @@
 
   const section = document.querySelector<HTMLElement>('[data-launch]');
   const canvas = section?.querySelector<HTMLCanvasElement>('[data-launch-canvas]');
-  const pauseButton = section?.querySelector<HTMLButtonElement>('[data-launch-pause]');
-  if (section && canvas && pauseButton && !startRocket(section, canvas, pauseButton)) section.remove();
+  if (section && canvas && !startRocket(section, canvas)) section.remove();
 </script>

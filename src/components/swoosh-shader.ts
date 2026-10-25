@@ -1,6 +1,5 @@
 // The swoosh: three layers of light drawn straight on the screen as the
-// camera dives into Earth. Shared by the home page hero and the farewell
-// astronaut above the footer. The shader that includes it must declare the
+// camera dives into Earth. Used by the home page hero. The shader that includes it must declare the
 // globals gScreen and gSize, and the colours WHITE, BLUE, MINT and GOLD.
 //
 // swoosh(layer, r, q, t, pull, along, aspect, col, a)

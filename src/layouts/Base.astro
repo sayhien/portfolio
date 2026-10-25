@@ -6,7 +6,6 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 import { site, projects } from '../data/site';
-import Rocket from '../components/Rocket.astro';
 import BeeGarden from '../components/BeeGarden.astro';
 import StarSky from '../components/StarSky.astro';
 import ContactMenu from '../components/ContactMenu.astro';
@@ -58,7 +57,6 @@ const caseStudies = projects.filter((p) => p.href);
       <slot />
     </main>
 
-    <Rocket />
 
     <footer class="site-footer">
       <BeeGarden line={site.footerLine}>

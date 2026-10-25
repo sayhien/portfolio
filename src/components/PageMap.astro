@@ -84,9 +84,16 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .map :global(tbody tr) { transition: background-color 0.3s; }
   .map :global(tbody tr.is-active) { background: var(--accent-soft); }
 
+  /* On narrow screens the sketch turns into a strip pinned above the table, so it stays in view while the rows scroll by. */
   @media (max-width: 900px) {
-    .map { grid-template-columns: minmax(0, 1fr); }
-    .sketch-wrap { display: none; }
+    .map { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+    .sketch-wrap { z-index: 2; top: calc(8px + var(--nav-offset, 0px) + var(--toc-bar, 0px)); }
+    .sketch { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; padding: 8px; background: rgba(23, 27, 33, 0.94); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    .bar { display: none; }
+    .block { min-height: 44px; padding: 4px; overflow: hidden; }
+    .block > :not(.name) { transform: scale(0.5); transform-origin: center; }
+    .hero { min-height: 44px; }
+    .name { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .block, .name, .map :global(tbody tr) { transition: none; }
@@ -128,6 +135,13 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
       row.addEventListener('pointerenter', () => { hovered = i; update(); });
       row.addEventListener('pointerleave', () => { hovered = null; update(); });
     });
+    // On narrow screens the side menu becomes a bar pinned at the top; the sketch strip sits just under it.
+    const tocBar = document.querySelector<HTMLElement>('.toc-wrap');
+    const narrow = window.matchMedia('(max-width: 900px)');
+    const placeStrip = () => map.style.setProperty('--toc-bar', narrow.matches && tocBar ? `${tocBar.offsetHeight}px` : '0px');
+    if (tocBar) new ResizeObserver(placeStrip).observe(tocBar);
+    narrow.addEventListener('change', placeStrip);
+    placeStrip();
     findScrolled();
     update();
   });

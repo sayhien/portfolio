@@ -49,10 +49,11 @@ if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`D
   .row-head { display: flex; align-items: center; gap: 14px; }
   .tile { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
   tbody th:has(.row-head) { min-width: 200px; }
-  tbody th:has(.row-art) { min-width: 250px; vertical-align: middle; }
+  tbody th:has(.row-art) { min-width: 250px; }
+  /* In rows with an icon or picture, the text beside it must hold its own: brighter, larger and roomier than a plain table. */
+  tbody tr:has(.row-head) > * { vertical-align: middle; padding-block: 22px; }
   tbody tr:has(.row-art) > * { padding-block: 30px; }
-  /* In rows with a picture, the text beside it must hold its own: brighter, larger and roomier than a plain table. */
-  tbody tr:has(.row-art) > td { vertical-align: middle; color: var(--text); font-size: 17px; line-height: 1.6; }
-  tbody tr:has(.row-art) > th { font-size: 16px; }
+  tbody tr:has(.row-head) > td { color: var(--text); font-size: 17px; line-height: 1.6; }
+  tbody tr:has(.row-head) > th { font-size: 16px; }
   thead th { white-space: nowrap; }
 </style>

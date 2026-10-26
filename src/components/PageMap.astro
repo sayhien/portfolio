@@ -1,7 +1,7 @@
 ---
 // The page structure table with a small sketch of the page beside it. The
 // sketch has one block per section, drawn to hint at what the section holds.
-// As the reader scrolls through the table, or points at a row, that row and
+// As the reader scrolls through the table, the row being read and
 // its block in the sketch light up together. The sketch is decorative: the
 // table carries all the meaning, so screen readers get the table only.
 import DataTable from './DataTable.astro';
@@ -31,7 +31,7 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
           {kind === 'videos' && <div class="trio">{[0, 1, 2].map(() => <b class="video"></b>)}</div>}
           {kind === 'cards' && <div class="grid">{[0, 1, 2, 3, 4, 5].map(() => <b class="card"></b>)}</div>}
           {kind === 'rows' && <div class="grid-table">{[0, 1, 2, 3, 4, 5, 6, 7].map(() => <b class="cell"></b>)}</div>}
-          {kind === 'chat' && <div class="chat"><b class="msg in"></b><b class="msg out"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
+          {kind === 'chat' && <div class="chat"><b class="msg out"></b><b class="msg in short"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
           {kind === 'logos' && <div class="trio">{[0, 1, 2, 3, 4].map(() => <b class="logo"></b>)}</div>}
           {kind === 'badges' && <div class="trio">{[0, 1, 2].map(() => <b class="badge"></b>)}</div>}
           {kind === 'button' && <b class="pill big"></b>}
@@ -47,7 +47,9 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
 <style>
   .map { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: var(--space-4); align-items: start; margin-top: var(--space-3); }
   .map .table :global(.table-wrap) { margin-top: 0; }
-  .sketch-wrap { position: sticky; top: calc(24px + var(--nav-offset, 0px)); transition: top 0.3s ease; }
+  /* The sketch slides down the table so the lit block always sits level with its row. */
+  .sketch-wrap { align-self: stretch; }
+  .sketch { transform: translateY(var(--slide, 0px)); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
   .sketch { display: grid; gap: 6px; padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
   .bar { display: flex; gap: 4px; padding: 2px 2px 6px; }
   .bar i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); }
@@ -74,7 +76,7 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .cell { height: 6px; }
   .chips { display: flex; gap: 3px; margin-top: 2px; }
   .chip { flex: 1; height: 6px; border-radius: 999px !important; }
-  .chat { display: grid; gap: 4px; padding: 4px; border-radius: 5px; border: 1px dashed var(--line-2); }
+  .chat { display: grid; gap: 5px; padding: 5px; border-radius: 5px; border: 1px solid var(--line-2); }
   .msg { height: 8px; width: 60%; border-radius: 6px !important; }
   .msg.out { justify-self: end; width: 48%; }
   .msg.short { width: 34%; }
@@ -83,7 +85,7 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .button { min-height: 34px; }
 
   /* The matching table row lights up too. */
-  .map :global(tbody tr) { transition: background-color 0.3s; }
+  .map :global(tbody tr) { transition: background-color 0.25s; }
   .map :global(tbody tr.is-active) { background: var(--accent-soft); }
 
   /* On narrow screens the sketch would run sideways while the rows run down the page, so it is left out. The table still has its animated pictures. */
@@ -92,57 +94,63 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
     .sketch-wrap { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .block, .name, .map :global(tbody tr) { transition: none; }
+    .block, .name, .sketch, .map :global(tbody tr) { transition: none; }
   }
 </style>
 
 <script>
-  // The row nearest the reading line is active; pointing at a row takes over until the pointer leaves.
+  // The row that crosses the reading line is the one lit, in the table and the sketch.
+  // Only scrolling moves it, and only when the line enters another row, so it never flips back and forth.
   document.querySelectorAll<HTMLElement>('[data-page-map]').forEach((map) => {
     const rows = Array.from(map.querySelectorAll<HTMLElement>('tbody tr[data-row]'));
     const blocks = Array.from(map.querySelectorAll<HTMLElement>('[data-block]'));
-    const SWITCH_MARGIN = 48; // pixels
-    let hovered: number | null = null, scrolled = -1;
+    let active = -1;
+
+    const sketch = map.querySelector<HTMLElement>('.sketch');
+
+    // Slide the sketch so the lit block lines up with its row, without leaving the table's height.
+    const alignSketch = () => {
+      if (!sketch || active < 0) return;
+      const row = rows[active].getBoundingClientRect(), block = blocks[active].getBoundingClientRect();
+      const mapBox = map.getBoundingClientRect(), sketchBox = sketch.getBoundingClientRect();
+      const current = sketchBox.top - mapBox.top;
+      const wanted = current + (row.top + row.height / 2) - (block.top + block.height / 2);
+      const slide = Math.max(0, Math.min(wanted, mapBox.height - sketchBox.height));
+      sketch.style.setProperty('--slide', `${slide}px`);
+    };
 
     const show = (index: number) => {
+      if (index === active) return;
+      active = index;
+      alignSketch();
       map.classList.toggle('has-active', index >= 0);
       rows.forEach((row, i) => row.classList.toggle('is-active', i === index));
       blocks.forEach((block, i) => block.classList.toggle('is-active', i === index));
     };
-    const update = () => show(hovered ?? scrolled);
 
     const readingLine = () => window.innerHeight * 0.45;
-    const findScrolled = () => {
-      const box = map.getBoundingClientRect();
-      if (box.bottom < 0 || box.top > window.innerHeight) { scrolled = -1; return; }
-      const distanceTo = (row: HTMLElement) => {
+    const findActive = () => {
+      const line = readingLine(), box = map.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > window.innerHeight) return -1;
+      const crossing = rows.findIndex((row) => {
         const r = row.getBoundingClientRect();
-        return Math.abs((r.top + r.bottom) / 2 - readingLine());
-      };
-      let best = -1, bestDistance = Infinity;
-      rows.forEach((row, i) => {
-        const distance = distanceTo(row);
-        if (distance < bestDistance) { best = i; bestDistance = distance; }
+        return r.top <= line && r.bottom > line;
       });
-      // Stay on the current row until another is clearly closer, so scrolling slowly back and forth does not flip between two rows.
-      if (scrolled >= 0 && best !== scrolled && distanceTo(rows[scrolled]) < bestDistance + SWITCH_MARGIN) return;
-      scrolled = best;
+      if (crossing >= 0) return crossing;
+      // Above the first row or below the last one, the nearest end stays lit.
+      const first = rows[0].getBoundingClientRect(), last = rows[rows.length - 1].getBoundingClientRect();
+      if (line < first.top) return 0;
+      if (line >= last.bottom) return rows.length - 1;
+      return active;
     };
+
     let queued = false;
     window.addEventListener('scroll', () => {
       if (queued) return;
       queued = true;
-      requestAnimationFrame(() => { queued = false; hovered = null; findScrolled(); update(); });
+      requestAnimationFrame(() => { queued = false; show(findActive()); });
     }, { passive: true });
-    // Pointing only counts when the mouse itself moves. Rows sliding under a still mouse while scrolling must not take over, or the highlight flips between the row under the mouse and the row being read.
-    map.addEventListener('pointermove', (event) => {
-      const row = (event.target as HTMLElement).closest<HTMLElement>('tbody tr[data-row]');
-      const index = row ? rows.indexOf(row) : -1;
-      const next = index >= 0 ? index : null;
-      if (next !== hovered) { hovered = next; update(); }
-    });
-    map.addEventListener('pointerleave', () => { hovered = null; update(); });
-    findScrolled();
-    update();
+    show(findActive());
+    new ResizeObserver(alignSketch).observe(map);
   });
 </script>

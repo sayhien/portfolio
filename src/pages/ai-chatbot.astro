@@ -4,12 +4,14 @@ import SpaceBand from '../components/SpaceBand.astro';
 import Personas from '../components/Personas.astro';
 import type { Persona } from '../components/Personas.astro';
 import DataTable from '../components/DataTable.astro';
+import PageMap from '../components/PageMap.astro';
+import type { Sketch } from '../components/PageMap.astro';
+import type { RowArtName } from '../components/row-art';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import { caseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
 import { sectionNumber } from '../layouts/sections';
-import type { IconName } from '../components/Icon.astro';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -36,7 +38,7 @@ const competitorIssues = [
   ['Same page for every buyer', 'Developers, operations and procurement all get the same content.', 'Each buyer has to dig through details meant for someone else to find what they need to decide.'],
 ];
 
-const issueIcons: IconName[] = ['target', 'code', 'video', 'users', 'link', 'layers'];
+const issueArt: RowArtName[] = ['diluted', 'jargon', 'passive', 'logos', 'integration', 'onesize'];
 
 const personas: Persona[] = [
   { img: james, name: 'James Daleen', role: 'Chief Technology Officer, the technical validator', quote: 'Vendors say setup is easy. Then they ask for months of our data.', facts: [
@@ -89,7 +91,8 @@ const pageSections = [
   ['Call to action', 'Talk to sales', 'Turns interested prospects into qualified leads.', 'All personas'],
 ];
 
-const sectionIcons: IconName[] = ['spark', 'users', 'tool', 'building', 'flask', 'link', 'shield', 'mail'];
+const sectionArt: RowArtName[] = ['hero', 'proof', 'capabilities', 'usecases', 'sandbox', 'hub', 'security', 'cta'];
+const sectionSketches: Sketch[] = ['hero', 'videos', 'cards', 'rows', 'chat', 'logos', 'badges', 'button'];
 
 const metrics = [
   ['Sandbox interaction rate', 'None yet', '40%', 'Share of visitors who try the live chatbot'],
@@ -98,7 +101,7 @@ const metrics = [
   ['Bounce rate', '55%', '35%', 'Sessions that leave after one page'],
 ];
 
-const metricIcons: IconName[] = ['flask', 'chat', 'clock', 'bars'];
+const metricArt: RowArtName[] = ['sandboxRate', 'testimonialClicks', 'engagement', 'bounce'];
 
 const outcomes: Card[] = [
   { icon: 'check', label: 'Delivery', title: 'A working prototype in three weeks', text: 'Delivered a fully interactive, high fidelity prototype in Framer within the three week timeline.' },
@@ -136,7 +139,7 @@ const prototype = 'https://simplifynext-bot.framer.website/';
     <h2>Discovery and Research</h2>
     <p>I compared the chatbot pages of seven leading providers, including Oracle, Google Cloud, Andersen Lab, ManageEngine, HKT Enterprise and SMEs Go Digital. Together with buyer personas and a map of what drives each buyer, this became the base for the design.</p>
     <h3 class="sub">Six problems the competitors share</h3>
-    <DataTable caption="Six UX problems found across competitor chatbot pages" head={['Issue', 'Evidence', 'Impact on prospects']} rows={competitorIssues} icons={issueIcons} />
+    <DataTable caption="Six UX problems found across competitor chatbot pages" head={['Issue', 'Evidence', 'Impact on prospects']} rows={competitorIssues} art={issueArt} />
   </section>
 
   <section id="personas" class="sec">
@@ -175,7 +178,7 @@ const prototype = 'https://simplifynext-bot.framer.website/';
     <p class="sn">{n('page-structure')}</p>
     <h2>Page Structure</h2>
     <p>The information architecture for one page: it moves prospects from first interest, to judging the fit for themselves, to technical confidence.</p>
-    <DataTable caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} icons={sectionIcons} />
+    <PageMap caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} art={sectionArt} sketches={sectionSketches} />
     <div class="takeaway">
       <b>Design principle</b>
       <p>The same navigation for every prospect, with more depth revealed only when they ask for it.</p>
@@ -198,7 +201,7 @@ const prototype = 'https://simplifynext-bot.framer.website/';
     <p class="sn">{n('metrics')}</p>
     <h2>Success Metrics</h2>
     <p>I gave the client a set of UX metrics to track the new page after launch. The baseline is the average of their other service pages.</p>
-    <DataTable caption="UX metrics with baseline, target and how each is measured" head={['Metric', 'Baseline', 'Target', 'How it is measured']} rows={metrics} icons={metricIcons} />
+    <DataTable caption="UX metrics with baseline, target and how each is measured" head={['Metric', 'Baseline', 'Target', 'How it is measured']} rows={metrics} art={metricArt} />
   </section>
 
   <section id="outcome" class="sec">

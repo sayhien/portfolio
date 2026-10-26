@@ -51,5 +51,8 @@ if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`D
   tbody th:has(.row-head) { min-width: 200px; }
   tbody th:has(.row-art) { min-width: 250px; vertical-align: middle; }
   tbody tr:has(.row-art) > * { padding-block: 30px; }
-  tbody tr:has(.row-art) > td { vertical-align: middle; }
+  /* In rows with a picture, the text beside it must hold its own: brighter, larger and roomier than a plain table. */
+  tbody tr:has(.row-art) > td { vertical-align: middle; color: var(--text); font-size: 17px; line-height: 1.6; }
+  tbody tr:has(.row-art) > th { font-size: 16px; }
+  thead th { white-space: nowrap; }
 </style>

@@ -50,5 +50,6 @@ if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`D
   .tile { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
   tbody th:has(.row-head) { min-width: 200px; }
   tbody th:has(.row-art) { min-width: 250px; vertical-align: middle; }
+  tbody tr:has(.row-art) > * { padding-block: 30px; }
   tbody tr:has(.row-art) > td { vertical-align: middle; }
 </style>

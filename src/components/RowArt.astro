@@ -15,62 +15,65 @@ const { name } = Astro.props;
 <style is:global>
   .row-art { flex: none; width: 76px; height: 76px; border-radius: 16px; display: grid; place-items: center; color: var(--accent); background: radial-gradient(circle at 30% 25%, rgba(110, 231, 183, 0.16), var(--accent-soft) 70%); border: 1px solid rgba(110, 231, 183, 0.18); }
   .row-art svg { overflow: visible; }
-  .row-art .d { stroke: var(--muted); }
+  .row-art .d { stroke: rgba(110, 231, 183, 0.5); }
   .row-art .f { fill: rgba(110, 231, 183, 0.2); }
   .row-art .s { fill: currentColor; stroke: none; }
 
   /* Everything waits until the picture is on screen, then loops slowly. Offset with --i inside a scene and --n between rows. */
-  .row-art [class*='a-'] { animation-duration: 4.800s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-play-state: paused; animation-delay: calc(var(--i, 0) * 0.5s); transform-box: fill-box; transform-origin: center; }
+  .row-art [class*='a-'] { animation-duration: 7s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-play-state: paused; animation-delay: calc(var(--n, 0) * 0.6s + var(--i, 0) * 0.7s); transform-box: fill-box; transform-origin: center; }
   .row-art.is-live [class*='a-'] { animation-play-state: running; }
-  .row-art .a-orbit { animation-name: art-orbit; animation-duration: 14s; animation-timing-function: linear; transform-box: view-box; transform-origin: 24px 24px; }
-  .row-art .a-dot { animation-name: art-blink; animation-duration: 1.800s; }
-  .row-art .a-packet { animation-name: art-packet; animation-duration: 3s; }
+  .row-art .a-orbit { animation-name: art-orbit; animation-duration: 24s; animation-timing-function: linear; transform-box: view-box; transform-origin: 24px 24px; }
+  .row-art .a-dot { animation-name: art-blink; animation-duration: 3.600s; }
+  .row-art .a-packet { animation-name: art-packet; animation-duration: 5.500s; }
   .row-art .a-progress { animation-name: art-progress; stroke-dasharray: 1 1; }
   .row-art .a-blink { animation-name: art-blink; }
-  .row-art .a-bob { animation-name: art-bob; animation-duration: 2.400s; }
-  .row-art .a-flow { animation-name: art-flow; animation-duration: 1.200s; animation-timing-function: linear; }
+  .row-art .a-bob { animation-name: art-bob; animation-duration: 4.200s; }
+  .row-art .a-flow { animation-name: art-flow; animation-duration: 2.600s; animation-timing-function: linear; }
   .row-art .a-scan { animation-name: art-scan; }
-  .row-art .a-press { animation-name: art-press; animation-duration: 3s; }
-  .row-art .a-lit { animation-name: art-lit; animation-duration: 4.500s; }
+  .row-art .a-press { animation-name: art-press; animation-duration: 6s; }
+  .row-art .a-lit { animation-name: art-lit; animation-duration: 7.500s; }
   .row-art .a-tag { animation-name: art-tag; }
   .row-art .a-open { animation-name: art-open; transform-origin: top; }
   .row-art .a-shift { animation-name: art-shift; }
   .row-art .a-rows { animation-name: art-rows; animation-timing-function: steps(3, jump-none); }
   .row-art .a-msg { animation-name: art-msg; }
-  .row-art .a-chip { animation-name: art-chip; animation-duration: 4.500s; }
+  .row-art .a-chip { animation-name: art-chip; animation-duration: 8s; }
   .row-art .a-glow { animation-name: art-glow; }
   .row-art .a-check { animation-name: art-progress; stroke-dasharray: 1 1; }
-  .row-art .a-spin { animation-name: art-orbit; animation-duration: 8s; animation-timing-function: linear; transform-box: view-box; transform-origin: 24px 24px; }
-  .row-art .a-ping { animation-name: art-ping; animation-duration: 2.800s; animation-timing-function: ease-out; }
-  .row-art .a-nudge { animation-name: art-nudge; animation-duration: 1.800s; }
+  .row-art .a-spin { animation-name: art-orbit; animation-duration: 14s; animation-timing-function: linear; transform-box: view-box; transform-origin: 24px 24px; }
+  .row-art .a-ping { animation-name: art-ping; animation-duration: 4.500s; animation-timing-function: ease-out; }
+  .row-art .a-nudge { animation-name: art-nudge; animation-duration: 3.200s; }
   .row-art .a-ring { animation-name: art-ring; stroke-dasharray: 1 1; stroke-width: 3; }
-  .row-art .a-card { animation-name: art-card; animation-duration: 3.600s; }
-  .row-art .a-click { animation-name: art-click; animation-duration: 3.600s; }
-  .row-art .a-cursor { animation-name: art-cursor; animation-duration: 3.600s; transform-box: view-box; transform-origin: 0 0; }
-  .row-art .a-hand { animation-name: art-sweep; transform-box: view-box; transform-origin: 24px 24px; animation-timing-function: linear; animation-duration: 6s; }
+  .row-art .a-card { animation-name: art-card; animation-duration: 6.500s; }
+  .row-art .a-click { animation-name: art-click; animation-duration: 6.500s; }
+  .row-art .a-cursor { animation-name: art-cursor; animation-duration: 6.500s; transform-box: view-box; transform-origin: 0 0; }
+  .row-art .a-hand { animation-name: art-sweep; transform-box: view-box; transform-origin: 24px 24px; animation-timing-function: linear; animation-duration: 12s; }
   .row-art .a-bar { animation-name: art-bar; transform-origin: bottom; }
-  .row-art .a-exit { animation-name: art-exit; animation-duration: 2.400s; }
+  .row-art .a-exit { animation-name: art-exit; animation-duration: 4.500s; }
 
+  /* The plain lines draw in, rest and slip away, like the case study icons. */
+  .row-art.is-live svg > :not([class*='a-']):not([stroke-dasharray]):not(.s) { animation: art-draw 9s ease-in-out infinite; animation-delay: calc(var(--n, 0) * 0.6s); }
+  @keyframes art-draw { 0% { stroke-dasharray: 1 1; stroke-dashoffset: 1; } 20%, 86% { stroke-dasharray: 1 1; stroke-dashoffset: 0; } 100% { stroke-dasharray: 1 1; stroke-dashoffset: -1; } }
   @keyframes art-orbit { to { transform: rotate(360deg); } }
-  @keyframes art-blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+  @keyframes art-blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
   @keyframes art-packet { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 70% { transform: translateX(11px); opacity: 1; } 100% { transform: translateX(12px); opacity: 0; } }
   @keyframes art-progress { 0% { stroke-dashoffset: 1; } 60%, 90% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
-  @keyframes art-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  @keyframes art-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
   @keyframes art-flow { to { stroke-dashoffset: -5; } }
   @keyframes art-scan { 0% { transform: translateY(0); } 33% { transform: translateY(7px); } 66% { transform: translateY(14px); } 100% { transform: translateY(21px); } }
   @keyframes art-press { 0%, 55%, 100% { transform: scale(1); } 65% { transform: scale(0.88); } 80% { transform: scale(1.06); } }
-  @keyframes art-lit { 0%, 100% { opacity: 0.25; } 25%, 50% { opacity: 1; } }
+  @keyframes art-lit { 0%, 100% { opacity: 0.4; } 25%, 50% { opacity: 1; } }
   @keyframes art-tag { 0%, 100% { transform: translateX(-10px); opacity: 0; } 30%, 70% { transform: translateX(0); opacity: 1; } }
   @keyframes art-open { 0%, 15% { transform: scaleY(0.05); opacity: 0; } 40%, 85% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(0.05); opacity: 0; } }
   @keyframes art-shift { 0%, 15%, 100% { transform: translateY(-9px); } 40%, 85% { transform: translateY(0); } }
   @keyframes art-rows { 0% { transform: translateY(0); } 100% { transform: translateY(17px); } }
   @keyframes art-msg { 0%, 20% { opacity: 0; transform: translateY(4px); } 40%, 85% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; } }
-  @keyframes art-chip { 0%, 100% { fill: transparent; stroke: var(--muted); } 15%, 40% { fill: rgba(110, 231, 183, 0.35); stroke: var(--accent); } 55% { fill: transparent; stroke: var(--muted); } }
+  @keyframes art-chip { 0%, 100% { fill: transparent; stroke: rgba(110, 231, 183, 0.5); } 15%, 40% { fill: rgba(110, 231, 183, 0.35); stroke: var(--accent); } 55% { fill: transparent; stroke: rgba(110, 231, 183, 0.5); } }
   @keyframes art-glow { 0%, 100% { fill: rgba(110, 231, 183, 0.1); } 50% { fill: rgba(110, 231, 183, 0.32); } }
   @keyframes art-ping { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.3, 1.9); opacity: 0; } }
   @keyframes art-nudge { 0%, 100% { transform: translateX(-1px); } 50% { transform: translateX(3px); } }
   @keyframes art-ring { 0% { stroke-dashoffset: 1; } 55%, 90% { stroke-dashoffset: 0.6; } 100% { stroke-dashoffset: 1; } }
-  @keyframes art-card { 0%, 40%, 100% { fill: transparent; stroke: var(--muted); } 50%, 85% { fill: rgba(110, 231, 183, 0.3); stroke: var(--accent); } }
+  @keyframes art-card { 0%, 40%, 100% { fill: transparent; stroke: rgba(110, 231, 183, 0.5); } 50%, 85% { fill: rgba(110, 231, 183, 0.3); stroke: var(--accent); } }
   @keyframes art-click { 0%, 40% { transform: scale(0.3); opacity: 0; } 45% { opacity: 1; } 75%, 100% { transform: scale(2.8); opacity: 0; } }
   @keyframes art-cursor { 0%, 8% { transform: translate(34px, 40px); } 38%, 55% { transform: translate(22px, 20px); } 100% { transform: translate(34px, 40px); } }
   @keyframes art-sweep { to { transform: rotate(360deg); } }
@@ -91,5 +94,9 @@ const { name } = Astro.props;
   const watcher = new IntersectionObserver((entries) => {
     entries.forEach((entry) => entry.target.classList.toggle('is-live', entry.isIntersecting));
   }, { rootMargin: '60px' });
-  pictures.forEach((picture) => watcher.observe(picture));
+  // Lines can only draw in when they know their own length.
+  pictures.forEach((picture) => {
+    picture.querySelectorAll('svg > :not([class*="a-"])').forEach((shape) => shape.setAttribute('pathLength', '1'));
+    watcher.observe(picture);
+  });
 </script>

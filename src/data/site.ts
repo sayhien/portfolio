@@ -17,7 +17,7 @@ export const site = {
   resume: 'https://sayhien.github.io/Resume/',
   linkedin: 'https://www.linkedin.com/in/loo-say-hien-05094260/',
   heroLine: 'Some designers see the galaxy. Some see the grass. I see both, and I know when to zoom in.',
-  footerLine: 'The big picture sets the direction. The small details earn the trust. I care about both.',
+  footerLine: 'From the whole galaxy to a single blade of grass, I care about both.',
   intro:
     'Passionate UI/UX Designer with nine years of experience crafting efficient solutions that bridge user needs and business goals. Proficient in translating dense data and complex regulatory frameworks into intuitive, scalable interfaces.',
 };

@@ -30,8 +30,8 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
           {kind === 'hero' && <><b class="line wide"></b><b class="line"></b><b class="pill"></b><b class="bot"></b></>}
           {kind === 'videos' && <div class="trio">{[0, 1, 2].map(() => <b class="video"></b>)}</div>}
           {kind === 'cards' && <div class="grid">{[0, 1, 2, 3, 4, 5].map(() => <b class="card"></b>)}</div>}
-          {kind === 'rows' && <div class="stack">{[0, 1, 2, 3].map(() => <b class="row"></b>)}</div>}
-          {kind === 'chat' && <div class="chat"><b class="msg in"></b><b class="msg out"></b><b class="msg in short"></b></div>}
+          {kind === 'rows' && <div class="grid-table">{[0, 1, 2, 3, 4, 5, 6, 7].map(() => <b class="cell"></b>)}</div>}
+          {kind === 'chat' && <div class="chat"><b class="msg in"></b><b class="msg out"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
           {kind === 'logos' && <div class="trio">{[0, 1, 2, 3, 4].map(() => <b class="logo"></b>)}</div>}
           {kind === 'badges' && <div class="trio">{[0, 1, 2].map(() => <b class="badge"></b>)}</div>}
           {kind === 'button' && <b class="pill big"></b>}
@@ -70,8 +70,10 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .video { flex: 1; height: 24px; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
   .card { height: 16px; }
-  .stack { display: grid; gap: 3px; }
-  .row { height: 5px; }
+  .grid-table { display: grid; grid-template-columns: 1fr 2fr; gap: 3px; }
+  .cell { height: 6px; }
+  .chips { display: flex; gap: 3px; margin-top: 2px; }
+  .chip { flex: 1; height: 6px; border-radius: 999px !important; }
   .chat { display: grid; gap: 4px; padding: 4px; border-radius: 5px; border: 1px dashed var(--line-2); }
   .msg { height: 8px; width: 60%; border-radius: 6px !important; }
   .msg.out { justify-self: end; width: 48%; }
@@ -130,12 +132,16 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
     window.addEventListener('scroll', () => {
       if (queued) return;
       queued = true;
-      requestAnimationFrame(() => { queued = false; findScrolled(); update(); });
+      requestAnimationFrame(() => { queued = false; hovered = null; findScrolled(); update(); });
     }, { passive: true });
-    rows.forEach((row, i) => {
-      row.addEventListener('pointerenter', () => { hovered = i; update(); });
-      row.addEventListener('pointerleave', () => { hovered = null; update(); });
+    // Pointing only counts when the mouse itself moves. Rows sliding under a still mouse while scrolling must not take over, or the highlight flips between the row under the mouse and the row being read.
+    map.addEventListener('pointermove', (event) => {
+      const row = (event.target as HTMLElement).closest<HTMLElement>('tbody tr[data-row]');
+      const index = row ? rows.indexOf(row) : -1;
+      const next = index >= 0 ? index : null;
+      if (next !== hovered) { hovered = next; update(); }
     });
+    map.addEventListener('pointerleave', () => { hovered = null; update(); });
     findScrolled();
     update();
   });

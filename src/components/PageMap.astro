@@ -31,7 +31,7 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
           {kind === 'videos' && <div class="trio">{[0, 1, 2].map(() => <b class="video"></b>)}</div>}
           {kind === 'cards' && <div class="grid">{[0, 1, 2, 3, 4, 5].map(() => <b class="card"></b>)}</div>}
           {kind === 'rows' && <div class="grid-table">{[0, 1, 2, 3, 4, 5, 6, 7].map(() => <b class="cell"></b>)}</div>}
-          {kind === 'chat' && <div class="chat"><b class="msg out"></b><b class="msg in short"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
+          {kind === 'chat' && <div class="sandbox"><b class="msg out"></b><b class="reply"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
           {kind === 'logos' && <div class="trio">{[0, 1, 2, 3, 4].map(() => <b class="logo"></b>)}</div>}
           {kind === 'badges' && <div class="trio">{[0, 1, 2].map(() => <b class="badge"></b>)}</div>}
           {kind === 'button' && <b class="pill big"></b>}
@@ -74,12 +74,14 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .card { height: 16px; }
   .grid-table { display: grid; grid-template-columns: 1fr 2fr; gap: 3px; }
   .cell { height: 6px; }
-  .chips { display: flex; gap: 3px; margin-top: 2px; }
-  .chip { flex: 1; height: 6px; border-radius: 999px !important; }
-  .chat { display: grid; gap: 5px; padding: 5px; border-radius: 5px; border: 1px solid var(--line-2); }
-  .msg { height: 8px; width: 60%; border-radius: 6px !important; }
-  .msg.out { justify-self: end; width: 48%; }
-  .msg.short { width: 34%; }
+  /* Mirrors the Demo sandbox picture: a window, one filled message, a thin reply line, three outlined options. */
+  .sandbox { display: grid; align-content: space-between; gap: 6px; height: 64px; box-sizing: border-box; padding: 7px; border-radius: 5px; border: 1px solid var(--line-2); }
+  .block.is-active .sandbox { border-color: rgba(110, 231, 183, 0.6); }
+  .msg { height: 14px; width: 55%; justify-self: end; border-radius: 5px !important; }
+  .reply { height: 2px; width: 48%; }
+  .chips { display: flex; gap: 4px; }
+  .block .chip { flex: 1; height: 8px; border-radius: 999px !important; background: transparent; border: 1px solid var(--line-2); }
+  .block.is-active .chip { background: transparent; border-color: rgba(110, 231, 183, 0.6); }
   .logo { width: 16px; height: 16px; border-radius: 50% !important; }
   .badge { width: 22px; height: 24px; margin-inline: auto; border-radius: 6px 6px 11px 11px !important; }
   .button { min-height: 34px; }

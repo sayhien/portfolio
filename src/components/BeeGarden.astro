@@ -48,9 +48,9 @@ const { line } = Astro.props;
     display: grid; justify-items: center; gap: calc(var(--space-4) * 2);
   }
   .garden-line {
-    /* Set like the home hero heading, so the last words on the page land with the same weight as the first. */
-    text-align: center; font-family: var(--display); font-weight: 600; font-size: clamp(32px, 4.8vw, 68px); line-height: 1.04; letter-spacing: -0.03em;
-    color: var(--text); text-wrap: balance; max-width: 1040px; margin: 0; pointer-events: none;
+    /* Set in the hero heading style but smaller, so it echoes the top without competing with it. */
+    text-align: center; font-family: var(--display); font-weight: 600; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.1; letter-spacing: -0.03em;
+    color: var(--text); text-wrap: balance; max-width: 860px; margin: 0; pointer-events: none;
     text-shadow: 0 0 24px rgba(10, 14, 20, 0.7);
   }
   /* Without the meadow, the tagline and links still show on the plain page. */

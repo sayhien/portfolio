@@ -7,7 +7,9 @@
 export type RowArtName =
   | 'diluted' | 'jargon' | 'passive' | 'logos' | 'integration' | 'onesize'
   | 'hero' | 'proof' | 'capabilities' | 'usecases' | 'sandbox' | 'hub' | 'security' | 'cta'
-  | 'sandboxRate' | 'testimonialClicks' | 'engagement' | 'bounce';
+  | 'sandboxRate' | 'testimonialClicks' | 'engagement' | 'bounce'
+  | 'twoSites' | 'buriedOrder' | 'textInPictures' | 'emptyAreas' | 'smallErrors' | 'pointsValue' | 'typefaces' | 'nestedScroll' | 'noProof'
+  | 'cakeOrders' | 'dropOff' | 'signUps' | 'orderTime';
 
 export const rowArt: Record<RowArtName, string> = {
   // Problems found in competitor pages
@@ -93,4 +95,59 @@ export const rowArt: Record<RowArtName, string> = {
     <path class="d" d="M5 42h24"/>
     <rect class="f a-bar" x="8" y="12" width="8" height="30" rx="1.500"/><rect class="f a-bar" style="--i:1" x="19" y="12" width="8" height="30" rx="1.500"/>
     <path class="a-exit" d="M32 24h11M39 19l5 5-5 5"/>`,
+  // Problems found on the Four Leaves websites
+  twoSites: `
+    <rect x="3" y="9" width="19" height="26" rx="2.500"/><path class="f" d="M3 15h19v-3.500a2.500 2.500 0 0 0-2.500-2.500h-14A2.500 2.500 0 0 0 3 11.500Z"/><path class="d" d="M7 22h11M7 27h7"/>
+    <g class="a-bob"><rect class="d" x="26" y="13" width="19" height="26" rx="2.500"/><path class="s" d="M26 19h19v-3.500a2.500 2.500 0 0 0-2.500-2.500h-14A2.500 2.500 0 0 0 26 15.500Z"/><path class="d" d="M30 26h11M30 31h7"/></g>`,
+  buriedOrder: `
+    <rect x="4" y="6" width="40" height="11" rx="2.500"/>
+    <rect class="d" x="8" y="10" width="4" height="3" rx="1"/><rect class="d" x="14" y="10" width="4" height="3" rx="1"/><rect class="d" x="20" y="10" width="4" height="3" rx="1"/><rect class="d" x="26" y="10" width="4" height="3" rx="1"/><rect class="s a-lit" x="32" y="10" width="4" height="3" rx="1"/><rect class="d" x="38" y="10" width="3" height="3" rx="1"/>
+    <path class="d a-flow" d="M34 19v7" stroke-dasharray="2 3"/>
+    <rect x="22" y="28" width="22" height="15" rx="2.500"/><path class="d" d="M26 34h14M26 38h8"/>`,
+  textInPictures: `
+    <rect x="6" y="5" width="36" height="38" rx="3"/>
+    <circle class="f" cx="33" cy="15" r="4"/><path class="d" d="M6 30l9-8 8 7 6-5 13 9"/>
+    <path class="d" d="M12 37h24"/><path class="d" d="M12 40h14"/>
+    <rect class="f a-scan" x="10" y="8" width="28" height="4" rx="1.500"/>`,
+  emptyAreas: `
+    <rect x="4" y="5" width="40" height="38" rx="3"/><path d="M10 12h16"/>
+    <rect class="d a-blink" x="10" y="19" width="28" height="18" rx="2" stroke-dasharray="3 3"/>
+    <path class="d" d="M16 28h16"/>`,
+  smallErrors: `
+    <path class="d" d="M5 10h22M5 16h14"/><path class="d" d="M5 38h14M29 38h14"/>
+    <path class="f a-glow" d="M24 17l13 22H11Z"/>
+    <path class="a-bob" d="M24 25v6M24 35h.01"/>`,
+  pointsValue: `
+    <circle class="f" cx="13" cy="24" r="9"/><path d="M13 19v10M16 21h-5a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H10"/>
+    <path class="a-nudge" d="M26 24h6M29 21l3 3-3 3"/>
+    <circle class="d" cx="38" cy="24" r="7"/><path class="a-bob" d="M35 27l6-6"/><circle class="s" cx="35.500" cy="21.500" r="1"/><circle class="s" cx="40.500" cy="26.500" r="1"/>`,
+  typefaces: `
+    <path d="M5 38L14 9l9 29M8.500 28h11"/>
+    <path class="f a-blink" d="M27 12h14M34 12v12"/>
+    <path class="a-bob" d="M27 38c3-12 6-12 8-2s5 6 6-4"/>
+    <path class="d a-blink" style="--i:1" d="M27 31h4"/>`,
+  nestedScroll: `
+    <rect x="4" y="5" width="40" height="38" rx="3"/>
+    <rect class="f" x="8" y="10" width="11" height="28" rx="2"/><circle class="s a-blink" cx="13.500" cy="22" r="2"/>
+    <rect class="d" x="23" y="10" width="17" height="28" rx="2"/><path class="d" d="M26 17h8M26 23h8M26 29h8"/>
+    <rect class="f a-scan" x="36" y="12" width="2.500" height="5" rx="1.250"/>`,
+  noProof: `
+    <rect class="f" x="8" y="27" width="32" height="14" rx="3"/><path class="d" d="M8 33h32"/><path class="s" d="M24 21v6" stroke-width="2"/>
+    <path class="a-bob" d="M20.600 6.500a3.600 3.600 0 1 1 4.300 3.500c-1 .4-1.200 1.100-1.200 2M24 17h.01"/>`,
+  // Measures to track after launch
+  cakeOrders: `
+    <path class="d" d="M5 42h38"/>
+    <rect class="f a-lit" x="7" y="28" width="9" height="14" rx="1.500"/><rect class="f a-lit" style="--i:1" x="19" y="19" width="9" height="23" rx="1.500"/><rect class="f a-lit" style="--i:2" x="31" y="9" width="9" height="33" rx="1.500"/>
+    <path class="d a-nudge" d="M9 20l9-6 9-4"/>`,
+  dropOff: `
+    <path d="M6 8h36L29 25v11l-10 5V25Z"/>
+    <circle class="s a-blink" cx="17" cy="14" r="1.500"/><circle class="s a-blink" style="--i:1" cx="25" cy="14" r="1.500"/><circle class="s a-blink" style="--i:2" cx="32" cy="14" r="1.500"/>
+    <path class="d a-exit" d="M33 31h10M40 28l3 3-3 3"/>`,
+  signUps: `
+    <circle cx="19" cy="16" r="6"/><path d="M6 40a13 13 0 0 1 26 0"/>
+    <circle class="f a-press" cx="37" cy="17" r="7"/><path class="a-press" d="M37 13.500v7M33.500 17h7"/>`,
+  orderTime: `
+    <circle cx="24" cy="26" r="16"/>
+    <path class="d" d="M20 4h8M24 4v6"/><path class="d" d="M24 12v2M38 26h-2M24 40v-2M10 26h2"/>
+    <path class="a-hand" d="M24 26V16" style="transform-origin:24px 26px"/><circle class="s" cx="24" cy="26" r="1.600"/>`,
 };

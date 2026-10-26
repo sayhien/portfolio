@@ -8,7 +8,7 @@ import StepList from '../components/StepList.astro';
 import Shot from '../components/Shot.astro';
 import type { Card } from '../components/CardGrid.astro';
 import type { Step } from '../components/StepList.astro';
-import type { IconName } from '../components/Icon.astro';
+import type { RowArtName } from '../components/row-art';
 import { caseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 
@@ -44,7 +44,7 @@ const findings: string[][] = [
   ['Scrolling inside scrolling', 'On store pick up, a region map sits next to a list that scrolls inside the page (“1 out of 31”).', 'User control and freedom'],
   ['No reason to believe', 'Nothing explains where the strawberries, cream or flour come from, so cakes compete on price alone.', 'Beyond the ten rules: trust'],
 ];
-const findingIcons: IconName[] = ['link', 'target', 'layers', 'flask', 'code', 'bars', 'layers', 'target', 'users'];
+const findingArt: RowArtName[] = ['twoSites', 'buriedOrder', 'textInPictures', 'emptyAreas', 'smallErrors', 'pointsValue', 'typefaces', 'nestedScroll', 'noProof'];
 
 const consequences: Card[] = [
   { title: 'Fewer people reach the order', text: 'Every extra click and page change loses some customers. The cake path has the most of them.', label: 'Revenue' },
@@ -81,7 +81,7 @@ const measures: string[][] = [
   ['Membership sign ups', 'New members per week', 'Shows if the points explanation works.'],
   ['Time to order a cake', 'Seconds from the first page to the order confirmation', 'A shorter path should be a faster one.'],
 ];
-const measureIcons: IconName[] = ['bars', 'target', 'users', 'flask'];
+const measureArt: RowArtName[] = ['cakeOrders', 'dropOff', 'signUps', 'orderTime'];
 
 const limits: Card[] = [
   { title: 'No customer research', text: 'I did not interview or survey customers. The findings are an expert review against Nielsen’s ten usability rules, so they are my judgement, not proof.', label: 'Method' },
@@ -123,7 +123,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
     <h2>Discover</h2>
     <p>I walked through the current main site and the separate online shop as a first time customer who wants to order a cake. I judged every page against Nielsen’s ten usability rules, which are common checks for a clear interface.</p>
     <h3 class="sub">Nine problems, and the rule each one breaks</h3>
-    <DataTable caption="Nine problems found on the current Four Leaves websites" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} icons={findingIcons} />
+    <DataTable caption="Nine problems found on the current Four Leaves websites" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} />
     <div class="takeaway">
       <b>The biggest one</b>
       <p>Ordering a cake is the main way the business earns money, and it is the hardest thing to find.</p>
@@ -240,7 +240,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
     <p class="sn">{n('measures')}</p>
     <h2>How I Would Measure It</h2>
     <p>After launch I would watch four numbers. The first two show if ordering got easier. The last two show if the story and the points are working.</p>
-    <DataTable caption="Measures to track after launch" head={['Measure', 'How it is counted', 'Why it matters']} rows={measures} icons={measureIcons} />
+    <DataTable caption="Measures to track after launch" head={['Measure', 'How it is counted', 'Why it matters']} rows={measures} art={measureArt} />
   </section>
 
   <section id="learnings" class="sec">

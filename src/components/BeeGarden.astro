@@ -45,7 +45,7 @@ const { line } = Astro.props;
   }
   .garden-over {
     position: absolute; z-index: 1; top: 96px; left: 0; right: 0;
-    display: grid; justify-items: center; gap: var(--space-4);
+    display: grid; justify-items: center; gap: calc(var(--space-4) * 2);
   }
   .garden-line {
     /* Set like the home hero heading, so the last words on the page land with the same weight as the first. */
@@ -64,7 +64,7 @@ const { line } = Astro.props;
     min-height: 44px; text-decoration: underline; text-underline-offset: 4px;
   }
   .garden-hello:hover { color: var(--accent); }
-  @media (max-width: 700px) { .garden { height: 880px; } .garden-over { top: 64px; gap: var(--space-3); } }
+  @media (max-width: 700px) { .garden { height: 880px; } .garden-over { top: 64px; gap: calc(var(--space-3) * 2); } }
 </style>
 
 <script>

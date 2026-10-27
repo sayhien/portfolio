@@ -1,49 +1,57 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
 import SpaceBand from '../components/SpaceBand.astro';
-import BeforeAfter from '../components/BeforeAfter.astro';
 import DataTable from '../components/DataTable.astro';
 import CardGrid from '../components/CardGrid.astro';
-import StepList from '../components/StepList.astro';
+import ChangeCards from '../components/ChangeCards.astro';
+import OrderSteps from '../components/OrderSteps.astro';
 import Shot from '../components/Shot.astro';
 import type { Card } from '../components/CardGrid.astro';
-import type { Step } from '../components/StepList.astro';
+import type { Change } from '../components/ChangeCards.astro';
 import type { RowArtName } from '../components/row-art';
 import { nextCaseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 
 import afterHome from '../assets/four-leaves/after-home.webp';
-import afterSignature from '../assets/four-leaves/after-signature-cakes.webp';
-import afterOrigin from '../assets/four-leaves/after-origin.webp';
-import afterCakes from '../assets/four-leaves/after-cakes.webp';
-import afterCake from '../assets/four-leaves/after-cake-page.webp';
-import afterRewards from '../assets/four-leaves/after-rewards.webp';
+import stepsCake from '../assets/four-leaves/steps-cake.webp';
+import beforeOrder from '../assets/four-leaves/before-order.webp';
+import beforeLook from '../assets/four-leaves/before-look.webp';
+import beforeOrigin from '../assets/four-leaves/before-origin.webp';
+import beforeLocation from '../assets/four-leaves/before-location.webp';
+import beforePoints from '../assets/four-leaves/before-points.webp';
+import beforeMailing from '../assets/four-leaves/before-mailing.webp';
+import beforeApply from '../assets/four-leaves/before-apply.webp';
+import fixOrder from '../assets/four-leaves/fix-order.webp';
+import fixLook from '../assets/four-leaves/fix-look.webp';
+import fixOrigin from '../assets/four-leaves/fix-origin.webp';
+import fixLocation from '../assets/four-leaves/fix-location.webp';
+import fixPoints from '../assets/four-leaves/fix-points.webp';
+import fixMailing from '../assets/four-leaves/fix-mailing.webp';
+import fixApply from '../assets/four-leaves/fix-apply.webp';
 
 const liveSite = 'https://sayhien.github.io/four-leaves-redesign/';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
   { id: 'discover', title: 'Discover' },
-  { id: 'define', title: 'Define' },
-  { id: 'develop', title: 'Develop' },
-  { id: 'deliver', title: 'Deliver' },
-  { id: 'before-after', title: 'Before and After' },
+  { id: 'fixes', title: 'Problems and Fixes' },
+  { id: 'ordering', title: 'Ordering a Cake' },
   { id: 'measures', title: 'How I Would Measure It' },
-  { id: 'learnings', title: 'Honest Limits and Learnings' },
+  { id: 'learnings', title: 'Limits and Learnings' },
 ];
 const n = sectionNumber(sections);
 
 const findings: string[][] = [
-  ['Ordering is buried', '“Shop Online” is one of eight equal links split around the logo. There is no main button, and it opens a second website. Cakes are the main source of sales, so every person who cannot find the way to order is a sale lost at the front door.', '7. Flexibility and efficiency of use'],
-  ['Disjointed and dated look', 'The main site and the online shop look like two different brands. Mixed colours, bars, footers and typefaces make the whole site feel patched together and dated.', '4. Consistency and standards'],
-  ['Nothing makes you want the cake', 'Nothing explains where the strawberries, cream or flour come from, or who bakes the cake. With no story to believe in, a cake is only a photo and a price, so shoppers compare on price and cheaper shops win.', 'Beyond the ten rules: trust'],
-  ['Location is hard to use', 'The “click here to find location” link does not work, and outlets show only a street address. People must copy it into a map app, and unless they know the area they cannot tell where it is.', '6. Recognition rather than recall'],
-  ['Points are hard to value', '“$2 spent = 1 point” and “60 points = $5” make customers do the maths. Nothing says it is about 4 to 6% back.', '2. Match between the system and the real world'],
-  ['Mailing list is not inviting', 'The sign up is a plain email box on a photo. Nothing shows what people would get, such as new cakes, outlet openings or seasonal bakes, so there is little reason to share an email.', 'Beyond the ten rules: motivation'],
-  ['Apply is far from the role', 'After reading a role, people must go to the application form button at the bottom of the page, instead of applying right where the role is described.', '7. Flexibility and efficiency of use'],
-  ['Too many typefaces', 'I counted ten different typefaces across the two sites. They feel inconsistent, and that can quietly change how people see the Four Leaves brand.', '4. Consistency and standards'],
-  ['Weak contrast', 'White text on the tan cake tabs measures about 3.2 to 1, below the 4.5 to 1 minimum for small text. The footer text and the headline over the factory photo only just pass.', 'Beyond the ten rules: accessibility'],
-  ['A message box with no form', 'The contact page says “Leave Us A Message” but shows no form.', '4. Consistency and standards'],
+  ['Ordering is buried', '“Shop Online” is one of eight links of the same size. There is no main button. The link opens a second website. Cakes earn the most money, so each lost visitor is a lost sale.', '7. Flexibility and efficiency of use'],
+  ['Disjointed and dated look', 'The main site and the shop look like two different brands. The mix of colours, bars, footers and typefaces makes the site look old and patched together.', '4. Consistency and standards'],
+  ['Nothing makes you want the cake', 'The site does not say where the strawberries, cream or flour come from, or who bakes the cake. So people compare on price only, and cheaper shops win.', 'Beyond the ten rules: trust'],
+  ['Location is hard to use', 'The “click here to find location” link does not work. Each outlet shows only a street address, so people must copy it into a map app.', '6. Recognition rather than recall'],
+  ['Points are hard to value', '“$2 spent = 1 point” and “60 points = $5” make people do the maths. The site does not say this is about 4 to 6% back.', '2. Match between the system and the real world'],
+  ['Mailing list is not inviting', 'The sign up is only an email box on a photo. It does not show what people get, such as new cakes or outlet openings.', 'Beyond the ten rules: motivation'],
+  ['Apply is far from the role', 'To apply for a job, people must find the form button at the bottom of the page. The button is not next to the role.', '7. Flexibility and efficiency of use'],
+  ['Too many typefaces', 'I counted ten different typefaces on the two sites. This makes the brand look less consistent.', '4. Consistency and standards'],
+  ['Weak contrast', 'White text on the tan cake tabs has a contrast of about 3.2 to 1. The minimum for small text is 4.5 to 1.', 'Beyond the ten rules: accessibility'],
+  ['A message box with no form', 'The contact page says “Leave Us A Message”, but it has no form.', '4. Consistency and standards'],
 ];
 const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[] = [
   { label: 'Critical', level: 'critical' },
@@ -54,42 +62,78 @@ const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low
 ];
 const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast', 'emptyAreas'];
 
-const howMightWe: Card[] = [
-  { title: 'Order from anywhere', text: 'How might we put cake ordering one click from every page?' },
-  { title: 'Prove the quality', text: 'How might we show the people and places behind the ingredients?' },
-  { title: 'Make points plain', text: 'How might we show what points are worth in simple numbers, right when someone buys?' },
-  { title: 'One calm brand', text: 'How might we make browsing and buying feel like the same shop?' },
+const changes: Change[] = [
+  {
+    problem: 'Ordering is buried',
+    title: 'One Order button on every page',
+    text: 'People browse and buy on one website. The “Order cakes” button stays in the header on every page.',
+    before: beforeOrder, beforeAlt: 'Old header: eight links of the same size around the logo, with Shop Online among them',
+    after: fixOrder, afterAlt: 'New header with an Order cakes button, above an Order a cake button on the home page',
+  },
+  {
+    problem: 'Disjointed and dated look',
+    title: 'One warm patisserie look',
+    text: 'A French patisserie style with Asian nostalgia. One serif for headings and one rounded Japanese font for text.',
+    before: beforeLook, beforeAlt: 'Old online shop: a black top bar, small grey menu and a flat green banner',
+    after: fixLook, afterAlt: 'New cake cards on a cream page, each with sizes, prices and points',
+  },
+  {
+    problem: 'Nothing makes you want the cake',
+    title: 'Stories of where it begins',
+    text: 'Short films and photos show the growers and farms. A face and a place make quality easy to believe.',
+    before: beforeOrigin, beforeAlt: 'Old cake grid: a photo and a name only',
+    after: fixOrigin, afterAlt: 'New Where it begins section with a strawberry greenhouse and a peach grower',
+  },
+  {
+    problem: 'Location is hard to use',
+    title: 'Outlets on a map',
+    text: 'A map of Singapore shows each region. Every outlet has a Directions link that opens the map app.',
+    before: beforeLocation, beforeAlt: 'Old outlet list: names only, in two long columns',
+    after: fixLocation, afterAlt: 'New outlet finder with a map of Singapore and a Directions link for each outlet',
+  },
+  {
+    problem: 'Points are hard to value',
+    title: 'Points shown as money',
+    text: 'Each voucher shows its points and how much money comes back, up to 6%.',
+    before: beforePoints, beforeAlt: 'Old rewards page: $2 spent equals 1 point, and a table of points for vouchers',
+    after: fixPoints, afterAlt: 'New rewards page: three vouchers, each with the percentage returned',
+  },
+  {
+    problem: 'Mailing list is not inviting',
+    title: 'A mailing list with reasons',
+    text: 'Small drawings show what people get: new cakes, seasonal bakes and outlet openings.',
+    before: beforeMailing, beforeAlt: 'Old mailing list: an email box on a photo of cakes',
+    after: fixMailing, afterAlt: 'New mailing list with drawings of new cakes, seasonal bakes and outlet openings',
+  },
+  {
+    problem: 'Apply is far from the role',
+    title: 'Apply inside each role',
+    text: 'Each role has its own “Apply for this role” button, right below the role details.',
+    before: beforeApply, beforeAlt: 'Old careers page: role details with no apply button nearby',
+    after: fixApply, afterAlt: 'New role card with an Apply for this role button under the details',
+  },
 ];
 
-const ideas: Card[] = [
-  { title: 'One website', text: 'Browsing and ordering together, with an “Order cakes” button always in the header.', label: 'Structure' },
-  { title: 'Four step ordering', text: 'Choose, personalise with a free message, pick an outlet and a two hour slot, then collect. An account is optional.', label: 'Flow' },
-  { title: 'Origin stories', text: 'Short films and photos of the growers and farms. A story and a face make quality believable: storytelling, authority and social proof.', label: 'Persuasion' },
-  { title: 'Points made concrete', text: '“Up to 6% back on every cake”, a table of what points are worth, and a worked example.', label: 'Value' },
-  { title: 'A patisserie shop front', text: 'A warm French patisserie look, softened with Asian nostalgia. A cream page, a scalloped awning edge on the header and one serif for headings, so the whole site feels like one comforting shop.', label: 'Look' },
-  { title: 'An inviting mailing list', text: 'Small illustrations of cakes, outlet openings and seasonal bakes, with a line on what each email brings, give people a reason to leave their address.', label: 'Growth' },
-];
-
-const orderingSteps: Step[] = [
-  { title: 'Choose', text: 'Seven signature cakes with the price and size on the card. Picking a size changes the price at once, so there are no surprises later.', img: afterSignature, alt: 'Three cake cards on a cream page, each with sizes, prices and an Add to order button' },
-  { title: 'Personalise', text: 'A free message on every cake, with a short hint about how many letters fit.', img: afterCake, alt: 'Chocolate Classico cake page with a photo gallery, three size options and a message field' },
-  { title: 'Collection', text: 'Pick an outlet, a date and a two hour slot. Slots are written plainly, such as 11am to 1pm.' },
-  { title: 'Collect', text: 'Show up and collect. No account is needed, and members simply see their past orders.' },
+const orderSteps = [
+  { title: 'Choose', text: 'Pick a cake and a size. The price changes at once.' },
+  { title: 'Personalise', text: 'Add a free message to the cake.' },
+  { title: 'Collection', text: 'Choose an outlet, a date and a two hour slot.' },
+  { title: 'Collect', text: 'Show your order at the outlet. You do not need an account.' },
 ];
 
 const measures: string[][] = [
-  ['Online cake orders', 'Count of completed orders per week', 'Ordering is the main revenue driver.'],
-  ['Drop off before payment', 'Share of people who open a cake page but do not pay', 'Shows where the path still loses people.'],
-  ['Membership sign ups', 'New members per week', 'Shows if the points explanation works.'],
-  ['Time to order a cake', 'Seconds from the first page to the order confirmation', 'A shorter path should be a faster one.'],
+  ['Online cake orders', 'Orders completed each week', 'Cakes earn the most money.'],
+  ['Drop off before payment', 'People who open a cake page but do not pay', 'Shows where the path still loses people.'],
+  ['Membership sign ups', 'New members each week', 'Shows if the points table works.'],
+  ['Time to order a cake', 'Seconds from the first page to the order confirmation', 'A shorter path should be faster.'],
 ];
 const measureArt: RowArtName[] = ['cakeOrders', 'dropOff', 'signUps', 'orderTime'];
 
 const limits: Card[] = [
-  { title: 'No customer research', text: 'I did not interview or survey customers. The findings are an expert review against Nielsen’s ten usability rules, so they are my judgement, not proof.', label: 'Method' },
-  { title: 'Most media is AI generated', text: 'Only the cake, career and company pictures are real. The films, grower portraits and the grower quote are AI generated and made up, to show the idea. Real photography would replace them.', label: 'Media' },
-  { title: 'The old site is shown as redraws', text: 'The “before” pictures are simple redraws from my audit notes, not screenshots, and are labelled that way.', label: 'Evidence' },
-  { title: 'Next step', text: 'Test with five customers: ask where they would order a cake, and time how long a first order takes.', label: 'Learning' },
+  { title: 'No customer research', text: 'I did not talk to customers. The problems come from my review against the ten usability rules.', label: 'Method' },
+  { title: 'Most media is AI generated', text: 'Only the cake, career and company photos are real. The films, grower photos and quote are AI generated to show the idea.', label: 'Media' },
+  { title: 'The points terms do not match', text: 'The terms say 120 points for a $20 voucher. The rewards page says 160. I would tell the client before launch.', label: 'Found' },
+  { title: 'Next step', text: 'Test with five customers. Ask where they would order a cake, and time the first order.', label: 'Learning' },
 ];
 
 const next = nextCaseLinks('four-leaves');
@@ -97,8 +141,8 @@ const next = nextCaseLinks('four-leaves');
 <CaseStudy
   title="Four Leaves Redesign, a UX case study by Loo Say Hien"
   kicker="Concept project, a bakery in Singapore"
-  heading="A bakery that sells cakes, with ordering hidden on another website."
-  lede="A self started redesign of the Four Leaves bakery website. I moved cake ordering to the front, told the story behind the ingredients, and made the points scheme easy to value."
+  heading="Cakes earn the most money. But the order button was hard to find."
+  lede="I redesigned the Four Leaves bakery website. Now people can order a cake from every page."
   meta={[
     { label: 'Role', value: 'UX Designer, sole designer on the project' },
     { label: 'Type', value: 'Self started concept redesign' },
@@ -112,158 +156,66 @@ const next = nextCaseLinks('four-leaves');
   <section id="introduction" class="sec">
     <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
-    <p class="big">Four Leaves has baked in Singapore since 1981. Most of its sales come from cakes, yet to order one you have to leave the main website for a second shop.</p>
-    <p>I redesigned the website to fix that. I worked backwards from the finished design, using the Double Diamond to explain each step: <b>Discover</b> the problems, <b>Define</b> the one to solve, <b>Develop</b> ideas, and <b>Deliver</b> the result.</p>
-    <p>This is a concept. I have no link with the company, and I did not talk to customers. The last section is open about what that means.</p>
+    <p class="big">Four Leaves has baked in Singapore since 1981. Cakes earn most of its money. But to order a cake, people must leave the main website for a second shop.</p>
+    <p>I redesigned the website to fix this. This is a concept. I have no link with the company, and I did not talk to customers.</p>
     <p><a href={liveSite} target="_blank" rel="noopener">Try the redesigned website</a></p>
-    <Shot src={afterHome} alt="The redesigned Four Leaves home page: a green header with a scalloped edge, a baker’s film behind the words A Singapore bakery since 1981, and an Order a cake button" caption="The redesigned home page. The Order cakes button sits in the header on every page." frame />
+    <Shot src={afterHome} alt="The new Four Leaves home page: a green header with a scalloped edge, a film of the bakers, and an Order a cake button" caption="The new home page. The Order cakes button is in the header on every page." frame />
   </section>
 
   <section id="discover" class="sec">
     <SpaceBand name="station" />
     <p class="sn">{n('discover')}</p>
     <h2>Discover</h2>
-    <p>I walked through the current main site and the separate online shop as a first time customer who wants to order a cake. I judged every page against Nielsen’s ten usability rules, which are common checks for a clear interface.</p>
-    <h3 class="sub">Ten problems, rated by how much they hurt cake sales</h3>
-    <p>Critical stops an order. High weakens the reason to order. Medium adds effort or doubt. Low is polish. The ratings are my judgement, not measured loss.</p>
-    <DataTable caption="Ten problems found on the current Four Leaves websites, most critical first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
+    <p>I used the main site and the online shop as a new customer who wants a cake. I checked each page against Nielsen’s ten usability rules.</p>
+    <h3 class="sub">Ten problems, most serious first</h3>
+    <p>Critical stops an order. High gives less reason to order. Medium adds effort or doubt. Low is a small fix. These ratings are my judgement.</p>
+    <DataTable caption="Ten problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
     <div class="takeaway">
       <b>Critical: fix this first</b>
-      <p>Ordering a cake is the main way the business earns money, and it is the hardest thing to find. Nothing else on this list matters as much, because every other fix only helps people who can already reach the order.</p>
+      <p>Cakes earn the most money, but ordering is the hardest thing to find. The other fixes only help people who can find the order.</p>
     </div>
   </section>
 
-  <section id="define" class="sec">
-    <p class="sn">{n('define')}</p>
-    <h2>Define</h2>
-    <p class="big">Busy customers who want a celebration cake cannot order it in one smooth path, and nothing on the site shows why the cakes are worth the price.</p>
-    <p>The business goal is to grow online cake orders and membership sign ups. I turned the problem into four questions to guide the ideas.</p>
-    <CardGrid items={howMightWe} numbered />
+  <section id="fixes" class="sec">
+    <p class="sn">{n('fixes')}</p>
+    <h2>Problems and Fixes</h2>
+    <p>The goal: more online cake orders and more members. Each fix solves one problem. The small picture is the old site, from October 2026.</p>
+    <ChangeCards items={changes} />
   </section>
 
-  <section id="develop" class="sec">
-    <p class="sn">{n('develop')}</p>
-    <h2>Develop</h2>
-    <p>Each idea answers one of the four questions. The origin stories came from marketing psychology: people trust quality they can see, and a face and a place make it easier to believe.</p>
-    <CardGrid items={ideas} />
-  </section>
-
-  <section id="deliver" class="sec">
-    <p class="sn">{n('deliver')}</p>
-    <h2>Deliver</h2>
-    <p>The redesign covers the home page, the cake catalogue, a page for each cake, rewards, outlets, careers and promotions, all in one calm system. Ordering takes four steps.</p>
-    <StepList items={orderingSteps} />
-    <h3 class="sub">Filters that match how people choose a cake</h3>
-    <p>People first think “how many people am I feeding?”, so the catalogue filters by that, then flavour and shape.</p>
-    <Shot src={afterCakes} alt="The Order a cake page with filters for number of people, flavour and shape, above a row of three cakes" caption="The catalogue. Seven cakes, three filters, prices from $35." frame />
-    <h3 class="sub">Something I found while redesigning</h3>
-    <p>The membership terms say 120 points for a $20 voucher, but the rewards page says 160. The banner says “up to 6%”, yet the top tier returns 6.25%. I would flag both to the client before launch.</p>
-  </section>
-
-  <section id="before-after" class="sec">
-    <p class="sn">{n('before-after')}</p>
-    <h2>Before and After</h2>
-    <p>Four changes that matter most. The “before” side is a simple redraw of the old site from my audit notes.</p>
-
-    <BeforeAfter
-      title="Ordering moves to the front"
-      rule="7. Flexibility and efficiency of use"
-      beforeAlt="Redraw of the old header: eight equal links around the logo, one of them Shop Online, which leads to a second website"
-      beforeNote="Eight equal links. Shop Online is one of them and opens a second website."
-      afterImg={afterHome}
-      afterAlt="The new header with the Order cakes button on the right and a main button in the page"
-      afterNote="One main button, Order cakes, always in the header."
-    >
-      <div slot="before" class="wf">
-        <div class="wf-nav">
-          <i class="wf-bar"></i><i class="wf-bar"></i><i class="wf-bar"></i><i class="wf-bar"></i>
-          <b class="wf-logo">Logo</b>
-          <i class="wf-bar"></i><i class="wf-bar"></i><i class="wf-bar"></i><span class="wf-hot">Shop Online</span>
-        </div>
-        <p class="wf-arrow">Opens a second website with a different look</p>
+  <section id="ordering" class="sec">
+    <p class="sn">{n('ordering')}</p>
+    <h2>Ordering a Cake</h2>
+    <p>Ordering now takes four steps, on one website.</p>
+    <OrderSteps steps={orderSteps} img={stepsCake} alt="A strawberry cake with whole strawberries on top and cut strawberries around the side" cta={{ label: 'Try ordering a cake', href: `${liveSite}#cakes` }} />
+    <h3 class="sub">Try the redesign here</h3>
+    <figure class="embed">
+      <div class="shot-frame">
+        <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <iframe src={liveSite} title="The redesigned Four Leaves website, live" loading="lazy"></iframe>
       </div>
-    </BeforeAfter>
-
-    <BeforeAfter
-      title="One website, from browse to pay"
-      rule="4. Consistency and standards"
-      beforeAlt="Redraw of the old path: main website, then a link, then a second shop website with a different logo colour, a black top bar and a different footer"
-      beforeNote="Browse on one site, pay on another that looks different."
-      afterImg={afterCake}
-      afterAlt="A cake page with a photo gallery, three size options with prices, and a message field"
-      afterNote="Sizes, prices and the message are on the cake page itself."
-    >
-      <div slot="before" class="wf">
-        <div class="wf-flow">
-          <div class="wf-box"><b>Main website</b><span>Cream and green</span></div>
-          <span class="wf-go" aria-hidden="true">&rarr;</span>
-          <div class="wf-box wf-dark"><b>Second shop</b><span>Black top bar, different footer</span></div>
-        </div>
-        <p class="wf-arrow">Two looks and two logins at the moment of payment</p>
-      </div>
-    </BeforeAfter>
-
-    <BeforeAfter
-      title="Points that explain themselves"
-      rule="2. Match between the system and the real world"
-      beforeAlt="Redraw of the old points text: two dollars spent equals one point, sixty points equals five dollars"
-      beforeNote="Two small rules. The customer has to work out that it is about 4 to 6% back."
-      afterImg={afterRewards}
-      afterAlt="The Rewards page showing what points are worth: $5 off for 60 points, $10 off for 100 points and $20 off for 160 points, each with the percentage returned"
-      afterNote="Each voucher shows its points and the percentage it returns."
-    >
-      <div slot="before" class="wf">
-        <p class="wf-line">$2 spent = 1 point</p>
-        <p class="wf-line">60 points = $5</p>
-        <p class="wf-arrow">What is that worth?</p>
-      </div>
-    </BeforeAfter>
-
-    <BeforeAfter
-      title="A reason to believe the cake"
-      rule="Beyond the ten rules: trust"
-      beforeAlt="Redraw of an old cake card: a photo and a name only, with no word about where the ingredients come from"
-      beforeNote="A photo and a name. Nothing about where the strawberries or cream come from."
-      afterImg={afterOrigin}
-      afterAlt="The Where it begins section: A cake is only as good as the hands it passes through, with two films of a strawberry greenhouse and a peach grower"
-      afterNote="Films and photos of the growers and places. These are AI generated for the concept."
-    >
-      <div slot="before" class="wf">
-        <div class="wf-photo">Cake photo</div>
-        <p class="wf-line">Cake name</p>
-        <p class="wf-arrow">No story, no source</p>
-      </div>
-    </BeforeAfter>
+      <figcaption>The live redesign. <a href={liveSite} target="_blank" rel="noopener">Open it in a new tab</a> for the full size.</figcaption>
+    </figure>
   </section>
 
   <section id="measures" class="sec">
     <p class="sn">{n('measures')}</p>
     <h2>How I Would Measure It</h2>
-    <p>After launch I would watch four numbers. The first two show if ordering got easier. The last two show if the story and the points are working.</p>
+    <p>After launch, I would track four numbers.</p>
     <DataTable caption="Measures to track after launch" head={['Measure', 'How it is counted', 'Why it matters']} rows={measures} art={measureArt} />
   </section>
 
   <section id="learnings" class="sec">
     <p class="sn">{n('learnings')}</p>
-    <h2>Honest Limits and Learnings</h2>
-    <p>A concept can show good thinking, but it cannot show results. Here is what to keep in mind.</p>
+    <h2>Limits and Learnings</h2>
+    <p>A concept shows thinking, not results.</p>
     <CardGrid items={limits} />
   </section>
 </CaseStudy>
 
 <style>
-  /* Simple redraws of the old site, built from plain blocks. */
-  .wf { display: grid; gap: 14px; justify-items: center; font-size: 14px; color: var(--text); }
-  .wf-nav { display: grid; grid-auto-flow: column; align-items: center; gap: 8px; width: 100%; background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 10px; }
-  .wf-bar { display: block; height: 8px; border-radius: 4px; background: var(--line-2); }
-  .wf-logo { font-family: var(--display); font-size: 15px; text-align: center; padding: 0 6px; }
-  .wf-hot { font-family: var(--mono); font-size: 11px; color: var(--accent); border: 1px solid var(--accent-line); border-radius: 4px; padding: 2px 4px; white-space: nowrap; text-align: center; }
-  .wf-arrow { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; }
-  .wf-flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; width: 100%; }
-  .wf-box { display: grid; gap: 4px; justify-items: center; text-align: center; padding: 14px 8px; background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; }
-  .wf-box span { font-size: 12px; color: var(--muted); }
-  .wf-dark { background: #0c0e11; border-color: var(--muted); }
-  .wf-go { font-size: 22px; color: var(--accent); }
-  .wf-line { font-family: var(--mono); font-size: 15px; background: var(--surface); border: 1px solid var(--line-2); border-radius: 6px; padding: 8px 14px; }
-  .wf-photo { width: 70%; aspect-ratio: 16 / 9; display: grid; place-items: center; font-size: 12px; color: var(--muted); background: var(--line); border-radius: 8px; }
+  .embed { margin: var(--space-3) 0 0; }
+  .embed .shot-frame { background: #fff; }
+  .embed iframe { display: block; width: 100%; height: min(78vh, 760px); border: 0; background: #fff; }
+  .embed figcaption { font-size: 14px; color: var(--muted); margin-top: var(--space-1); }
 </style>

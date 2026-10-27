@@ -1,0 +1,55 @@
+---
+// Numbered steps on a line, beside one large product picture, with one
+// button to try the flow. Used for a short ordering path.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+interface Props {
+  steps: { title: string; text: string }[];
+  img: ImageSource;
+  alt: string;
+  cta: { label: string; href: string };
+}
+const { steps, img, alt, cta } = Astro.props;
+---
+<div class="order">
+  <div class="o-copy">
+    <ol class="o-steps">
+      {steps.map((s) => (
+        <li>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))}
+    </ol>
+    <a class="o-cta" href={cta.href} target="_blank" rel="noopener">{cta.label}<span aria-hidden="true">&rarr;</span></a>
+  </div>
+  <div class="o-photo">
+    <SmartImage src={img} alt={alt} widths={[480, 880]} sizes="(max-width: 860px) 100vw, 45vw" />
+  </div>
+</div>
+
+<style>
+  .order { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: var(--space-4); align-items: center; margin-top: var(--space-3); padding: var(--space-4); border-radius: var(--radius); border: 1px solid var(--line); background: radial-gradient(120% 90% at 85% 50%, rgba(110, 231, 183, 0.1), transparent 60%), var(--surface); }
+  .o-copy { display: grid; gap: var(--space-3); justify-items: start; }
+
+  /* A line runs down the left, through the step numbers, to show the order. */
+  .o-steps { list-style: none; margin: 0; padding: 0 0 0 44px; position: relative; display: grid; gap: 14px; counter-reset: step; }
+  .o-steps::before { content: ''; position: absolute; left: 13px; top: 8px; bottom: 8px; width: 2px; background: var(--accent-line); }
+  .o-steps li { position: relative; counter-increment: step; padding: 14px 18px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); }
+  .o-steps li::before { content: counter(step); position: absolute; left: -44px; top: 50%; translate: 0 -50%; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--on-accent); background: var(--accent); }
+  .o-steps h3 { font-size: 19px; }
+  .o-steps p { font-size: 15px; line-height: 1.5; color: var(--text-2); margin-top: 2px; }
+
+  .o-cta { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 8px 0 22px; border-radius: 999px; background: var(--text); color: var(--bg); font-weight: 600; text-decoration: none; }
+  .o-cta span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); }
+  .o-cta:hover span { translate: 3px 0; }
+  .o-photo :global(img) { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius); }
+
+  @media (max-width: 860px) {
+    .order { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
+    .o-photo { order: -1; }
+    .o-photo :global(img) { aspect-ratio: 16 / 10; }
+  }
+  @media (prefers-reduced-motion: no-preference) { .o-cta span { transition: translate 0.2s; } }
+</style>

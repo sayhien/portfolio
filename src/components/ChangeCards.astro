@@ -1,0 +1,66 @@
+---
+// Problem and fix cards. Each card names the problem, the fix in one line,
+// and shows a cutout of the new design with a small cutout of the old one on
+// top, so text and picture tell the same story. Cards zigzag in two columns,
+// like the persona cards, and stack on small screens.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+export type Change = {
+  problem: string;
+  title: string;
+  text: string;
+  before: ImageSource;
+  beforeAlt: string;
+  after: ImageSource;
+  afterAlt: string;
+};
+interface Props {
+  items: Change[];
+}
+const { items } = Astro.props;
+---
+<ul class="changes">
+  {items.map((c, i) => (
+    <li class="change" style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
+      <p class="c-problem"><span>Problem</span>{c.problem}</p>
+      <h3>{c.title}</h3>
+      <p class="c-text">{c.text}</p>
+      <div class="c-visual">
+        <figure class="c-after">
+          <SmartImage src={c.after} alt={c.afterAlt} widths={[480, 840]} sizes="(max-width: 700px) 90vw, 440px" />
+          <figcaption class="chip">After</figcaption>
+        </figure>
+        <figure class="c-before">
+          <SmartImage src={c.before} alt={c.beforeAlt} widths={[320, 640]} sizes="(max-width: 700px) 50vw, 240px" />
+          <figcaption class="chip chip-before">Before</figcaption>
+        </figure>
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .changes { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
+  .change { grid-row: var(--row) / span 2; grid-column: var(--col); display: grid; align-content: start; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  .c-problem { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2); }
+  .c-problem span { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .change h3 { font-size: 24px; color: var(--accent); }
+  .c-text { font-size: 16px; line-height: 1.55; color: var(--text); }
+
+  /* The new design sits large on a soft circle; the old one overlaps its lower corner. */
+  .c-visual { position: relative; margin-top: var(--space-2); padding: 18px 0 64px 18%; }
+  .c-visual::before { content: ''; position: absolute; inset: 0 8% 8% 22%; border-radius: 50%; background: radial-gradient(circle, var(--accent-soft), transparent 70%); }
+  figure { position: relative; margin: 0; }
+  figure :global(img) { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; }
+  .c-after :global(img) { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
+  .c-before { position: absolute; left: 0; bottom: 0; width: 52%; }
+  .c-before :global(img) { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5); }
+  .chip { position: absolute; top: 8px; left: 8px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
+  .chip-before { background: #2a2f36; color: var(--text); border: 1px solid var(--line-2); }
+
+  @media (max-width: 700px) {
+    .changes { grid-template-columns: minmax(0, 1fr); row-gap: var(--gap-card); }
+    .change { grid-row: auto; grid-column: auto; padding: var(--space-2); }
+  }
+</style>

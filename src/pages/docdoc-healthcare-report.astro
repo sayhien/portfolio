@@ -9,7 +9,7 @@ import type { Step } from '../components/StepList.astro';
 import StatCompare from '../components/StatCompare.astro';
 import Shot from '../components/Shot.astro';
 import YouTube from '../components/YouTube.astro';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
 import { sectionNumber } from '../layouts/sections';
 
@@ -64,7 +64,7 @@ const learnings: Card[] = [
   { icon: 'pending', title: 'Insurance pivot', text: 'The project was paused when the company made a full pivot of its insurtech product to a new priority.' },
 ];
 
-const next = caseLinks(['swipe-remittance-app', 'docdoc-library']);
+const next = nextCaseLinks('docdoc-healthcare-report');
 ---
 <CaseStudy
   title="Healthcare Report, a UX case study by Loo Say Hien"

@@ -8,7 +8,7 @@ import type { Card } from '../components/CardGrid.astro';
 import StatCompare from '../components/StatCompare.astro';
 import Shot from '../components/Shot.astro';
 import YouTube from '../components/YouTube.astro';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
 import { sectionNumber } from '../layouts/sections';
 
@@ -84,7 +84,7 @@ const reading = [
   { title: 'Our target audience doesn’t want to use our remittance app, part 2', href: 'https://medium.com/@arctic_ocean/our-target-audience-doesnt-want-to-use-our-remittance-app-part-2-d57b427c7500' },
 ];
 
-const next = caseLinks(['esg-reporting-module', 'docdoc-healthcare-report']);
+const next = nextCaseLinks('swipe-remittance-app');
 ---
 <CaseStudy
   title="Swipe Remittance, a UX case study by Loo Say Hien"

@@ -9,7 +9,7 @@ import type { Sketch } from '../components/PageMap.astro';
 import type { RowArtName } from '../components/row-art';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
 import { sectionNumber } from '../layouts/sections';
 
@@ -109,7 +109,7 @@ const outcomes: Card[] = [
   { icon: 'compass', label: 'Self qualifying', title: 'Prospects decide for themselves', text: 'The client now has a page that lets prospects qualify themselves, with clearer information at every step.' },
 ];
 
-const next = caseLinks(['docdoc-breadcrumb', 'esg-reporting-module']);
+const next = nextCaseLinks('ai-chatbot');
 const prototype = 'https://simplifynext-bot.framer.website/';
 ---
 <CaseStudy

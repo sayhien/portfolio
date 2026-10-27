@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import CaseStudy from '../layouts/CaseStudy.astro';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 import YouTube from '../components/YouTube.astro';
 import JourneyMap from '../components/JourneyMap.astro';
@@ -168,7 +168,7 @@ const challenges: Challenge[] = [
   },
 ];
 
-const next = caseLinks(['ai-chatbot', 'swipe-remittance-app']);
+const next = nextCaseLinks('esg-reporting-module');
 ---
 <CaseStudy
   title="ESG Reporting Module, a UX case study by Loo Say Hien"

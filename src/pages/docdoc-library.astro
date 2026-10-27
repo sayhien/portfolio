@@ -6,7 +6,7 @@ import type { Card } from '../components/CardGrid.astro';
 import StepList from '../components/StepList.astro';
 import type { Step } from '../components/StepList.astro';
 import Shot from '../components/Shot.astro';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
 import { sectionNumber } from '../layouts/sections';
 
@@ -80,7 +80,7 @@ const impact: Card[] = [
   { icon: 'layers', title: 'Consistency at scale', text: 'As the product grew, new parts looked and worked like the rest, keeping the experience clear and unified.' },
 ];
 
-const next = caseLinks(['docdoc-healthcare-report', 'docdoc-breadcrumb']);
+const next = nextCaseLinks('docdoc-library');
 ---
 <CaseStudy
   title="DocDoc Design Library, a UX case study by Loo Say Hien"

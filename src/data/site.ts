@@ -145,6 +145,18 @@ export const projects: Project[] = [
   },
 ];
 
+/**
+ * The next case studies after this one, in home page order, wrapping round to the start.
+ * Each page shows a different pair, and every case study is suggested equally often.
+ */
+export function nextCaseLinks(slug: string, count = 2) {
+  const pages = projects.filter((item) => item.href && !item.external);
+  const at = pages.findIndex((item) => item.slug === slug);
+  if (at < 0) throw new Error(`No case study page for "${slug}"`);
+  const picks = Array.from({ length: Math.min(count, pages.length - 1) }, (_, i) => pages[(at + 1 + i) % pages.length].slug);
+  return caseLinks(picks);
+}
+
 /** Links to other case studies, in the order given, for the end of a case study page. */
 export function caseLinks(slugs: string[]) {
   const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');

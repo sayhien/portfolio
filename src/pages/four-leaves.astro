@@ -9,7 +9,7 @@ import Shot from '../components/Shot.astro';
 import type { Card } from '../components/CardGrid.astro';
 import type { Step } from '../components/StepList.astro';
 import type { RowArtName } from '../components/row-art';
-import { caseLinks } from '../data/site';
+import { nextCaseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 
 import afterHome from '../assets/four-leaves/after-home.webp';
@@ -34,16 +34,16 @@ const sections = [
 const n = sectionNumber(sections);
 
 const findings: string[][] = [
-  ['Ordering is buried', '“Shop Online” is one of eight equal links split around the logo. There is no main button, and it opens a second website. Cakes are the main source of sales, so every person who cannot find the way to order is a sale lost at the front door.', 'Aesthetic and minimalist design'],
-  ['Disjointed and dated look', 'The main site and the online shop look like two different brands, with other logo colours, a black top bar and an older footer. The whole feel is clunky and old, which does not suit a bakery people trust with birthdays and weddings.', 'Consistency and standards'],
+  ['Ordering is buried', '“Shop Online” is one of eight equal links split around the logo. There is no main button, and it opens a second website. Cakes are the main source of sales, so every person who cannot find the way to order is a sale lost at the front door.', '7. Flexibility and efficiency of use'],
+  ['Disjointed and dated look', 'The main site and the online shop look like two different brands. Mixed colours, bars, footers and typefaces make the whole site feel patched together and dated.', '4. Consistency and standards'],
   ['Nothing makes you want the cake', 'Nothing explains where the strawberries, cream or flour come from, or who bakes the cake. With no story to believe in, a cake is only a photo and a price, so shoppers compare on price and cheaper shops win.', 'Beyond the ten rules: trust'],
-  ['Location is hard to use', 'The “click here to find location” link does not work, and outlets show only a street address. People must copy it into a map app, and unless they know the area they cannot tell where it is.', 'Flexibility and efficiency of use'],
-  ['Points are hard to value', '“$2 spent = 1 point” and “60 points = $5” make customers do the maths. Nothing says it is about 4 to 6% back.', 'Match with the real world'],
+  ['Location is hard to use', 'The “click here to find location” link does not work, and outlets show only a street address. People must copy it into a map app, and unless they know the area they cannot tell where it is.', '6. Recognition rather than recall'],
+  ['Points are hard to value', '“$2 spent = 1 point” and “60 points = $5” make customers do the maths. Nothing says it is about 4 to 6% back.', '2. Match between the system and the real world'],
   ['Mailing list is not inviting', 'The sign up is a plain email box on a photo. Nothing shows what people would get, such as new cakes, outlet openings or seasonal bakes, so there is little reason to share an email.', 'Beyond the ten rules: motivation'],
-  ['Apply is far from the role', 'After reading a role, people must go to the application form button at the bottom of the page, instead of applying right where the role is described.', 'Flexibility and efficiency of use'],
-  ['Too many typefaces', 'I counted ten different typefaces across the two sites. They feel inconsistent, and that can quietly change how people see the Four Leaves brand.', 'Consistency and standards'],
-  ['Weak contrast', 'White text on the tan cake tabs measures about 3.2 to 1, below the 4.5 to 1 minimum for small text. The footer text and the headline over the factory photo only just pass.', 'Accessibility'],
-  ['A message box with no form', 'The contact page says “Leave Us A Message” but shows no form.', 'Visibility of system status'],
+  ['Apply is far from the role', 'After reading a role, people must go to the application form button at the bottom of the page, instead of applying right where the role is described.', '7. Flexibility and efficiency of use'],
+  ['Too many typefaces', 'I counted ten different typefaces across the two sites. They feel inconsistent, and that can quietly change how people see the Four Leaves brand.', '4. Consistency and standards'],
+  ['Weak contrast', 'White text on the tan cake tabs measures about 3.2 to 1, below the 4.5 to 1 minimum for small text. The footer text and the headline over the factory photo only just pass.', 'Beyond the ten rules: accessibility'],
+  ['A message box with no form', 'The contact page says “Leave Us A Message” but shows no form.', '4. Consistency and standards'],
 ];
 const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[] = [
   { label: 'Critical', level: 'critical' },
@@ -53,13 +53,6 @@ const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low
   { label: 'Low', level: 'low' },
 ];
 const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast', 'emptyAreas'];
-
-const consequences: Card[] = [
-  { title: 'Sales leak at the front door', text: 'Cakes are the main source of sales. Every person who cannot find how to order, or who gives up when the site switches to a second one, is a sale lost before it starts.', label: 'Revenue' },
-  { title: 'Payment feels risky', text: 'The shop looks older than the main site, so people are asked to pay on the page that feels least safe. Some will leave at the last step, after the business has already won their attention.', label: 'Trust' },
-  { title: 'Cakes compete on price', text: 'With no story about ingredients or bakers, a cake is only a photo and a number. Cheaper shops win, and the brand cannot hold a higher price.', label: 'Value' },
-  { title: 'Fewer members and subscribers', text: 'Points are hard to read and the mailing list gives no reason to join, so there are fewer ways to bring customers back for the next promotion or season.', label: 'Loyalty' },
-];
 
 const howMightWe: Card[] = [
   { title: 'Order from anywhere', text: 'How might we put cake ordering one click from every page?' },
@@ -99,7 +92,7 @@ const limits: Card[] = [
   { title: 'Next step', text: 'Test with five customers: ask where they would order a cake, and time how long a first order takes.', label: 'Learning' },
 ];
 
-const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
+const next = nextCaseLinks('four-leaves');
 ---
 <CaseStudy
   title="Four Leaves Redesign, a UX case study by Loo Say Hien"
@@ -119,7 +112,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
   <section id="introduction" class="sec">
     <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
-    <p class="big">Four Leaves has baked in Singapore since 1981. Most of its sales come from cakes, yet to order one you have to leave the main website for a second, older shop.</p>
+    <p class="big">Four Leaves has baked in Singapore since 1981. Most of its sales come from cakes, yet to order one you have to leave the main website for a second shop.</p>
     <p>I redesigned the website to fix that. I worked backwards from the finished design, using the Double Diamond to explain each step: <b>Discover</b> the problems, <b>Define</b> the one to solve, <b>Develop</b> ideas, and <b>Deliver</b> the result.</p>
     <p>This is a concept. I have no link with the company, and I did not talk to customers. The last section is open about what that means.</p>
     <p><a href={liveSite} target="_blank" rel="noopener">Try the redesigned website</a></p>
@@ -138,9 +131,6 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
       <b>Critical: fix this first</b>
       <p>Ordering a cake is the main way the business earns money, and it is the hardest thing to find. Nothing else on this list matters as much, because every other fix only helps people who can already reach the order.</p>
     </div>
-    <h3 class="sub">What a buried order costs</h3>
-    <p>I had no sales data, so this is reasoning and not measured loss. Each effect makes the next one worse.</p>
-    <CardGrid items={consequences} />
   </section>
 
   <section id="define" class="sec">
@@ -177,7 +167,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
 
     <BeforeAfter
       title="Ordering moves to the front"
-      rule="Aesthetic and minimalist design"
+      rule="7. Flexibility and efficiency of use"
       beforeAlt="Redraw of the old header: eight equal links around the logo, one of them Shop Online, which leads to a second website"
       beforeNote="Eight equal links. Shop Online is one of them and opens a second website."
       afterImg={afterHome}
@@ -196,9 +186,9 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
 
     <BeforeAfter
       title="One website, from browse to pay"
-      rule="Consistency and standards"
-      beforeAlt="Redraw of the old path: main website, then a link, then a second shop website with a different logo colour, a black top bar and an older footer"
-      beforeNote="Browse on one site, pay on another that looks older."
+      rule="4. Consistency and standards"
+      beforeAlt="Redraw of the old path: main website, then a link, then a second shop website with a different logo colour, a black top bar and a different footer"
+      beforeNote="Browse on one site, pay on another that looks different."
       afterImg={afterCake}
       afterAlt="A cake page with a photo gallery, three size options with prices, and a message field"
       afterNote="Sizes, prices and the message are on the cake page itself."
@@ -207,7 +197,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
         <div class="wf-flow">
           <div class="wf-box"><b>Main website</b><span>Cream and green</span></div>
           <span class="wf-go" aria-hidden="true">&rarr;</span>
-          <div class="wf-box wf-dark"><b>Second shop</b><span>Black top bar, older footer</span></div>
+          <div class="wf-box wf-dark"><b>Second shop</b><span>Black top bar, different footer</span></div>
         </div>
         <p class="wf-arrow">Two looks and two logins at the moment of payment</p>
       </div>
@@ -215,7 +205,7 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
 
     <BeforeAfter
       title="Points that explain themselves"
-      rule="Match with the real world"
+      rule="2. Match between the system and the real world"
       beforeAlt="Redraw of the old points text: two dollars spent equals one point, sixty points equals five dollars"
       beforeNote="Two small rules. The customer has to work out that it is about 4 to 6% back."
       afterImg={afterRewards}

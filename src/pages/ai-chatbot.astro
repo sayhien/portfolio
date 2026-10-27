@@ -154,8 +154,8 @@ const prototype = 'https://simplifynext-bot.framer.website/';
     <h2>Psychological Tactics</h2>
     <p>Each tactic on the page is there for named buyers, with a clear reason it works.</p>
     <ul class="tactics">
-      {tactics.map((t) => (
-        <li>
+      {tactics.map((t, i) => (
+        <li style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
           <h3>{t.title}</h3>
           <p class="t-what">{t.what}</p>
           <div class="t-for">
@@ -212,12 +212,12 @@ const prototype = 'https://simplifynext-bot.framer.website/';
 </CaseStudy>
 
 <style>
-  /* One box per row. On wide screens they step left then right, so the eye follows a path down the page. When there is no room to step, they line up. */
-  .tactics { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; gap: var(--space-4); }
-  .tactics > li { display: grid; align-content: start; gap: var(--space-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
-  @media (min-width: 1200px) {
-    .tactics > li { width: 68%; }
-    .tactics > li:nth-child(even) { justify-self: end; }
+  /* The boxes follow the persona cards: two columns, each box spans two half rows and starts one half row below the last, so the eye reads left, right, left. One column on small screens. */
+  .tactics { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
+  .tactics > li { grid-row: var(--row) / span 2; grid-column: var(--col); display: grid; align-content: start; gap: var(--space-2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
+  @media (max-width: 700px) {
+    .tactics { grid-template-columns: minmax(0, 1fr); row-gap: var(--gap-card); }
+    .tactics > li { grid-row: auto; grid-column: auto; }
   }
   .tactics h3 { font-size: 24px; }
   .t-what { font-size: 16px; line-height: 1.55; color: var(--text); }

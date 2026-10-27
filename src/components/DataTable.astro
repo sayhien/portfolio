@@ -15,8 +15,10 @@ interface Props {
   icons?: IconName[];
   /** Or one larger animated picture per row, which explains the row better than an icon. */
   art?: RowArtName[];
+  /** One criticality tag per row, shown under the row name. The words carry the meaning, the colour only helps. */
+  tags?: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[];
 }
-const { caption, head, rows, icons, art } = Astro.props;
+const { caption, head, rows, icons, art, tags } = Astro.props;
 if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`DataTable "${caption}" needs one icon per row`);
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={caption}>
@@ -29,7 +31,7 @@ if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`D
       {rows.map(([first, ...rest], index) => (
         <tr style={`--n:${index}`} data-row={index}>
           <th scope="row">
-            {art ? <span class="row-head"><RowArt name={art[index]} />{first}</span> : icons ? <span class="row-head"><span class="tile" aria-hidden="true"><Icon name={icons[index]} size={18} /></span>{first}</span> : first}
+            {art ? <span class="row-head"><RowArt name={art[index]} /><span class="row-text">{first}{tags && <span class={`tag tag-${tags[index].level}`}>{tags[index].label}</span>}</span></span> : icons ? <span class="row-head"><span class="tile" aria-hidden="true"><Icon name={icons[index]} size={18} /></span>{first}</span> : first}
           </th>
           {rest.map((cell) => <td>{cell}</td>)}
         </tr>
@@ -56,4 +58,10 @@ if ((icons ?? art) && (icons ?? art)!.length !== rows.length) throw new Error(`D
   tbody tr:has(.row-head) > td { color: var(--text); font-size: 17px; line-height: 1.6; }
   tbody tr:has(.row-head) > th { font-size: 16px; }
   thead th { white-space: nowrap; }
+  .row-text { display: grid; gap: 8px; justify-items: start; }
+  .tag { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor; }
+  .tag-critical { color: #ff9b8a; background: rgba(255, 120, 100, 0.12); }
+  .tag-high { color: #f6c46b; background: rgba(246, 196, 107, 0.1); }
+  .tag-medium { color: var(--accent); background: var(--accent-soft); }
+  .tag-low { color: var(--muted); background: transparent; }
 </style>

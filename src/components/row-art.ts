@@ -8,7 +8,8 @@ export type RowArtName =
   | 'diluted' | 'jargon' | 'passive' | 'logos' | 'integration' | 'onesize'
   | 'hero' | 'proof' | 'capabilities' | 'usecases' | 'sandbox' | 'hub' | 'security' | 'cta'
   | 'sandboxRate' | 'testimonialClicks' | 'engagement' | 'bounce'
-  | 'twoSites' | 'buriedOrder' | 'textInPictures' | 'emptyAreas' | 'smallErrors' | 'pointsValue' | 'typefaces' | 'nestedScroll' | 'noProof'
+  | 'twoSites' | 'buriedOrder' | 'emptyAreas' | 'pointsValue' | 'typefaces' | 'noProof'
+  | 'mapPin' | 'mailList' | 'applyFar' | 'lowContrast'
   | 'cakeOrders' | 'dropOff' | 'signUps' | 'orderTime';
 
 export const rowArt: Record<RowArtName, string> = {
@@ -104,19 +105,10 @@ export const rowArt: Record<RowArtName, string> = {
     <rect class="d" x="8" y="10" width="4" height="3" rx="1"/><rect class="d" x="14" y="10" width="4" height="3" rx="1"/><rect class="d" x="20" y="10" width="4" height="3" rx="1"/><rect class="d" x="26" y="10" width="4" height="3" rx="1"/><rect class="s a-lit" x="32" y="10" width="4" height="3" rx="1"/><rect class="d" x="38" y="10" width="3" height="3" rx="1"/>
     <path class="d a-flow" d="M34 19v7" stroke-dasharray="2 3"/>
     <rect x="22" y="28" width="22" height="15" rx="2.500"/><path class="d" d="M26 34h14M26 38h8"/>`,
-  textInPictures: `
-    <rect x="6" y="5" width="36" height="38" rx="3"/>
-    <circle class="f" cx="33" cy="15" r="4"/><path class="d" d="M6 30l9-8 8 7 6-5 13 9"/>
-    <path class="d" d="M12 37h24"/><path class="d" d="M12 40h14"/>
-    <rect class="f a-scan" x="10" y="8" width="28" height="4" rx="1.500"/>`,
   emptyAreas: `
     <rect x="4" y="5" width="40" height="38" rx="3"/><path d="M10 12h16"/>
     <rect class="d a-blink" x="10" y="19" width="28" height="18" rx="2" stroke-dasharray="3 3"/>
     <path class="d" d="M16 28h16"/>`,
-  smallErrors: `
-    <path class="d" d="M5 10h22M5 16h14"/><path class="d" d="M5 38h14M29 38h14"/>
-    <path class="f a-glow" d="M24 17l13 22H11Z"/>
-    <path class="a-bob" d="M24 25v6M24 35h.01"/>`,
   pointsValue: `
     <circle class="f" cx="13" cy="24" r="9"/><path d="M13 19v10M16 21h-5a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H10"/>
     <path class="a-nudge" d="M26 24h6M29 21l3 3-3 3"/>
@@ -126,14 +118,25 @@ export const rowArt: Record<RowArtName, string> = {
     <path class="f a-blink" d="M27 12h14M34 12v12"/>
     <path class="a-bob" d="M27 38c3-12 6-12 8-2s5 6 6-4"/>
     <path class="d a-blink" style="--i:1" d="M27 31h4"/>`,
-  nestedScroll: `
-    <rect x="4" y="5" width="40" height="38" rx="3"/>
-    <rect class="f" x="8" y="10" width="11" height="28" rx="2"/><circle class="s a-blink" cx="13.500" cy="22" r="2"/>
-    <rect class="d" x="23" y="10" width="17" height="28" rx="2"/><path class="d" d="M26 17h8M26 23h8M26 29h8"/>
-    <rect class="f a-scan" x="36" y="12" width="2.500" height="5" rx="1.250"/>`,
   noProof: `
     <rect class="f" x="8" y="27" width="32" height="14" rx="3"/><path class="d" d="M8 33h32"/><path class="s" d="M24 21v6" stroke-width="2"/>
     <path class="a-bob" d="M20.600 6.500a3.600 3.600 0 1 1 4.300 3.500c-1 .4-1.200 1.100-1.200 2M24 17h.01"/>`,
+  mapPin: `
+    <path class="d" d="M5 14l12-5 14 5 12-5v26l-12 5-14-5-12 5Z"/><path class="d" d="M17 9v26M31 14v26"/>
+    <g class="a-bob"><path class="f" d="M24 7a8 8 0 0 1 8 8c0 7-8 15-8 15s-8-8-8-15a8 8 0 0 1 8-8Z"/><circle class="s" cx="24" cy="15" r="2.500"/></g>
+    <path class="d a-flow" d="M9 41c6-2 9 1 15-1" stroke-dasharray="2 3"/>`,
+  mailList: `
+    <rect x="5" y="16" width="38" height="26" rx="3"/><path d="M5 19l19 13 19-13"/>
+    <circle class="s a-blink" cx="14" cy="8" r="1.600"/><circle class="s a-blink" style="--i:1" cx="24" cy="5" r="1.600"/><circle class="s a-blink" style="--i:2" cx="34" cy="8" r="1.600"/>`,
+  applyFar: `
+    <rect x="8" y="4" width="32" height="40" rx="3"/>
+    <path d="M13 11h14"/><path class="d" d="M13 17h22M13 22h22M13 27h16"/>
+    <rect class="f a-press" x="13" y="34" width="22" height="6" rx="3"/>
+    <circle class="s a-scan" cx="44" cy="10" r="1.800"/>`,
+  lowContrast: `
+    <rect x="4" y="10" width="40" height="28" rx="3"/><path class="d" d="M26 10v28"/>
+    <path d="M9 31l5-14 5 14M11 26h6"/>
+    <path class="d a-blink" d="M30 31l5-14 5 14M32 26h6"/>`,
   // Measures to track after launch
   cakeOrders: `
     <path class="d" d="M5 42h38"/>

@@ -34,23 +34,31 @@ const sections = [
 const n = sectionNumber(sections);
 
 const findings: string[][] = [
-  ['Two websites, two looks', 'Ordering lives on a separate shop with a different logo colour, a black top bar, other fonts and an older footer.', 'Consistency and standards'],
-  ['Ordering is buried', '“Shop Online” is one of eight equal links split around the logo. There is no main button, and it opens a second website.', 'Aesthetic and minimalist design'],
-  ['Text inside pictures', 'Promotions are posters. Prices and names cannot be read by a screen reader, searched or zoomed.', 'Accessibility'],
-  ['Empty areas', 'The location page opens with a large blank space. The contact page says “Leave Us A Message” but shows no form.', 'Visibility of system status'],
-  ['Small errors', 'Collection slots read “11:00am to 13:00pm”. The shop footer shows a garbled copyright symbol.', 'Error prevention'],
+  ['Ordering is buried', '“Shop Online” is one of eight equal links split around the logo. There is no main button, and it opens a second website. Cakes are the main source of sales, so every person who cannot find the way to order is a sale lost at the front door.', 'Aesthetic and minimalist design'],
+  ['Disjointed and dated look', 'The main site and the online shop look like two different brands, with other logo colours, a black top bar and an older footer. The whole feel is clunky and old, which does not suit a bakery people trust with birthdays and weddings.', 'Consistency and standards'],
+  ['Nothing makes you want the cake', 'Nothing explains where the strawberries, cream or flour come from, or who bakes the cake. With no story to believe in, a cake is only a photo and a price, so shoppers compare on price and cheaper shops win.', 'Beyond the ten rules: trust'],
+  ['Location is hard to use', 'The “click here to find location” link does not work, and outlets show only a street address. People must copy it into a map app, and unless they know the area they cannot tell where it is.', 'Flexibility and efficiency of use'],
   ['Points are hard to value', '“$2 spent = 1 point” and “60 points = $5” make customers do the maths. Nothing says it is about 4 to 6% back.', 'Match with the real world'],
-  ['Too many typefaces', 'A script face, a heavy display serif and two plain faces compete, so the brand feels busy instead of premium.', 'Consistency and standards'],
-  ['Scrolling inside scrolling', 'On store pick up, a region map sits next to a list that scrolls inside the page (“1 out of 31”).', 'User control and freedom'],
-  ['No reason to believe', 'Nothing explains where the strawberries, cream or flour come from, so cakes compete on price alone.', 'Beyond the ten rules: trust'],
+  ['Mailing list is not inviting', 'The sign up is a plain email box on a photo. Nothing shows what people would get, such as new cakes, outlet openings or seasonal bakes, so there is little reason to share an email.', 'Beyond the ten rules: motivation'],
+  ['Apply is far from the role', 'After reading a role, people must go to the application form button at the bottom of the page, instead of applying right where the role is described.', 'Flexibility and efficiency of use'],
+  ['Too many typefaces', 'I counted ten different typefaces across the two sites. They feel inconsistent, and that can quietly change how people see the Four Leaves brand.', 'Consistency and standards'],
+  ['Weak contrast', 'White text on the tan cake tabs measures about 3.2 to 1, below the 4.5 to 1 minimum for small text. The footer text and the headline over the factory photo only just pass.', 'Accessibility'],
+  ['A message box with no form', 'The contact page says “Leave Us A Message” but shows no form.', 'Visibility of system status'],
 ];
-const findingArt: RowArtName[] = ['twoSites', 'buriedOrder', 'textInPictures', 'emptyAreas', 'smallErrors', 'pointsValue', 'typefaces', 'nestedScroll', 'noProof'];
+const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[] = [
+  { label: 'Critical', level: 'critical' },
+  { label: 'High', level: 'high' }, { label: 'High', level: 'high' },
+  { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
+  { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
+  { label: 'Low', level: 'low' },
+];
+const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast', 'emptyAreas'];
 
 const consequences: Card[] = [
-  { title: 'Fewer people reach the order', text: 'Every extra click and page change loses some customers. The cake path has the most of them.', label: 'Revenue' },
-  { title: 'Trust drops at payment', text: 'The shop looks older than the main site. People are asked to pay on the page that feels least safe.', label: 'Trust' },
-  { title: 'Cakes become a price check', text: 'Without a story, a cake is only a photo and a number, so cheaper shops win.', label: 'Value' },
-  { title: 'Members are not won', text: 'Points are hard to read, so there is little reason to sign up or come back.', label: 'Loyalty' },
+  { title: 'Sales leak at the front door', text: 'Cakes are the main source of sales. Every person who cannot find how to order, or who gives up when the site switches to a second one, is a sale lost before it starts.', label: 'Revenue' },
+  { title: 'Payment feels risky', text: 'The shop looks older than the main site, so people are asked to pay on the page that feels least safe. Some will leave at the last step, after the business has already won their attention.', label: 'Trust' },
+  { title: 'Cakes compete on price', text: 'With no story about ingredients or bakers, a cake is only a photo and a number. Cheaper shops win, and the brand cannot hold a higher price.', label: 'Value' },
+  { title: 'Fewer members and subscribers', text: 'Points are hard to read and the mailing list gives no reason to join, so there are fewer ways to bring customers back for the next promotion or season.', label: 'Loyalty' },
 ];
 
 const howMightWe: Card[] = [
@@ -65,13 +73,14 @@ const ideas: Card[] = [
   { title: 'Four step ordering', text: 'Choose, personalise with a free message, pick an outlet and a two hour slot, then collect. An account is optional.', label: 'Flow' },
   { title: 'Origin stories', text: 'Short films and photos of the growers and farms. A story and a face make quality believable: storytelling, authority and social proof.', label: 'Persuasion' },
   { title: 'Points made concrete', text: '“Up to 6% back on every cake”, a table of what points are worth, and a worked example.', label: 'Value' },
-  { title: 'A patisserie shop front', text: 'A cream page and a scalloped awning edge on the header, with one serif for headings.', label: 'Look' },
+  { title: 'A patisserie shop front', text: 'A warm French patisserie look, softened with Asian nostalgia. A cream page, a scalloped awning edge on the header and one serif for headings, so the whole site feels like one comforting shop.', label: 'Look' },
+  { title: 'An inviting mailing list', text: 'Small illustrations of cakes, outlet openings and seasonal bakes, with a line on what each email brings, give people a reason to leave their address.', label: 'Growth' },
 ];
 
 const orderingSteps: Step[] = [
   { title: 'Choose', text: 'Seven signature cakes with the price and size on the card. Picking a size changes the price at once, so there are no surprises later.', img: afterSignature, alt: 'Three cake cards on a cream page, each with sizes, prices and an Add to order button' },
   { title: 'Personalise', text: 'A free message on every cake, with a short hint about how many letters fit.', img: afterCake, alt: 'Chocolate Classico cake page with a photo gallery, three size options and a message field' },
-  { title: 'Collection', text: 'Pick an outlet, a date and a two hour slot. Slots are written plainly, such as 11am to 1pm, so the old “13:00pm” mistake cannot happen.' },
+  { title: 'Collection', text: 'Pick an outlet, a date and a two hour slot. Slots are written plainly, such as 11am to 1pm.' },
   { title: 'Collect', text: 'Show up and collect. No account is needed, and members simply see their past orders.' },
 ];
 
@@ -122,11 +131,12 @@ const next = caseLinks(['ai-chatbot', 'esg-reporting-module']);
     <p class="sn">{n('discover')}</p>
     <h2>Discover</h2>
     <p>I walked through the current main site and the separate online shop as a first time customer who wants to order a cake. I judged every page against Nielsen’s ten usability rules, which are common checks for a clear interface.</p>
-    <h3 class="sub">Nine problems, and the rule each one breaks</h3>
-    <DataTable caption="Nine problems found on the current Four Leaves websites" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} />
+    <h3 class="sub">Ten problems, rated by how much they hurt cake sales</h3>
+    <p>Critical stops an order. High weakens the reason to order. Medium adds effort or doubt. Low is polish. The ratings are my judgement, not measured loss.</p>
+    <DataTable caption="Ten problems found on the current Four Leaves websites, most critical first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
     <div class="takeaway">
-      <b>The biggest one</b>
-      <p>Ordering a cake is the main way the business earns money, and it is the hardest thing to find.</p>
+      <b>Critical: fix this first</b>
+      <p>Ordering a cake is the main way the business earns money, and it is the hardest thing to find. Nothing else on this list matters as much, because every other fix only helps people who can already reach the order.</p>
     </div>
     <h3 class="sub">What a buried order costs</h3>
     <p>I had no sales data, so this is reasoning and not measured loss. Each effect makes the next one worse.</p>

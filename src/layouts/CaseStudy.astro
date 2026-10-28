@@ -111,8 +111,8 @@ const skyBand = heroSky === 'cake' ? 400 : 300;
   }
   dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   dd { margin: 0; font-size: 16px; line-height: 1.45; }
-  /* On desktop the hero text keeps to the left 60%, leaving the right side to the scene. */
-  @media (min-width: 1001px) {
+  /* On tablets and desktops the hero text keeps to the left 60%, leaving the right side to the scene. */
+  @media (min-width: 761px) {
     .cs-hero > * { max-width: 60%; }
     .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }

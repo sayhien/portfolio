@@ -1,5 +1,5 @@
 ---
-// Numbered steps on a mission trajectory rail: a line runs down the left with
+// Counted steps (1/5, 2/5 ...) on a mission trajectory rail, styled like OrderSteps: a line runs down the left with
 // a glowing node for each step. As the reader scrolls, the line fills with the
 // accent colour and each node lights up when its step is reached. On wide
 // screens a step's picture sits beside its text, swapping sides each step.
@@ -19,7 +19,7 @@ const { items, stacked = false } = Astro.props;
 <ol class:list={['rail', { stacked }]} data-rail>
   {items.map((step, index) => (
     <li class:list={['step', { 'has-img': !!step.img }]} data-rail-step>
-      <span class="node" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+      <span class="node" aria-hidden="true">{index + 1}/{items.length}</span>
       <div class="body">
         <div class="copy">
           <h3>{step.title}</h3>
@@ -37,22 +37,30 @@ const { items, stacked = false } = Astro.props;
 
 <style>
   .rail { --node: 36px; position: relative; list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-5); }
-  /* The track (before) and its glowing fill (after) run from the first node's centre to the last one's. */
-  .rail::before, .rail::after {
-    content: ''; position: absolute; left: calc(var(--node) / 2 - 1px); top: calc(var(--node) / 2); bottom: var(--track-end, 0px); width: 2px;
+  /* The dashed track is the rail's background; the solid fill (before) and the glowing craft at its tip (after)
+     run from the first node's centre to the last one's. */
+  .rail {
+    background: repeating-linear-gradient(to bottom, var(--line-2) 0 6px, transparent 6px 12px) no-repeat;
+    background-position: calc(var(--node) / 2 - 1px) calc(var(--node) / 2);
+    background-size: 2px calc(100% - var(--node) / 2 - var(--track-end, 0px));
   }
-  .rail::before { background: var(--line-2); }
-  .rail::after { background: var(--accent-line); transform-origin: top; transform: scaleY(var(--rail, 1)); }
+  .rail::before {
+    content: ''; position: absolute; left: calc(var(--node) / 2 - 1px); top: calc(var(--node) / 2); bottom: var(--track-end, 0px); width: 2px;
+    background: var(--accent); transform-origin: top; transform: scaleY(var(--rail, 1));
+  }
+  .rail.is-live::after {
+    content: ''; position: absolute; z-index: 0; left: calc(var(--node) / 2 - 6px); top: calc(var(--node) / 2 + var(--rail-px, 0px) - 6px);
+    width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 0 18px var(--accent); pointer-events: none;
+  }
   .step { position: relative; display: grid; grid-template-columns: var(--node) minmax(0, 1fr); column-gap: var(--space-3); align-items: start; }
-  /* A quiet node: an outlined circle with its number. Reached steps take the accent outline. */
+  /* Nodes match OrderSteps: grey until reached, then solid accent. */
   .node {
     position: relative; z-index: 1; width: var(--node); height: var(--node); border-radius: 50%;
-    display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 500;
-    color: var(--accent); background: var(--bg); border: 1px solid var(--accent-line);
-    transition: color 0.4s, border-color 0.4s;
+    display: grid; place-items: center; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--on-accent); background: var(--accent); border: 1px solid var(--accent);
+    transition: background-color 0.4s, color 0.4s, border-color 0.4s;
   }
-  /* Before the reader reaches a step, its node waits in the track's grey. */
-  .rail.is-live .step:not(.is-reached) .node { color: var(--muted); border-color: var(--line-2); }
+  .rail.is-live .step:not(.is-reached) .node { color: var(--text); background: var(--surface-2); border-color: var(--line-2); }
   .body { display: grid; gap: var(--space-3); align-items: center; padding-top: 6px; }
   .has-img .body { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
   .has-img:nth-child(even) .copy { order: 2; }
@@ -68,7 +76,7 @@ const { items, stacked = false } = Astro.props;
   @media (max-width: 760px) {
     .rail { --node: 32px; gap: var(--space-4); }
     .step { column-gap: var(--space-2); }
-    .node { font-size: 11px; }
+    .node { font-size: 10px; }
     .has-img .body { grid-template-columns: minmax(0, 1fr); }
     .has-img:nth-child(even) .copy { order: 0; }
   }
@@ -83,7 +91,9 @@ const { items, stacked = false } = Astro.props;
   function update(rail: HTMLElement, steps: HTMLElement[], nodes: HTMLElement[]) {
     const eye = window.innerHeight * REACH_AT, first = nodes[0].getBoundingClientRect(), last = nodes[nodes.length - 1].getBoundingClientRect();
     const span = Math.max(1, last.top - first.top);
-    rail.style.setProperty('--rail', String(Math.min(1, Math.max(0, (eye - first.top - first.height / 2) / span))));
+    const progress = Math.min(1, Math.max(0, (eye - first.top - first.height / 2) / span));
+    rail.style.setProperty('--rail', String(progress));
+    rail.style.setProperty('--rail-px', `${progress * span}px`);
     steps.forEach((step, index) => step.classList.toggle('is-reached', nodes[index].getBoundingClientRect().top + nodes[index].offsetHeight / 2 <= eye));
   }
 

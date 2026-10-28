@@ -5,7 +5,7 @@
 // its block in the sketch light up together. The sketch is decorative: the
 // table carries all the meaning, so screen readers get the table only.
 import DataTable from './DataTable.astro';
-import type { RowArtName } from './row-art';
+import type { VignetteName } from './vignettes';
 
 /** How each section is drawn in the sketch. */
 export type Sketch = 'hero' | 'videos' | 'cards' | 'rows' | 'chat' | 'logos' | 'badges' | 'button';
@@ -13,11 +13,12 @@ interface Props {
   caption: string;
   head: string[];
   rows: string[][];
-  art?: RowArtName[];
+  /** One spot illustration per row, drawn like that section's block in the sketch. */
+  vignettes?: VignetteName[];
   /** One sketch per row, in the same order as the rows. */
   sketches: Sketch[];
 }
-const { caption, head, rows, art, sketches } = Astro.props;
+const { caption, head, rows, vignettes, sketches } = Astro.props;
 if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs one sketch per row`);
 ---
 <div class="map" data-page-map>
@@ -34,19 +35,21 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
           {kind === 'chat' && <div class="sandbox"><b class="msg out"></b><b class="reply"></b><div class="chips"><b class="chip"></b><b class="chip"></b><b class="chip"></b></div></div>}
           {kind === 'logos' && <div class="trio">{[0, 1, 2, 3, 4].map(() => <b class="logo"></b>)}</div>}
           {kind === 'badges' && <div class="trio">{[0, 1, 2].map(() => <b class="badge"></b>)}</div>}
-          {kind === 'button' && <b class="pill big"></b>}
+          {kind === 'button' && <b class="pill big cta"><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 4h9M7 1l3 3-3 3" /></svg></b>}
         </div>
       ))}
     </div>
   </div>
   <div class="table">
-    <DataTable caption={caption} head={head} rows={rows} art={art} />
+    <DataTable caption={caption} head={head} rows={rows} vignettes={vignettes} />
   </div>
 </div>
 
 <style>
   .map { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: var(--space-4); align-items: start; margin-top: var(--space-3); }
   .map .table :global(.table-wrap) { margin-top: 0; }
+  /* Smaller scenes here, since the sketch shares the width */
+  .map .table :global(.row-head.stacked .uv) { width: 136px; }
   /* The sketch slides down the table so the lit block always sits level with its row. */
   .sketch-wrap { align-self: stretch; }
   .sketch { transform: translateY(var(--slide, 0px)); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
@@ -85,6 +88,10 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .logo { width: 16px; height: 16px; border-radius: 50% !important; }
   .badge { width: 22px; height: 24px; margin-inline: auto; border-radius: 6px 6px 11px 11px !important; }
   .button { min-height: 34px; }
+  /* The call to action carries an arrow, like its picture in the table */
+  .pill.cta { display: grid; place-items: center; background: var(--line-2); }
+  .pill.cta svg { width: 10px; height: 7px; fill: none; stroke: var(--surface); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .block.is-active .pill.cta { background: var(--accent); }
 
   /* The matching table row lights up too. */
   .map :global(tbody tr) { transition: background-color 0.25s; }

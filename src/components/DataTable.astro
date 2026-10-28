@@ -4,8 +4,6 @@
 // scroll sideways inside a focusable box on small screens.
 import Icon from './Icon.astro';
 import type { IconName } from './Icon.astro';
-import RowArt from './RowArt.astro';
-import type { RowArtName } from './row-art';
 import Vignette from './Vignette.astro';
 import type { VignetteName } from './vignettes';
 
@@ -15,15 +13,13 @@ interface Props {
   rows: string[][];
   /** One icon per row, in the same order as the rows. */
   icons?: IconName[];
-  /** Or one larger animated picture per row, which explains the row better than an icon. */
-  art?: RowArtName[];
   /** Or one small UI scene per row, shown above the row name. Best when the row is about a piece of interface. */
   vignettes?: VignetteName[];
   /** One criticality tag per row, shown under the row name. The words carry the meaning, the colour only helps. */
   tags?: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[];
 }
-const { caption, head, rows, icons, art, vignettes, tags } = Astro.props;
-const pictures = icons ?? art ?? vignettes;
+const { caption, head, rows, icons, vignettes, tags } = Astro.props;
+const pictures = icons ?? vignettes;
 if (pictures && pictures.length !== rows.length) throw new Error(`DataTable "${caption}" needs one picture per row`);
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={caption}>
@@ -38,8 +34,6 @@ if (pictures && pictures.length !== rows.length) throw new Error(`DataTable "${c
           <th scope="row">
             {vignettes ? (
               <span class="row-head stacked"><Vignette name={vignettes[index]} /><span class="row-text">{first}{tags && <span class={`tag tag-${tags[index].level}`}>{tags[index].label}</span>}</span></span>
-            ) : art ? (
-              <span class="row-head"><RowArt name={art[index]} /><span class="row-text">{first}{tags && <span class={`tag tag-${tags[index].level}`}>{tags[index].label}</span>}</span></span>
             ) : icons ? (
               <span class="row-head"><span class="tile" aria-hidden="true"><Icon name={icons[index]} size={18} /></span>{first}</span>
             ) : first}
@@ -62,13 +56,11 @@ if (pictures && pictures.length !== rows.length) throw new Error(`DataTable "${c
   .row-head { display: flex; align-items: center; gap: 14px; }
   .tile { flex: none; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
   tbody th:has(.row-head) { min-width: 200px; }
-  tbody th:has(.row-art) { min-width: 250px; }
   /* A UI scene sits above the row name */
   .row-head.stacked { flex-direction: column; align-items: flex-start; gap: 12px; }
   .row-head.stacked :global(.uv) { width: 168px; }
   /* In rows with an icon or picture, the text beside it must hold its own: brighter, larger and roomier than a plain table. */
   tbody tr:has(.row-head) > * { vertical-align: middle; padding-block: 22px; }
-  tbody tr:has(.row-art) > * { padding-block: 30px; }
   tbody tr:has(.stacked) > * { vertical-align: top; padding-block: 26px; }
   tbody tr:has(.row-head) > td { color: var(--text); font-size: 17px; line-height: 1.6; }
   tbody tr:has(.row-head) > th { font-size: 16px; }

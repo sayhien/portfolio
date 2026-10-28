@@ -28,6 +28,8 @@ type SkyDef = {
   baseShift?: [number, number];
   /** 0 skips the opening where every particle gathers in from afar (for scenes that build themselves). */
   gather?: number;
+  /** A wider lens for phones, for scenes that are tall and need room above and below. */
+  phoneFov?: number;
   /** The moment shown as a still picture when motion is reduced. */
   still?: number;
 };
@@ -35,7 +37,7 @@ type SkyDef = {
 const SKIES: Record<CaseSkyName, SkyDef> = {
   cake: {
     count: 140000,
-    gather: 0,
+    gather: 0, phoneFov: 56,
     still: 15.6, // the cake is finished and the candle is lit
     camera: (t) => { const a = Math.sin(t * 0.12) * 0.5; return { eye: [Math.sin(a) * 820, 250 + Math.sin(t * 0.09) * 20, Math.cos(a) * 820], target: [0, 30, 0], shift: [0, 0] }; },
   },
@@ -55,7 +57,7 @@ const SKIES: Record<CaseSkyName, SkyDef> = {
 };
 
 /** Start a sky on a canvas. Returns false if this browser cannot draw it. */
-export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name: CaseSkyName): boolean {
+export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name: CaseSkyName, phoneBand = 300): boolean {
   const sky = SKIES[name];
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true });
   if (!sky || !gl) return false;
@@ -89,11 +91,14 @@ export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name:
   const draw = (t: number) => {
     const cam = sky.camera(t), aspect = canvas.width / Math.max(1, canvas.height);
     // leave room for the headline: to the right on wide screens, lower on phones
-    const shift: [number, number] = narrowMedia.matches ? [cam.shift[0], cam.shift[1] - 0.5] : [cam.shift[0] + 0.5, cam.shift[1]];
+    // On phones the picture is centred in the band: the band's share of the height decides how far down it slides (a little less, so the scene sits just above the middle).
+    const lift = sky.phoneFov ? 0.05 : 0.2; // the tall cake scene needs less of a lift
+    const bandShare = Math.min(1, phoneBand / Math.max(1, host.clientHeight));
+    const shift: [number, number] = narrowMedia.matches ? [cam.shift[0], cam.shift[1] - (1 - bandShare - lift)] : [cam.shift[0] + 0.5, cam.shift[1]];
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniformMatrix4fv(loc.uProj, false, perspective(aspect, { shift }));
+    gl.uniformMatrix4fv(loc.uProj, false, perspective(aspect, { shift, fov: narrowMedia.matches ? sky.phoneFov : undefined }));
     gl.uniformMatrix4fv(loc.uView, false, lookAt(cam.eye, cam.target));
     gl.uniform3fv(loc.uEye, cam.eye);
     gl.uniform1f(loc.uT, t);

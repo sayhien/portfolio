@@ -25,13 +25,15 @@ interface Props {
   heroSky?: CaseSkyName;
 }
 const { title, kicker, heading, lede, meta, sections, next = [], heroScene, heroSky } = Astro.props;
+// On phones the sky shows in a band under the text. The cake scene is tall (saucers above, cake below), so it gets more room.
+const skyBand = heroSky === 'cake' ? 400 : 300;
 const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
 <Base title={title} description={lede} revealHeader>
   <article>
-    <div class="hero-zone">
+    <div class="hero-zone" style={`--sky-band: ${skyBand}px`}>
     {heroScene && <EarthScene mode={heroScene} layout="background" />}
-    {heroSky && <CaseSky name={heroSky} />}
+    {heroSky && <CaseSky name={heroSky} band={skyBand} />}
     <header class="wrap cs-hero">
       <p class="eyebrow">{kicker}</p>
       <h1>{heading}</h1>
@@ -98,7 +100,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
 <style>
   .hero-zone { position: relative; }
   .cs-hero { position: relative; z-index: 1; padding-top: 96px; padding-bottom: 96px; }
-  @media (max-width: 760px) { .cs-hero { padding-top: 64px; padding-bottom: 300px; } }
+  @media (max-width: 760px) { .cs-hero { padding-top: 64px; padding-bottom: var(--sky-band, 300px); } }
   .cs-hero .eyebrow { margin-bottom: var(--space-3); }
   h1 { font-size: clamp(40px, 5.2vw, 76px); line-height: 1.02; max-width: 1040px; }
   .lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.55; color: var(--text-2); max-width: 780px; margin-top: var(--space-3); }

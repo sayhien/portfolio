@@ -5,10 +5,12 @@
 import type { CaseSkyName } from './case-sky';
 interface Props {
   name: CaseSkyName;
+  /** Height in pixels of the space under the text where the scene shows on phones. */
+  band?: number;
 }
-const { name } = Astro.props;
+const { name, band = 300 } = Astro.props;
 ---
-<div class="case-sky" data-case-sky={name}>
+<div class="case-sky" data-case-sky={name} data-band={band} style={`--sky-band: ${band}px`}>
   <canvas aria-hidden="true"></canvas>
 </div>
 
@@ -24,9 +26,9 @@ const { name } = Astro.props;
   }
   @media (max-width: 760px) {
     canvas {
-      /* On phones the scene sits in the space under the text (the hero keeps 300px for it), so it never runs behind the words. */
-      -webkit-mask-image: linear-gradient(to bottom, transparent calc(100% - 330px), #000 calc(100% - 250px), #000 calc(100% - 40px), transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent calc(100% - 330px), #000 calc(100% - 250px), #000 calc(100% - 40px), transparent 100%);
+      /* On phones the scene sits in the space under the text (the hero keeps this band free for it), so it never runs behind the words. */
+      -webkit-mask-image: linear-gradient(to bottom, transparent calc(100% - var(--sky-band) - 30px), #000 calc(100% - var(--sky-band) + 50px), #000 calc(100% - 40px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent calc(100% - var(--sky-band) - 30px), #000 calc(100% - var(--sky-band) + 50px), #000 calc(100% - 40px), transparent 100%);
     }
   }
 </style>
@@ -38,6 +40,6 @@ const { name } = Astro.props;
   document.querySelectorAll<HTMLElement>('[data-case-sky]').forEach((host) => {
     const canvas = host.querySelector('canvas');
     // Without graphics support the sky is left out; the headline still reads fine.
-    if (!canvas || !startCaseSky(host, canvas, host.dataset.caseSky as CaseSkyName)) host.remove();
+    if (!canvas || !startCaseSky(host, canvas, host.dataset.caseSky as CaseSkyName, Number(host.dataset.band))) host.remove();
   });
 </script>

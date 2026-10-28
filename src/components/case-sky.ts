@@ -22,7 +22,23 @@ function orbit(t: number, radius: number, height: number, swing: number, speed: 
   return [Math.sin(ang) * radius + extra[0], height + extra[1], Math.cos(ang) * radius + extra[2]];
 }
 
-const SKIES: Record<CaseSkyName, { count: number; camera: (t: number) => Camera; baseShift?: [number, number] }> = {
+type SkyDef = {
+  count: number;
+  camera: (t: number) => Camera;
+  baseShift?: [number, number];
+  /** 0 skips the opening where every particle gathers in from afar (for scenes that build themselves). */
+  gather?: number;
+  /** The moment shown as a still picture when motion is reduced. */
+  still?: number;
+};
+
+const SKIES: Record<CaseSkyName, SkyDef> = {
+  cake: {
+    count: 140000,
+    gather: 0,
+    still: 15.6, // the cake is finished and the candle is lit
+    camera: (t) => { const a = Math.sin(t * 0.12) * 0.5; return { eye: [Math.sin(a) * 820, 250 + Math.sin(t * 0.09) * 20, Math.cos(a) * 820], target: [0, 30, 0], shift: [0, 0] }; },
+  },
   chatbot: { count: 110000, camera: (t) => ({ eye: orbit(t, 1050 - Math.sin(t * 0.21) * 120, 220 + Math.sin(t * 0.17) * 160, 0.9, 0.11), target: [0, 0, 0], shift: [0, 0] }) },
   remit: { count: 140000, camera: (t) => ({ eye: orbit(t, 1180, 420, 0.35, 0.07), target: [0, 120, 0], shift: [0.04, -0.3] }) },
   health: { count: 110000, camera: (t) => ({ eye: orbit(t, 1150 - Math.sin(t * 0.13) * 160, 60 + Math.sin(t * 0.09) * 130, 1.1, 0.06), target: [0, 0, 0], shift: [0, 0] }) },
@@ -87,14 +103,15 @@ export function startCaseSky(host: HTMLElement, canvas: HTMLCanvasElement, name:
     gl.uniform1f(loc.uSizeRef, 900);
     gl.uniform1f(loc.uFog, 3200);
     gl.uniform1f(loc.uNear, 10);
-    gl.uniform1f(loc.uGather, 1);
+    gl.uniform1f(loc.uGather, sky.gather ?? 1);
     gl.uniform1f(loc.uLensR, 0);
     gl.drawArrays(gl.POINTS, 0, count);
   };
 
   if (prefersReducedMotion()) {
-    draw(STILL_TIME);
-    new ResizeObserver(() => { resize(); draw(STILL_TIME); }).observe(host);
+    const still = sky.still ?? STILL_TIME;
+    draw(still);
+    new ResizeObserver(() => { resize(); draw(still); }).observe(host);
     return true;
   }
   new ResizeObserver(resize).observe(host);

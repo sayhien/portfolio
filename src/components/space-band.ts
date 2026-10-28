@@ -107,6 +107,8 @@ const zodiacExtra: Extra = (gl, program) => {
 // ---------------------------------------------------------------- The bands
 
 const BANDS: Record<BandName, BandDef> = {
+  // story is in band seconds: the delivery timeline ends near 8.6 and runs at DELIVERY_SPEED inside the shader
+  delivery: { count: 140000, story: 7.9, still: 3.1, far: 14000, fog: 9000, camera: turning([0, 270, -400], 1280, -30, 0.1, 46, 0.12) },
   station: { count: 130000, story: 14.5, still: 15, far: 16000, fog: 12000, camera: turning([0, -20, 0], 820, 250, 0.035, 46, 0, -0.7) },
   meteors: { count: 120000, story: 11.5, still: 7.8, far: 12000, fog: 12000, camera: turning([-150, 0, -300], 1350, 180, 0.05, 48, 0.3) },
   rings: { count: 110000, story: 9, still: 5.2, far: 9000, fog: 5000, camera: turning([0, 0, 0], 1350, 420, 0.03, 46, 0, 0.2) },

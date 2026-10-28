@@ -1,5 +1,6 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
+import SpaceBand from '../components/SpaceBand.astro';
 import DataTable from '../components/DataTable.astro';
 import CardGrid from '../components/CardGrid.astro';
 import ChangeCards from '../components/ChangeCards.astro';
@@ -181,7 +182,7 @@ const next = nextCaseLinks('four-leaves');
   ]}
   sections={sections}
   next={next}
-  heroSky="chatbot"
+  heroSky="cake"
 >
   <section id="introduction" class="sec">
     <p class="sn">{n('introduction')}</p>
@@ -221,6 +222,7 @@ const next = nextCaseLinks('four-leaves');
   </section>
 
   <section id="ordering" class="sec">
+    <SpaceBand name="delivery" />
     <p class="sn">{n('ordering')}</p>
     <h2>Ordering a Cake</h2>
     <p class="big">Cakes earn the most money, so they now sit at the front, right below the home page hero.</p>

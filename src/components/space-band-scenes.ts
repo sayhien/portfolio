@@ -4,6 +4,7 @@
 // scene settles into a calm loop. The cameras and the renderer live in
 // space-band.ts; the shared particle helpers come from case-sky-scenes.ts.
 import { COMMON, HEADER } from './case-sky-scenes';
+import { CAKE_GLSL } from './cake-shader';
 
 // ---------------------------------------------------------------- AI Chatbot, page structure
 // A space station modelled on China's Tiangong, built module by module in the
@@ -380,5 +381,52 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
   return p;
 }`;
 
-export const BAND_SHADERS = { station: STATION, meteors: METEORS, rings: RINGS, zodiac: ZODIAC, crystals: CRYSTALS };
+
+// ---------------------------------------------------------------- Four Leaves, ordering a cake
+// A saucer comes down, lifts the finished cake up its beam and rises off in a
+// gentle arc. Then it leaps to light speed, leaving a streak while the stars
+// stretch, and vanishes in a sparkle: the cake is on its way.
+const DELIVERY = HEADER + COMMON + CAKE_GLSL + `
+const float DELIVERY_SPEED = 1.1;          // a little quicker than the shared band speed
+const float LIFT_END = 4.07, AWAY = 4.33, GLIDE_END = 6.33, JUMP = 6.6, GONE = 7.07;
+vec3 arc(float u){ vec3 a = vec3(0., 360., 0.), b = vec3(-260., 560., -500.), c = vec3(-120., 700., -1300.); return mix(mix(a, b, u), mix(b, c, u), u); }
+vec3 scene(vec4 s, float time, out vec3 col, out float a){
+  vec4 r = rnd(s, 3.), q = rnd(s, 5.);
+  float t = time*DELIVERY_SPEED;
+  vec3 far = vec3(500., 900., -8000.);
+  float glide = ease(win(t, AWAY, GLIDE_END)), jump = easeIn(win(t, JUMP, GONE)), gone = step(GONE, t);
+  vec3 craft = t < AWAY ? mix(vec3(380., 900., -900.), vec3(0., 360., 0.), easeOut(win(t, 0., 2.2))) + vec3(0., sin(t*1.4)*5., 0.) : mix(arc(glide), far, jump);
+  vec3 hold = craft - vec3(0., 221., 0.);   // the cake hangs just under the saucer
+  vec3 cakeAt = t < AWAY ? mix(vec3(0.), hold, ease(win(t, 2.6, LIFT_END))) : hold;
+  if(s.x < .07){ // stars stretch towards the jump point while the saucer leaps
+    vec3 p = cakeStars(r, t, col, a); float warp = sin(win(t, 6.53, 7.33)*PI);
+    a *= 1. + warp; return p + normalize(far - p)*q.x*warp*900.;
+  }
+  if(s.x < .5) return cakeGround(r, col, a);
+  if(s.x < .82){
+    float kind, tier, ord; vec3 target = cakeShape(r, col, kind, tier, ord);
+    if(kind > 3.5) target = FLAME + (target - FLAME)*(1. + .25*sin(t*23. + ord*9.));
+    a = cakeGlow(kind)*(1. - gone); return cakeAt + rotY(target, glide*.8);
+  }
+  if(s.x < .87){ // the tractor beam while the cake is lifted
+    float on = ease(win(t, 2.2, 2.6))*(1. - ease(win(t, LIFT_END, AWAY + .07)));
+    float ang = q.y*TAU; float v = q.z; float rad = mix(30., 110., v)*sqrt(q.w);
+    col = YELLOW; a = .14*on; return mix(craft - vec3(0., 40., 0.), vec3(0.), v) + vec3(cos(ang)*rad, 0., sin(ang)*rad);
+  }
+  if(s.x < .94){ vec3 p = craft + rotZ(saucer(r, t, 0., 0., col, a), sin(glide*PI)*.3)*4.; a *= 1. - gone; return p; }
+  if(s.x < .97){ // the streak left behind by the leap
+    float on = step(JUMP, t)*(1. - ease(win(t, GONE, GONE + .53)));
+    col = mix(MINT, WHITE, q.y); a = .75*on*q.y; return mix(arc(1.), craft, q.y) + ball(q.zwx)*14.*(1. - q.y);
+  }
+  // the sparkle where it vanishes: a four point star, a ring and a puff of sparks
+  float u = win(t, GONE, GONE + 1.3), flare = sin(u*PI);
+  if(q.x < .4){
+    float arm = floor(q.y*4.); vec3 dir = arm < 1. ? vec3(1.,0.,0.) : (arm < 2. ? vec3(-1.,0.,0.) : (arm < 3. ? vec3(0.,1.,0.) : vec3(0.,-1.,0.)));
+    col = mix(WHITE, YELLOW, q.z); a = flare*(1. - q.z)*1.3; return far + dir*q.z*q.z*1000.*flare;
+  }
+  if(q.x < .7){ float ang = q.y*TAU; col = MINT; a = (1. - u)*.8*step(.001, u); return far + vec3(cos(ang), sin(ang), 0.)*u*700.; }
+  col = mix(YELLOW, WHITE, q.w); a = (1. - u)*step(.001, u); return far + sph(q.yz)*u*500.*q.w;
+}`;
+
+export const BAND_SHADERS = { delivery: DELIVERY, station: STATION, meteors: METEORS, rings: RINGS, zodiac: ZODIAC, crystals: CRYSTALS };
 export type BandName = keyof typeof BAND_SHADERS;

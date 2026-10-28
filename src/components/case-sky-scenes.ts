@@ -3,6 +3,7 @@
 // earth-scenes.ts and space-hero-scene.ts. The renderer and the moving
 // cameras live in case-sky.ts.
 import { SAUCER_GLSL } from './saucer-shader';
+import { CAKE_GLSL } from './cake-shader';
 
 export const HEADER = `
 precision highp float;
@@ -290,4 +291,57 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
   col = mix(MINT, WHITE, .4); a = e > 0. ? .35*exp(-e*1.1)*(1. - .9*hidden(p, vec3(0.), PR)) : 0.; return p;
 }`;
 
-export const SKY_SHADERS = { chatbot: CHATBOT, remit: REMIT, health: HEALTH, library: LIBRARY, crumb: BREADCRUMB };
+
+// Four Leaves: three saucers circle a spot on a small planet and build a strawberry cake
+// together. They beam up the tiers, stream cream onto the rims and drop the berries and
+// the candle. Then a little alien flies over and lights the candle with a lighter, and
+// the saucers wave. The story loops every CAKE_CYCLE seconds of story time.
+const CAKE = HEADER + COMMON + CAKE_GLSL + `
+const float CAKE_SPEED = 1.375, CAKE_CYCLE = 24.;
+const float BEAM_END = 14.6, ALIEN_OUT = 14.6, ALIEN_AT = 15.6, LIGHT_AT = 16., ALIEN_BACK = 16.4, ALIEN_HOME = 17.4;
+vec3 crew(float j, float t){ float ang = j/3.*TAU + t*.28; return vec3(cos(ang)*230., 235. + sin(t*1.3 + j*2.)*10., sin(ang)*230.); }
+// Where the alien hangs while it lights the wick: its lighter flame sits just above the candle top.
+const vec3 ALIEN_LIGHT = vec3(-19., 150., 0.);
+vec3 alienPath(float t){
+  vec3 home = crew(0., t) - vec3(0., 20., 0.);
+  if(t < ALIEN_AT){ float u = ease(win(t, ALIEN_OUT, ALIEN_AT)); return mix(home, ALIEN_LIGHT, u) + vec3(0., sin(u*PI)*45., 0.); }
+  if(t < ALIEN_BACK) return ALIEN_LIGHT + vec3(0., sin(t*3.)*1.5, 0.);
+  float u = ease(win(t, ALIEN_BACK, ALIEN_HOME)); return mix(ALIEN_LIGHT, home, u) + vec3(0., sin(u*PI)*45., 0.);
+}
+vec3 scene(vec4 s, float time, out vec3 col, out float a){
+  vec4 r = rnd(s, 3.), q = rnd(s, 5.);
+  float t = mod(time*CAKE_SPEED, CAKE_CYCLE);
+  float show = 1. - win(t, 22.6, 23.6);                       // the finished cake fades before the next build
+  if(s.x < .06) return cakeStars(r, t, col, a);
+  if(s.x < .52) return cakeGround(r, col, a);
+  if(s.x < .86){
+    float kind, tier, ord; vec3 target = cakeShape(r, col, kind, tier, ord);
+    vec3 src = crew(floor(q.x*3.), t) - vec3(0., 16., 0.);
+    vec3 p;
+    if(kind < .5){ // each tier is beamed up over 2.4 seconds, bottom first, one tier after another
+      float st = 1. + tier*3.1 + ord*2.4; float e = ease(win(t, st, st + .7));
+      p = mix(src, target, e) + vec3(0., sin(e*PI)*40., 0.);
+      a = step(st, t)*mix(.9, cakeGlow(kind), e); col = mix(MINT, col, e);
+    } else if(kind < 3.5){ // cream streams down onto the rims; berries and the candle drop from the saucers
+      float st = kind < 1.5 ? 10.6 + ord*1.6 : (kind < 2.5 ? 12.3 + ord*1.4 : 13.8);
+      float f = win(t, st, st + (kind < 1.5 ? .5 : .8)), e = kind < 1.5 ? ease(f) : easeIn(f);
+      p = mix(src, target, e) + vec3(0., kind < 1.5 ? sin(e*PI)*25. : 0., 0.);
+      a = step(st, t)*(kind < 1.5 ? mix(.9, cakeGlow(kind), e) : cakeGlow(kind)); if(kind < 1.5) col = mix(WHITE, col, e);
+    } else { // the flame lights when the alien's lighter touches the wick
+      float lit = ease(win(t, LIGHT_AT, LIGHT_AT + .4)); float fl = 1. + .25*sin(t*23. + ord*9.);
+      p = FLAME + (target - FLAME)*lit*fl; a = lit;
+    }
+    a *= show; return p;
+  }
+  if(s.x < .9){ // the little alien with its lighter
+    float out_ = step(ALIEN_OUT, t)*(1. - step(ALIEN_HOME, t));
+    float lighter = ease(win(t, ALIEN_AT - .2, ALIEN_AT + .1))*(1. - ease(win(t, LIGHT_AT + .3, ALIEN_BACK)));
+    vec3 p = alienPath(t) + alien(q, t, lighter, col, a)*1.6; a *= out_; return p;
+  }
+  float j = floor(q.y*3.);
+  float wave = ease(win(t, 17.6, 18.2))*(1. - ease(win(t, 20.4, 21.)));
+  float beam = step(1., t)*(1. - step(BEAM_END, t));
+  return crew(j, t) + saucer(r, t + j, beam, wave, col, a)*2.2;
+}`;
+
+export const SKY_SHADERS = { cake: CAKE, chatbot: CHATBOT, remit: REMIT, health: HEALTH, library: LIBRARY, crumb: BREADCRUMB };

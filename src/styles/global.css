@@ -138,6 +138,8 @@ p { margin: 0; }
 /* Every link that opens a new tab carries the same small arrow, so people know before they click. */
 a[target='_blank']:not(.o-cta)::after { content: '\2197' / ''; display: inline-block; margin-left: 0.3em; color: var(--accent); transition: transform 0.2s; }
 a[target='_blank']:not(.o-cta):hover::after { transform: translate(2px, -2px); }
+/* On phones the header has no room for the arrows, so its links stay plain there. */
+@media (max-width: 760px) { .site-header a[target='_blank']::after { content: none; } }
 
 ::selection { background: var(--accent); color: var(--on-accent); }
 

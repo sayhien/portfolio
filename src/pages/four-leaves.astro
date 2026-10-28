@@ -51,16 +51,14 @@ const findings: string[][] = [
   ['Apply is far from the role', 'To apply for a job, people must find the form button at the bottom of the page. The button is not next to the role.', '7. Flexibility and efficiency of use'],
   ['Too many typefaces', 'I counted ten different typefaces on the two sites. This makes the brand look less consistent.', '4. Consistency and standards'],
   ['Weak contrast', 'White text on the tan cake tabs has a contrast of about 3.2 to 1. The minimum for small text is 4.5 to 1.', 'Beyond the ten rules: accessibility'],
-  ['A message box with no form', 'The contact page says “Leave Us A Message”, but it has no form.', '4. Consistency and standards'],
 ];
 const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low' }[] = [
   { label: 'Critical', level: 'critical' },
   { label: 'High', level: 'high' }, { label: 'High', level: 'high' },
   { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
   { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
-  { label: 'Low', level: 'low' },
 ];
-const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast', 'emptyAreas'];
+const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast'];
 
 const changes: Change[] = [
   {
@@ -167,9 +165,9 @@ const next = nextCaseLinks('four-leaves');
     <p class="sn">{n('discover')}</p>
     <h2>Discover</h2>
     <p>I used the main site and the online shop as a new customer who wants a cake. I checked each page against Nielsen’s ten usability rules.</p>
-    <h3 class="sub">Ten problems, most serious first</h3>
-    <p>Critical stops an order. High gives less reason to order. Medium adds effort or doubt. Low is a small fix. These ratings are my judgement.</p>
-    <DataTable caption="Ten problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
+    <h3 class="sub">Nine problems, most serious first</h3>
+    <p>Critical stops an order. High gives less reason to order. Medium adds effort or doubt. These ratings are my judgement.</p>
+    <DataTable caption="Nine problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
     <div class="takeaway">
       <b>Critical: fix this first</b>
       <p>Cakes earn the most money, but ordering is the hardest thing to find. The other fixes only help people who can find the order.</p>

@@ -8,7 +8,7 @@ export type RowArtName =
   | 'diluted' | 'jargon' | 'passive' | 'logos' | 'integration' | 'onesize'
   | 'hero' | 'proof' | 'capabilities' | 'usecases' | 'sandbox' | 'hub' | 'security' | 'cta'
   | 'sandboxRate' | 'testimonialClicks' | 'engagement' | 'bounce'
-  | 'twoSites' | 'buriedOrder' | 'emptyAreas' | 'pointsValue' | 'typefaces' | 'noProof'
+  | 'twoSites' | 'buriedOrder' | 'pointsValue' | 'typefaces' | 'noProof'
   | 'mapPin' | 'mailList' | 'applyFar' | 'lowContrast'
   | 'cakeOrders' | 'dropOff' | 'signUps' | 'orderTime';
 
@@ -105,10 +105,6 @@ export const rowArt: Record<RowArtName, string> = {
     <rect class="d" x="8" y="10" width="4" height="3" rx="1"/><rect class="d" x="14" y="10" width="4" height="3" rx="1"/><rect class="d" x="20" y="10" width="4" height="3" rx="1"/><rect class="d" x="26" y="10" width="4" height="3" rx="1"/><rect class="s a-lit" x="32" y="10" width="4" height="3" rx="1"/><rect class="d" x="38" y="10" width="3" height="3" rx="1"/>
     <path class="d a-flow" d="M34 19v7" stroke-dasharray="2 3"/>
     <rect x="22" y="28" width="22" height="15" rx="2.500"/><path class="d" d="M26 34h14M26 38h8"/>`,
-  emptyAreas: `
-    <rect x="4" y="5" width="40" height="38" rx="3"/><path d="M10 12h16"/>
-    <rect class="d a-blink" x="10" y="19" width="28" height="18" rx="2" stroke-dasharray="3 3"/>
-    <path class="d" d="M16 28h16"/>`,
   pointsValue: `
     <circle class="f" cx="13" cy="24" r="9"/><path d="M13 19v10M16 21h-5a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H10"/>
     <path class="a-nudge" d="M26 24h6M29 21l3 3-3 3"/>

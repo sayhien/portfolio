@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import CaseStudy from '../layouts/CaseStudy.astro';
 import { nextCaseLinks } from '../data/site';
-import { sectionNumber } from '../layouts/sections';
 import YouTube from '../components/YouTube.astro';
 import JourneyMap from '../components/JourneyMap.astro';
 import EsgHierarchy from '../components/EsgHierarchy.astro';
@@ -48,7 +47,6 @@ const sections = [
   { id: 'collaborative-review', title: 'Collaborative Review' },
   { id: 'challenges', title: 'Challenges and Learnings' },
 ];
-const n = sectionNumber(sections);
 
 const personas = [
   { img: helen, name: 'Helen', quote: 'I need diversity and well-being numbers without chasing five spreadsheets.',  role: 'HR Manager', goals: ['Ensure compliance with labor laws', 'Promote diversity', 'Track employee well-being'] },
@@ -187,7 +185,6 @@ const next = nextCaseLinks('esg-reporting-module');
 >
 
   <section id="problem" class="sec">
-    <p class="sn">{n('problem')}</p>
     <h2>Problem Statement</h2>
     <p>
       Companies face increasing pressure from stakeholders to provide transparent reporting on their environmental, social, and governance impacts. However, the complexity of ESG reporting standards, such as GRI (Global Reporting Initiative) and IFRS (International Financial Reporting Standards), coupled with the volume of data required from across the business, makes this process challenging and time consuming.
@@ -200,7 +197,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="discovery" class="sec">
-    <p class="sn">{n('discovery')}</p>
     <h2>Discovery and Requirements Gathering</h2>
     <p>
       The initial phase involved getting the business requirements from the entrepreneur, and understanding the complex reporting frameworks (GRI and IFRS) and how they would integrate with the existing ERP system.
@@ -214,7 +210,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="personas" class="sec">
-    <p class="sn">{n('personas')}</p>
     <h2>Personas</h2>
     <p>
       Due to time constraints, and as the sole designer, I used AI to generate these personas to guide the design process. The system needed to serve both managers overseeing the entire reporting process and subject matter experts contributing specific data.
@@ -223,7 +218,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="journey-map" class="sec">
-    <p class="sn">{n('journey-map')}</p>
     <h2>Journey Map</h2>
     <p>
       While I developed extensive personas and journey maps with AI to guide the ESG module design, I prioritised my boss’s requirements as the primary framework. Even so, the pain points surfaced by the AI deliverables were matched by the solutions in his business requirements.
@@ -234,7 +228,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="information-architecture" class="sec">
-    <p class="sn">{n('information-architecture')}</p>
     <h2>Information Architecture</h2>
     <blockquote>Given the complexity of the reporting frameworks, creating a clear, logical structure was crucial to create a common reporting template.</blockquote>
     <p>
@@ -251,7 +244,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </EarthScene>
 
   <section id="dashboard" class="sec">
-    <p class="sn">{n('dashboard')}</p>
     <h2>Dashboard</h2>
     <p class="big">The Dashboard is the nerve center for ESG managers, built around three core principles.</p>
     <EsgQuestions items={dashboardQuestions} />
@@ -264,7 +256,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="user-assignment" class="sec">
-    <p class="sn">{n('user-assignment')}</p>
     <h2>User Assignment</h2>
     <p>Managers assign specific reporting standards to team members with appropriate permission levels. This established accountability and ownership for reporting tasks, while ensuring specialised knowledge is applied to relevant areas.</p>
     <div class="feature-row">
@@ -274,7 +265,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="data-synchronisation" class="sec">
-    <p class="sn">{n('data-synchronisation')}</p>
     <h2>Data Synchronisation</h2>
     <p>
       Data synchronisation integrates information from other modules, such as HR and Finance, into the ESG module. This ensures ESG reporting reflects the latest data across departments, streamlining compliance with frameworks like GRI and IFRS.
@@ -286,14 +276,12 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="frameworks" class="sec">
-    <p class="sn">{n('frameworks')}</p>
     <h2>GRI and IFRS Reporting</h2>
     <p>The system supports both frameworks through one reporting interface. Switch between them to see each prototype.</p>
     <EsgFrameworkTabs frameworks={frameworks} features={frameworkFeatures} />
   </section>
 
   <section id="progress-tracking" class="sec">
-    <p class="sn">{n('progress-tracking')}</p>
     <h2>Progress Tracking</h2>
     <p>The status tracking system provides visibility into reporting progress for a standard. The interface highlights:</p>
     <div class="feature-row">
@@ -320,7 +308,6 @@ const next = nextCaseLinks('esg-reporting-module');
   </section>
 
   <section id="collaborative-review" class="sec">
-    <p class="sn">{n('collaborative-review')}</p>
     <h2>Collaborative Review</h2>
     <p>The system includes communication tools for collaborative reporting. The chat feature allows users to:</p>
     <div class="feature-row">
@@ -331,7 +318,6 @@ const next = nextCaseLinks('esg-reporting-module');
 
   <section id="challenges" class="sec learn-sec">
     <div class="learn-head">
-      <p class="sn">{n('challenges')}</p>
       <h2>Challenges and Learnings</h2>
       <p class="learn-sub">What worked, what didn’t, and what goes back into the loop next time.</p>
     </div>

@@ -1,5 +1,5 @@
 ---
-// The page structure table with a small sketch of the page beside it. The
+// The page structure table with a small sketch of the page beside it (a thin minimap on phones). The
 // sketch has one block per section, drawn to hint at what the section holds.
 // As the reader scrolls through the table, the row being read and
 // its block in the sketch light up together. The sketch is decorative: the
@@ -90,10 +90,26 @@ if (sketches.length !== rows.length) throw new Error(`PageMap "${caption}" needs
   .map :global(tbody tr) { transition: background-color 0.25s; }
   .map :global(tbody tr.is-active) { background: var(--accent-soft); }
 
-  /* On narrow screens the sketch would run sideways while the rows run down the page, so it is left out. The table still has its animated pictures. */
+  /* On narrow screens the sketch shrinks to a thin minimap beside the table. It still slides to sit level with the row being read. */
   @media (max-width: 900px) {
-    .map { grid-template-columns: minmax(0, 1fr); }
-    .sketch-wrap { display: none; }
+    .map { grid-template-columns: 64px minmax(0, 1fr); gap: 10px; }
+    .sketch { gap: 4px; padding: 5px; border-radius: 10px; }
+    .bar, .name { display: none; }
+    .block { gap: 3px; padding: 6px 4px; border-radius: 4px; }
+    .hero { min-height: 38px; }
+    .line { height: 4px; } .line.wide { height: 5px; }
+    .pill { height: 5px; margin-top: 2px; } .pill.big { height: 8px; }
+    .bot { right: 5px; bottom: 6px; width: 10px; height: 10px; }
+    .trio { gap: 2px; }
+    .video { height: 11px; }
+    .grid { gap: 2px; } .card { height: 8px; }
+    .grid-table { gap: 2px; } .cell { height: 3px; }
+    .sandbox { height: 34px; gap: 3px; padding: 4px; }
+    .msg { height: 7px; } .reply { height: 1px; }
+    .chips { gap: 2px; } .block .chip { height: 4px; }
+    .logo { width: 7px; height: 7px; }
+    .badge { width: 9px; height: 10px; border-radius: 3px 3px 5px 5px !important; }
+    .button { min-height: 18px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .block, .name, .sketch, .map :global(tbody tr) { transition: none; }

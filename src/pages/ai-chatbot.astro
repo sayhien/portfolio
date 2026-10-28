@@ -11,7 +11,6 @@ import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
-import { sectionNumber } from '../layouts/sections';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -23,7 +22,6 @@ const sections = [
   { id: 'metrics', title: 'Success Metrics' },
   { id: 'outcome', title: 'Project Outcome' },
 ];
-const n = sectionNumber(sections);
 
 const james = framerImage('yKYPwWYnu55w2WPMa9dCSugoo.png');
 const tomei = framerImage('Q8pfEiL8zTXJO0rtjbihCEARM.png');
@@ -128,14 +126,12 @@ const prototype = 'https://simplifynext-bot.framer.website/';
   heroSky="chatbot"
 >
   <section id="introduction" class="sec">
-    <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
     <p class="big">SimplifyNext wanted a new page for their AI chatbot service. Prospects should be able to see what it can do, watch relevant demos, explore use cases, check integrations, and move toward a sales conversation with confidence.</p>
     <p>I was brought in as a UX consultant to lead the full redesign. Working from their requirements, I did the research, defined the information architecture, created the new user flows, and delivered a complete, interactive prototype ready for development. The product team took it over at the end of the engagement.</p>
   </section>
 
   <section id="discovery" class="sec">
-    <p class="sn">{n('discovery')}</p>
     <h2>Discovery and Research</h2>
     <p>I compared the chatbot pages of seven leading providers, including Oracle, Google Cloud, Andersen Lab, ManageEngine, HKT Enterprise and SMEs Go Digital. Together with buyer personas and a map of what drives each buyer, this became the base for the design.</p>
     <h3 class="sub">Six problems the competitors share</h3>
@@ -143,14 +139,12 @@ const prototype = 'https://simplifynext-bot.framer.website/';
   </section>
 
   <section id="personas" class="sec">
-    <p class="sn">{n('personas')}</p>
     <h2>Prospect Personas</h2>
     <p>Three buyers sign off on a chatbot. For each, I mapped what worries them and the psychological trigger that would answer it.</p>
     <Personas items={personas} />
   </section>
 
   <section id="tactics" class="sec">
-    <p class="sn">{n('tactics')}</p>
     <h2>Psychological Tactics</h2>
     <p>Each tactic on the page is there for named buyers, with a clear reason it works.</p>
     <ul class="tactics">
@@ -175,7 +169,6 @@ const prototype = 'https://simplifynext-bot.framer.website/';
 
   <section id="page-structure" class="sec">
     <SpaceBand name="station" />
-    <p class="sn">{n('page-structure')}</p>
     <h2>Page Structure</h2>
     <p>The information architecture for one page: it moves prospects from first interest, to judging the fit for themselves, to technical confidence.</p>
     <PageMap caption="Page sections, what each holds, why, and who it is for" head={['Section', 'Details', 'Rationale', 'For']} rows={pageSections} art={sectionArt} sketches={sectionSketches} />
@@ -186,7 +179,6 @@ const prototype = 'https://simplifynext-bot.framer.website/';
   </section>
 
   <section id="prototype" class="sec">
-    <p class="sn">{n('prototype')}</p>
     <h2>Fully Prototyped Solution</h2>
     <p>Try the page below, or <a href={prototype} target="_blank" rel="noopener">open it in a new tab</a>.</p>
     <figure class="embed">
@@ -198,14 +190,12 @@ const prototype = 'https://simplifynext-bot.framer.website/';
   </section>
 
   <section id="metrics" class="sec">
-    <p class="sn">{n('metrics')}</p>
     <h2>Success Metrics</h2>
     <p>I gave the client a set of UX metrics to track the new page after launch. The baseline is the average of their other service pages.</p>
     <DataTable caption="UX metrics with baseline, target and how each is measured" head={['Metric', 'Baseline', 'Target', 'How it is measured']} rows={metrics} art={metricArt} />
   </section>
 
   <section id="outcome" class="sec">
-    <p class="sn">{n('outcome')}</p>
     <h2>Project Outcome</h2>
     <CardGrid items={outcomes} />
   </section>

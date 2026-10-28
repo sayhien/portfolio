@@ -10,9 +10,8 @@ import Slides from '../components/Slides.astro';
 import type { Slide } from '../components/Slides.astro';
 import type { Card } from '../components/CardGrid.astro';
 import type { Change } from '../components/ChangeCards.astro';
-import type { RowArtName } from '../components/row-art';
+import type { VignetteName } from '../components/vignettes';
 import { nextCaseLinks } from '../data/site';
-import { sectionNumber } from '../layouts/sections';
 
 import beforeOrder from '../assets/four-leaves/before-order.webp';
 import beforeLook from '../assets/four-leaves/before-look.webp';
@@ -66,7 +65,6 @@ const sections = [
   { id: 'measures', title: 'How I Would Measure It' },
   { id: 'learnings', title: 'Limits and Learnings' },
 ];
-const n = sectionNumber(sections);
 
 const findings: string[][] = [
   ['Ordering is buried', '“Shop Online” is one of eight links of the same size. There is no main button. The link opens a second website. Cakes earn the most money, so each lost visitor is a lost sale.', '7. Flexibility and efficiency of use'],
@@ -85,7 +83,7 @@ const findingTags: { label: string; level: 'critical' | 'high' | 'medium' | 'low
   { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
   { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' }, { label: 'Medium', level: 'medium' },
 ];
-const findingArt: RowArtName[] = ['buriedOrder', 'twoSites', 'noProof', 'mapPin', 'pointsValue', 'mailList', 'applyFar', 'typefaces', 'lowContrast'];
+const findingScenes: VignetteName[] = ['buriedOrder', 'twoLooks', 'noOrigin', 'brokenLocation', 'pointsMaths', 'plainSignUp', 'applyFar', 'manyFonts', 'lowContrast'];
 
 const changes: Change[] = [
   {
@@ -159,7 +157,7 @@ const measures: string[][] = [
   ['Membership sign ups', 'New members each week', 'Shows if the points table works.'],
   ['Time to order a cake', 'Seconds from the first page to the order confirmation', 'A shorter path should be faster.'],
 ];
-const measureArt: RowArtName[] = ['cakeOrders', 'dropOff', 'signUps', 'orderTime'];
+const measureScenes: VignetteName[] = ['cakeOrders', 'dropOff', 'newMembers', 'orderTime'];
 
 const limits: Card[] = [
   { title: 'No customer research', text: 'I did not talk to customers. The problems come from my review against the ten usability rules.', label: 'Method', img: limitRoom },
@@ -185,7 +183,6 @@ const next = nextCaseLinks('four-leaves');
   heroSky="cake"
 >
   <section id="introduction" class="sec">
-    <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
     <p class="big">Four Leaves has baked in Singapore since 1981. Cakes earn most of its money. But to order a cake, people must leave the main website for a second shop.</p>
     <p>I redesigned the website to fix this. This is a concept. I have no link with the company, and I did not talk to customers.</p>
@@ -199,7 +196,6 @@ const next = nextCaseLinks('four-leaves');
   </section>
 
   <section id="discover" class="sec">
-    <p class="sn">{n('discover')}</p>
     <h2>Discover</h2>
     <p>I used the main site and the online shop as a new customer who wants a cake. I checked each page against Nielsen’s ten usability rules.</p>
     <ul class="links">
@@ -207,7 +203,7 @@ const next = nextCaseLinks('four-leaves');
     </ul>
     <h3 class="sub">Nine problems, most serious first</h3>
     <p>Critical stops an order. High gives less reason to order. Medium adds effort or doubt. These ratings are my judgement.</p>
-    <DataTable caption="Nine problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
+    <DataTable caption="Nine problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} vignettes={findingScenes} tags={findingTags} />
     <div class="takeaway">
       <b>Critical: fix this first</b>
       <p>Cakes earn the most money, but ordering is the hardest thing to find. The other fixes only help people who can find the order.</p>
@@ -215,7 +211,6 @@ const next = nextCaseLinks('four-leaves');
   </section>
 
   <section id="fixes" class="sec">
-    <p class="sn">{n('fixes')}</p>
     <h2>Problems and Fixes</h2>
     <p>The goal: more online cake orders and more members. Each fix solves one problem. The small picture is the old site, from October 2026.</p>
     <ChangeCards items={changes} />
@@ -223,7 +218,6 @@ const next = nextCaseLinks('four-leaves');
 
   <section id="ordering" class="sec">
     <SpaceBand name="delivery" />
-    <p class="sn">{n('ordering')}</p>
     <h2>Ordering a Cake</h2>
     <p class="big">Cakes earn the most money, so they now sit at the front, right below the home page hero.</p>
     <p>The “Order cakes” button stays in the header on every page. From there, ordering takes a few short steps on one website. Pick a step to see its screen.</p>
@@ -239,14 +233,12 @@ const next = nextCaseLinks('four-leaves');
   </section>
 
   <section id="measures" class="sec">
-    <p class="sn">{n('measures')}</p>
     <h2>How I Would Measure It</h2>
     <p>After launch, I would track four numbers.</p>
-    <DataTable caption="Measures to track after launch" head={['Measure', 'How it is counted', 'Why it matters']} rows={measures} art={measureArt} />
+    <DataTable caption="Measures to track after launch" head={['Measure', 'How it is counted', 'Why it matters']} rows={measures} vignettes={measureScenes} />
   </section>
 
   <section id="learnings" class="sec">
-    <p class="sn">{n('learnings')}</p>
     <h2>Limits and Learnings</h2>
     <p>A concept shows thinking, not results.</p>
     <CardGrid items={limits} />

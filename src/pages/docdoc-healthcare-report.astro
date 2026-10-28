@@ -11,7 +11,6 @@ import Shot from '../components/Shot.astro';
 import YouTube from '../components/YouTube.astro';
 import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
-import { sectionNumber } from '../layouts/sections';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -24,7 +23,6 @@ const sections = [
   { id: 'task-analysis', title: 'One of the Task Analyses' },
   { id: 'challenges', title: 'Challenges and Learnings' },
 ];
-const n = sectionNumber(sections);
 
 const report = 'https://drive.google.com/file/d/1kLyTVnEfBHjlJBnLXQcTuIyfJZprxzeE/view';
 
@@ -82,14 +80,12 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   heroSky="health"
 >
   <section id="introduction" class="sec">
-    <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
     <p class="big">Consumer sales staff opened NetSuite for member data, then DocDoc to build reports. Two apps for one job made the work slow and costly.</p>
     <p>As the solo designer over three months, I ran interviews across countries, prototyped a report builder inside DocDoc, and tested it with member reps and system analysts.</p>
   </section>
 
   <section id="summary" class="sec">
-    <p class="sn">{n('summary')}</p>
     <h2>Summary</h2>
     <div class="two-apps">
       <Shot src={framerImage('z0cDL2KYa9v9KFCgEH03hxs.png')} alt="NetSuite screen with member and doctor records" caption="NetSuite stores and organises data about doctors and members, which consumer sales staff manage." />
@@ -107,14 +103,12 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   </section>
 
   <section id="interviews" class="sec">
-    <p class="sn">{n('interviews')}</p>
     <h2>Remote Contextual Interviews</h2>
     <p>To understand how they worked, seven member staff shared their screens with me on Google Meet and walked me through the process.</p>
     <StepList items={workflow} />
   </section>
 
   <section id="persona" class="sec">
-    <p class="sn">{n('persona')}</p>
     <h2>Persona: Dr. Syima</h2>
     <p>A member representative who cares about compliance, built from the interviews.</p>
     <Personas items={[{
@@ -132,7 +126,6 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   </section>
 
   <section id="storyboard" class="sec">
-    <p class="sn">{n('storyboard')}</p>
     <h2>Storyboard: From Symptom to Specialist</h2>
     <p>Dr. Syima creates a doctor discovery report that lists the specialists who match Abdul’s needs.</p>
     <ol class="story">
@@ -147,7 +140,6 @@ const next = nextCaseLinks('docdoc-healthcare-report');
 
   <section id="test-plan" class="sec">
     <SpaceBand name="rings" />
-    <p class="sn">{n('test-plan')}</p>
     <h2>Usability Test Plan</h2>
     <p>Seven participants from the member representative and system analyst teams did five tasks in a Figma prototype.</p>
     <div class="side plan-side">
@@ -157,7 +149,6 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   </section>
 
   <section id="result" class="sec">
-    <p class="sn">{n('result')}</p>
     <h2>Overall Result</h2>
     <p>The experience was mostly positive. Participants completed most tasks. Adding a dependent was the main issue, but it didn’t stop anyone, and the suggestions were minor.</p>
     <StatCompare items={[
@@ -167,7 +158,6 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   </section>
 
   <section id="task-analysis" class="sec">
-    <p class="sn">{n('task-analysis')}</p>
     <h2>One of the Task Analyses</h2>
     <div class="side analysis">
       <div>
@@ -191,7 +181,6 @@ const next = nextCaseLinks('docdoc-healthcare-report');
   </section>
 
   <section id="challenges" class="sec">
-    <p class="sn">{n('challenges')}</p>
     <h2>Challenges and Learnings</h2>
     <CardGrid items={learnings} columns={2} />
   </section>

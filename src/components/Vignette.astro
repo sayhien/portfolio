@@ -1,0 +1,112 @@
+---
+// A small framed UI scene that explains a point at a glance (scenes in
+// vignettes.ts). Decorative: the text beside it says the same in words.
+// It only moves while on screen, and rests in a readable state with reduced motion.
+import { vignettes } from './vignettes';
+import type { VignetteName } from './vignettes';
+
+interface Props { name: VignetteName }
+const { name } = Astro.props;
+---
+<span class="uv" data-vignette aria-hidden="true">
+  <svg viewBox="0 0 120 68" set:html={vignettes[name]} />
+</span>
+
+<style is:global>
+  .uv { display: block; aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 6px; box-sizing: border-box; }
+  .uv svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  :where(.uv svg *) { transform-box: fill-box; transform-origin: center; }
+
+  /* Look */
+  .uv-panel { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.5; }
+  .uv-well { fill: var(--surface); stroke: var(--line-2); stroke-width: 1.5; }
+  .uv-soft { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+  .uv-solid { fill: var(--accent); }
+  .uv-bad { fill: var(--danger); }
+  .uv-tan { fill: #c9a77c; }
+  .uv-berry { fill: var(--danger); }
+  .uv-warn-dot { fill: var(--warn); }
+  .uv-dash { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .uv-axis { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-linecap: round; }
+  .uv-goal { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+  .uv-hand { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+  .uv-caret { fill: none; stroke: var(--text); stroke-width: 1.2; }
+  .uv-tick { fill: none; stroke: var(--on-accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-check { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-pointer { fill: var(--text); stroke: var(--bg); stroke-width: 0.8; }
+  .uv-note { font: 400 8px var(--sans); fill: var(--muted); }
+  .uv-key, .uv-ink, .uv-on, .uv-red, .uv-amber, .uv-blue { font: 700 10px var(--sans); }
+  .uv-key { fill: var(--accent); } .uv-ink { fill: var(--text); } .uv-on { fill: var(--on-accent); font-size: 8px; }
+  .uv-chip { font-size: 9px; }
+  .uv-red { fill: var(--danger); } .uv-amber { fill: var(--warn); } .uv-blue { fill: var(--info); }
+  .uv-pill-good { fill: var(--accent-soft); } .uv-pill-warn { fill: var(--warn-soft); }
+  .uv-pill-bad { fill: var(--danger-soft); } .uv-pill-info { fill: var(--info-soft); }
+
+  /* Resting state, also what reduced motion shows */
+  .uv-later { opacity: 0; }
+  .uv-grow { transform-origin: left center; }
+  .uv-rise { transform-origin: bottom; }
+  .uv-shrink { transform-origin: left center; }
+
+  /* Motion: everything loops, and only while the scene is on screen */
+  .uv:not(.is-live) [class*='uv-'] { animation-play-state: paused; }
+
+  .uv-left { animation: uv-left 4s ease-in-out infinite; } .uv-right { animation: uv-right 4s ease-in-out infinite; } .uv-merge { animation: uv-merge 4s ease-in-out infinite; }
+  @keyframes uv-left { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(24px); opacity: 0; } 100% { transform: none; } }
+  @keyframes uv-right { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(-24px); opacity: 0; } 100% { transform: none; } }
+  @keyframes uv-merge { 0%, 35% { opacity: 0; transform: scale(0.8); } 50%, 82% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
+
+  .uv-dot { animation: uv-travel 2.4s linear infinite; animation-delay: calc(var(--k, 0) * 0.8s); }
+  @keyframes uv-travel { from { offset-distance: 0%; opacity: 1; } 90% { opacity: 1; } to { offset-distance: 100%; opacity: 0; } }
+
+  .uv-cycle { animation: uv-cycle calc(var(--of, 3) * 1.5s) ease-in-out infinite; animation-delay: calc(var(--k, 0) * 1.5s); }
+  @keyframes uv-cycle { 0% { opacity: 0; transform: translateY(6px); } 6% { opacity: 1; transform: none; } 30% { opacity: 1; transform: none; } 36%, 100% { opacity: 0; transform: translateY(-6px); } }
+  /* With two states each one holds for half the loop */
+  .uv-cycle[style*='--of:2'] { animation-name: uv-cycle-2; }
+  @keyframes uv-cycle-2 { 0% { opacity: 0; transform: translateY(6px); } 8%, 44% { opacity: 1; transform: none; } 52%, 100% { opacity: 0; transform: translateY(-6px); } }
+
+  .uv-grow { transform: scaleX(0.4); animation: uv-grow 4s ease-in-out infinite; }
+  @keyframes uv-grow { 0% { transform: scaleX(0.05); } 25% { transform: scaleX(0.4); } 50% { transform: scaleX(0.7); } 70%, 90% { transform: scaleX(1); } 100% { transform: scaleX(0.05); } }
+  .uv-done { animation: uv-done 4s ease-in-out infinite; }
+  @keyframes uv-done { 0%, 66% { opacity: 0; transform: scale(0.4); } 72%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+  .uv-in1 { animation: uv-in1 4.5s ease-out infinite; } .uv-in2 { animation: uv-in2 4.5s ease-out infinite; } .uv-in3 { animation: uv-in3 4.5s ease-out infinite; }
+  @keyframes uv-in1 { 0% { opacity: 0; transform: translateY(6px); } 8%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  @keyframes uv-in2 { 0%, 28% { opacity: 0; transform: translateY(6px); } 36%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  @keyframes uv-in3 { 0%, 56% { opacity: 0; transform: translateY(6px); } 64%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+  .uv-rise { animation: uv-rise 4s ease-in-out infinite; animation-delay: calc(var(--k, 0) * 0.25s); }
+  @keyframes uv-rise { 0%, 10% { transform: scaleY(0.15); } 45%, 85% { transform: scaleY(1); } 100% { transform: scaleY(0.15); } }
+
+  .uv-scan { animation: uv-scan 4s steps(5, jump-end) infinite; }
+  @keyframes uv-scan { 0% { transform: none; } 75%, 100% { transform: translateX(var(--dx, 80px)); } }
+
+  .uv-shrink { animation: uv-shrink 4s ease-in-out infinite; }
+  @keyframes uv-shrink { 0%, 15% { transform: none; } 60%, 88% { transform: scaleX(0.35); } 100% { transform: none; } }
+
+  .uv-blink { animation: uv-blink 1.1s steps(2, jump-none) infinite; }
+  @keyframes uv-blink { 50% { opacity: 0; } }
+
+  .uv-cursor { transform-box: view-box; transform-origin: 0 0; transform: translate(40px, 42px); animation: uv-cursor 4s ease-in-out infinite; }
+  @keyframes uv-cursor { 0%, 8% { transform: translate(100px, 60px); } 40% { transform: translate(40px, 42px); } 46% { transform: translate(40px, 42px) scale(0.85); } 52%, 85% { transform: translate(40px, 42px); } 100% { transform: translate(100px, 60px); } }
+
+  .uv-wobble { animation: uv-wobble 3s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -1.5s); }
+  @keyframes uv-wobble { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateY(-1px); } }
+
+  .uv-spin { transform-origin: bottom center; animation: uv-spin 3s linear infinite; }
+  @keyframes uv-spin { to { transform: rotate(360deg); } }
+
+  /* Reduced motion: the resting picture, with the status that ends each story shown */
+  @media (prefers-reduced-motion: reduce) {
+    .uv-done, .uv-merge { opacity: 1; }
+    .uv-left, .uv-right { opacity: 0; }
+  }
+</style>
+
+<script>
+  // Scenes only move while they are on screen.
+  const watcher = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => entry.target.classList.toggle('is-live', entry.isIntersecting));
+  }, { rootMargin: '60px' });
+  document.querySelectorAll('[data-vignette]').forEach((scene) => watcher.observe(scene));
+</script>

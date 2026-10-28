@@ -129,6 +129,15 @@ p { margin: 0; }
 .img-fade img { opacity: 0; transition: opacity 0.6s ease-out; }
 .img-fade img.is-loaded { opacity: 1; }
 
+/* Ghost loading: a box for a picture whose size is not known up front (such as
+   a large animation from another host). It holds a shimmering placeholder of
+   --ghost-ratio until the picture loads, so people can see something is coming. */
+.ghost { display: block; position: relative; border-radius: 8px; overflow: hidden; }
+.ghost:not(:has(img.is-loaded)) { aspect-ratio: var(--ghost-ratio, 16 / 10); background: linear-gradient(100deg, var(--surface-2) 30%, var(--line-2) 50%, var(--surface-2) 70%) 0 0 / 300% 100%; animation: ghost-shimmer 1.6s ease-in-out infinite; }
+.ghost:not(:has(img.is-loaded)) img { position: absolute; inset: 0; }
+.ghost img { display: block; width: 100%; height: auto; }
+@keyframes ghost-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
 /* Feature rows: the framed video first at full width, so the prototype can be
    seen clearly, then the points it shows underneath. */
 .feature-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); margin-top: var(--space-3); }

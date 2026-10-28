@@ -8,7 +8,6 @@ import type { Step } from '../components/StepList.astro';
 import Shot from '../components/Shot.astro';
 import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
-import { sectionNumber } from '../layouts/sections';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -18,7 +17,6 @@ const sections = [
   { id: 'usability-test', title: 'Usability Test' },
   { id: 'challenges', title: 'Challenges and Learnings' },
 ];
-const n = sectionNumber(sections);
 
 const considerations: Step[] = [
   { title: 'Should the crumb be more specific?', text: 'Show the exact serial number, CL1000001, in place of a generic “Edit claim” crumb, for more accuracy.', img: framerImage('BZTm0j5WgEmigwastXcUUKuvH4U.png'), alt: 'A crumb with a generic label beside one with a specific serial number' },
@@ -56,14 +54,12 @@ const next = nextCaseLinks('docdoc-breadcrumb');
   heroSky="crumb"
 >
   <section id="introduction" class="sec">
-    <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
     <p class="big">Our healthcare enterprise app was confusing. Users couldn’t tell where they were, or how pages linked together.</p>
     <p>We added a breadcrumb trail and tested several designs. Users picked the cleanest one. We then reversed that choice when it fell short of engineering standards, and used an established, documented pattern instead.</p>
   </section>
 
   <section id="problem" class="sec">
-    <p class="sn">{n('problem')}</p>
     <h2>Problem Statement</h2>
     <h3 class="sub">Lost inside DocDoc</h3>
     <p>In account management, every person or organisation has an account, and each account has its own hierarchy. One layer is “Edit procedure price”, but it wasn’t clear whether that page belonged to an organisation or a person. The same confusion showed up across the app, because the links between layers weren’t clear.</p>
@@ -76,7 +72,6 @@ const next = nextCaseLinks('docdoc-breadcrumb');
 
   <section id="matrix" class="sec">
     <SpaceBand name="crystals" />
-    <p class="sn">{n('matrix')}</p>
     <h2>Impact Effort Matrix</h2>
     <p>We explored many ideas so we wouldn’t fall for the first one. After three days of brainstorming, we placed every idea in FigJam on an impact effort grid.</p>
     <p>Most of us kept coming back to a breadcrumb trail. Our hunch: users already expect a row of links, and the app was mature enough that breadcrumbs would feel natural, not tacked on.</p>
@@ -84,20 +79,18 @@ const next = nextCaseLinks('docdoc-breadcrumb');
   </section>
 
   <section id="considerations" class="sec">
-    <p class="sn">{n('considerations')}</p>
     <h2>Design Considerations</h2>
     <p>Four questions shaped the breadcrumb.</p>
     <StepList items={considerations} />
   </section>
 
   <section id="usability-test" class="sec">
-    <p class="sn">{n('usability-test')}</p>
     <h2>Usability Test</h2>
     <p>I ran an unmoderated remote test with Google Forms. Participants from the claim operations team picked one of three options and said why. It is quick, and gives a fair view of what users prefer.</p>
     <ul class="options">
       {options.map((option) => (
         <li class:list={{ chosen: option.chosen }}>
-          <img src={framerImage(option.file)} alt={option.alt} loading="lazy" decoding="async" />
+          <span class="ghost"><img src={framerImage(option.file)} alt={option.alt} loading="lazy" decoding="async" /></span>
           <div class="o-copy">
             <div class="o-head">
               <h3>{option.title}</h3>
@@ -112,7 +105,6 @@ const next = nextCaseLinks('docdoc-breadcrumb');
   </section>
 
   <section id="challenges" class="sec">
-    <p class="sn">{n('challenges')}</p>
     <h2>Challenges and Learnings</h2>
     <CardGrid items={learnings} min={300} />
   </section>

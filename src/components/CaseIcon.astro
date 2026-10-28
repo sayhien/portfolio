@@ -1,7 +1,7 @@
 ---
 // Small animated badge that hints at what a case study is about.
 // Decorative only; the card title carries the meaning.
-export type CaseIconKind = 'chat' | 'remit' | 'report' | 'library' | 'crumb' | 'globe';
+export type CaseIconKind = 'chat' | 'remit' | 'report' | 'library' | 'crumb' | 'globe' | 'cake';
 interface Props {
   kind: CaseIconKind;
 }
@@ -48,6 +48,16 @@ const { kind } = Astro.props;
       <circle class="crumb c3" cx="40" cy="24" r="3.4" />
     </svg>
   )}
+  {kind === 'cake' && (
+    <svg viewBox="0 0 48 48">
+      <rect class="sheet" x="9" y="28" width="30" height="12" rx="2" />
+      <rect class="sheet" x="14" y="19" width="20" height="9" rx="2" />
+      <path class="candle" d="M24 12v7" />
+      <path class="flame" d="M24 4c2.2 2.6 2.4 4.6 0 6.4-2.4-1.8-2.2-3.8 0-6.4Z" />
+      <circle class="berry" cx="18" cy="17.5" r="2.6" />
+      <circle class="berry b-2" cx="30" cy="17.5" r="2.6" />
+    </svg>
+  )}
   {kind === 'globe' && (
     <svg viewBox="0 0 48 48">
       <circle class="sheet" cx="24" cy="24" r="16" />
@@ -89,6 +99,13 @@ const { kind } = Astro.props;
 
   .meridian { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; animation: turn 6s linear infinite; }
   @keyframes turn { to { transform: rotate(360deg); } }
+
+  .candle { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; }
+  .flame { fill: var(--warn); transform-origin: bottom; animation: flicker 1.2s ease-in-out infinite; }
+  .berry { fill: var(--accent); animation: drop 3s ease-in-out infinite; }
+  .b-2 { animation-delay: 0.5s; }
+  @keyframes flicker { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(0.85, 1.15); } }
+  @keyframes drop { 0%, 10% { transform: translateY(-10px); opacity: 0; } 30%, 85% { transform: translateY(0); opacity: 1; } 100% { opacity: 0; } }
 
   /* Lift slightly when its card is hovered */
   .case-icon { transition: transform 0.3s; }

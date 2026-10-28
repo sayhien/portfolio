@@ -27,7 +27,6 @@ interface Props {
 const { title, kicker, heading, lede, meta, sections, next = [], heroScene, heroSky } = Astro.props;
 // On phones the sky shows in a band under the text. The cake scene is tall (saucers above, cake below), so it gets more room.
 const skyBand = heroSky === 'cake' ? 400 : 300;
-const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
 <Base title={title} description={lede} revealHeader>
   <article>
@@ -64,8 +63,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
           </summary>
           <nav aria-label="Case study sections">
             <ol>
-              {sections.map((s, i) => (
-                <li><a href={`#${s.id}`}><span class="n">{pad(i)}</span><span>{s.title}</span></a></li>
+              {sections.map((s) => (
+                <li><a href={`#${s.id}`}>{s.title}</a></li>
               ))}
             </ol>
           </nav>
@@ -112,6 +111,11 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   }
   dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   dd { margin: 0; font-size: 16px; line-height: 1.45; }
+  /* On desktop the hero text keeps to the left 60%, leaving the right side to the scene. */
+  @media (min-width: 1001px) {
+    .cs-hero > * { max-width: 60%; }
+    .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
 
   .hero-media { margin-bottom: var(--space-5); }
 
@@ -149,8 +153,6 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   .toc a:hover { color: var(--text); }
   .toc a[aria-current='true'] { color: var(--text); border-left-color: var(--accent); font-weight: 500; }
   .toc-now, .toc-progress { display: none; }
-  .toc .n { font-size: 12px; color: var(--muted); padding-top: 2px; min-width: 20px; font-variant-numeric: tabular-nums; }
-  .toc a[aria-current='true'] .n { color: var(--accent); }
 
   .content { min-width: 0; max-width: 1040px; }
 
@@ -253,7 +255,7 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
   const setCurrent = (id: string) => {
     links.forEach((a) => a.setAttribute('aria-current', String(a.hash.slice(1) === id)));
     const active = byId.get(id);
-    if (nowLabel && active) nowLabel.textContent = active.textContent?.replace(/^(\d+)/, '$1 ') ?? '';
+    if (nowLabel && active) nowLabel.textContent = active.textContent ?? '';
   };
   const updateProgress = () => {
     if (!progress) return;

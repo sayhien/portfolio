@@ -10,21 +10,19 @@ import Shot from '../components/Shot.astro';
 import YouTube from '../components/YouTube.astro';
 import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
-import { sectionNumber } from '../layouts/sections';
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
   { id: 'app-failure', title: 'App Failure After Launch' },
   { id: 'usability-failure', title: 'Usability Testing Failure' },
   { id: 'segments', title: 'A Tale of Two Segments' },
-  { id: 'core-problem', title: 'Core Problem Defined' },
+  { id: 'goals', title: 'Goals' },
   { id: 'priority-pain-points', title: 'Priority Pain Points' },
   { id: 'opportunities', title: 'From Pain Points to Opportunities' },
   { id: 'solution-toolkit', title: 'The Solution Toolkit' },
   { id: 'usability-success', title: 'Usability Testing Success' },
   { id: 'pivot', title: 'Pivot and Outcome' },
 ];
-const n = sectionNumber(sections);
 
 const failures: Card[] = [
   { icon: 'alert', title: 'Users abandoned core tasks' },
@@ -53,9 +51,9 @@ const personas: Persona[] = [
 ];
 
 const goals: Card[] = [
-  { icon: 'rise', title: 'Raise completion' },
-  { icon: 'tool', title: 'Cut costs' },
-  { icon: 'badge', title: 'Restore trust' },
+  { vignette: 'raiseCompletion', title: 'Raise completion' },
+  { vignette: 'cutCosts', title: 'Cut costs' },
+  { vignette: 'restoreTrust', title: 'Restore trust' },
 ];
 
 const priorities: Card[] = [
@@ -102,14 +100,12 @@ const next = nextCaseLinks('swipe-remittance-app');
   heroSky="remit"
 >
   <section id="introduction" class="sec">
-    <p class="sn">{n('introduction')}</p>
     <h2>Introduction</h2>
     <p class="big">Swipe lets foreign workers send money back home. After nearly twelve months of patches driven by business requests, I started user research to understand why the core flows kept failing.</p>
     <p>This moved the team from shipping features to solving problems with evidence, ahead of an important client presentation.</p>
   </section>
 
   <section id="app-failure" class="sec">
-    <p class="sn">{n('app-failure')}</p>
     <h2>App Failure After Launch</h2>
     <p>Research after launch showed that every core function was, in practice, broken.</p>
     <CardGrid items={failures} min={220} />
@@ -120,7 +116,6 @@ const next = nextCaseLinks('swipe-remittance-app');
   </section>
 
   <section id="usability-failure" class="sec">
-    <p class="sn">{n('usability-failure')}</p>
     <h2>Usability Testing Failure</h2>
     <p>A usability test of sign up, top up and send put numbers on the problem.</p>
     <StatCompare items={[
@@ -133,22 +128,19 @@ const next = nextCaseLinks('swipe-remittance-app');
   </section>
 
   <section id="segments" class="sec">
-    <p class="sn">{n('segments')}</p>
     <h2>A Tale of Two Segments</h2>
     <p>Interviews revealed two groups of users with opposite priorities.</p>
     <Personas items={personas} />
   </section>
 
-  <section id="core-problem" class="sec">
-    <p class="sn">{n('core-problem')}</p>
-    <h2>Core Problem Defined</h2>
+  <section id="goals" class="sec">
+    <h2>Goals</h2>
     <p class="big">The app’s critical flows were failing first time users. Its UX debt had to go before any marketing spend could bring lasting growth.</p>
     <CardGrid items={goals} min={200} />
   </section>
 
   <section id="priority-pain-points" class="sec">
     <SpaceBand name="meteors" />
-    <p class="sn">{n('priority-pain-points')}</p>
     <h2>Priority Pain Points</h2>
     <p>I sorted the raw findings into groups, then plotted them on an impact effort matrix to rank them by how much they mattered to users and to the business.</p>
     <Shot src={framerImage('JZQIvFOztrHwOz6DD9pbq6fthw.png')} alt="Ideation boards used to sort and rank the pain points" />
@@ -156,14 +148,12 @@ const next = nextCaseLinks('swipe-remittance-app');
   </section>
 
   <section id="opportunities" class="sec">
-    <p class="sn">{n('opportunities')}</p>
     <h2>From Pain Points to Opportunities</h2>
     <p>Each challenge was turned into a “how might we” question to spark solutions.</p>
     <CardGrid items={hmw} min={200} />
   </section>
 
   <section id="solution-toolkit" class="sec">
-    <p class="sn">{n('solution-toolkit')}</p>
     <h2>The Solution Toolkit</h2>
 
     <h3 class="sub">Merged flow, the flip flow</h3>
@@ -210,7 +200,6 @@ const next = nextCaseLinks('swipe-remittance-app');
   </section>
 
   <section id="usability-success" class="sec">
-    <p class="sn">{n('usability-success')}</p>
     <h2>Usability Testing Success</h2>
     <p>I tested the redesigned core flow with six participants. Every metric improved.</p>
     <StatCompare items={[
@@ -229,7 +218,6 @@ const next = nextCaseLinks('swipe-remittance-app');
   </section>
 
   <section id="pivot" class="sec">
-    <p class="sn">{n('pivot')}</p>
     <h2>Pivot and Outcome</h2>
     <h3 class="sub">Strategic pivot</h3>
     <p>Testing and interviews confirmed two simple facts. White collar users preferred their bank apps for convenience. Blue collar users chose Swipe for its better exchange rates. Their priorities followed their income.</p>

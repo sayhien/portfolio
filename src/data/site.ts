@@ -125,6 +125,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'four-leaves',
+    icon: 'cake',
     nextBlurb: 'Brought cake ordering to the front of a bakery website and told the story behind the ingredients.',
     title: 'Four Leaves',
     blurb: 'A concept redesign of a Singapore bakery website. Cake ordering was hidden on a second site, so I moved it to the front, added the story behind the ingredients and made the points scheme easy to value.',

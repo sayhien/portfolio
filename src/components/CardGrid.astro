@@ -2,9 +2,12 @@
 // A grid of short cards: an optional icon or small label, a title and a line
 // of text. Used for findings, principles, criteria and outcomes.
 import Icon from './Icon.astro';
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
 import type { IconName } from './Icon.astro';
 
-export type Card = { title: string; text?: string; icon?: IconName; label?: string };
+/** `img` shows a small round photo in place of the icon; the card text says the same, so it is decorative. */
+export type Card = { title: string; text?: string; icon?: IconName; label?: string; img?: ImageSource };
 interface Props {
   items: Card[];
   /** Smallest card width before the grid drops a column. */
@@ -21,7 +24,8 @@ const Tag = numbered ? 'ol' : 'ul';
   {items.map((card, index) => (
     <li style={`--n:${index}`}>
       {numbered && <span class="num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>}
-      {!numbered && card.icon && <span class="tile" aria-hidden="true"><Icon name={card.icon} size={20} /></span>}
+      {!numbered && card.img && <SmartImage class="photo" src={card.img} alt="" widths={[160]} sizes="80px" />}
+      {!numbered && !card.img && card.icon && <span class="tile" aria-hidden="true"><Icon name={card.icon} size={20} /></span>}
       {card.label && <p class="label">{card.label}</p>}
       <h3>{card.title}</h3>
       {card.text && <p class="text">{card.text}</p>}
@@ -34,6 +38,7 @@ const Tag = numbered ? 'ol' : 'ul';
   @media (min-width: 761px) { .fixed { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); } }
   li { display: flex; flex-direction: column; gap: var(--space-1); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
   .tile { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-bottom: 4px; }
+  li :global(.photo) { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-line); margin-bottom: 4px; }
   .num { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); }
   .label { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
   h3 { font-size: 20px; line-height: 1.3; }

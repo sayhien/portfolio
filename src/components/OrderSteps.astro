@@ -1,6 +1,8 @@
 ---
-// A short flow told as numbered steps on a line. Picking a step shows its
-// screen on the right. Built as tabs, so arrow keys move between steps.
+// A short flow told like a mission trajectory. Numbered waypoints sit on a
+// line; as the reader scrolls, the line fills to the step in view, that
+// step lights up and the screen beside it changes to match. On small screens
+// each step shows its own screen above its text instead.
 import SmartImage from './SmartImage.astro';
 import type { ImageSource } from './SmartImage.astro';
 
@@ -10,82 +12,109 @@ interface Props {
   cta: { label: string; href: string };
 }
 const { steps, cta } = Astro.props;
-const id = 'order-steps';
 ---
-<div class="order" data-order-steps>
-  <div class="o-copy">
-    <div class="o-steps" role="tablist" aria-orientation="vertical" aria-label="Steps to order a cake">
+<div class="mission" data-mission>
+  <div class="m-path">
+    <span class="m-track" aria-hidden="true"><span class="m-fill"></span><span class="m-craft"></span></span>
+    <ol class="m-steps">
       {steps.map((s, i) => (
-        <button type="button" role="tab" id={`${id}-tab-${i}`} aria-controls={`${id}-panel-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} class="o-step">
-          <span class="o-num" aria-hidden="true">{i + 1}</span>
-          <span class="o-title">{s.title}</span>
-          <span class="o-text">{s.text}</span>
-        </button>
+        <li class:list={['m-step', { 'is-on': i === 0 }]}>
+          <span class="m-num" aria-hidden="true">{i + 1}</span>
+          <div class="m-pic">
+            <SmartImage src={s.img} alt={s.alt} widths={[640, 960]} sizes="92vw" />
+          </div>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))}
+      <li class="m-end">
+        <a class="o-cta" href={cta.href} target="_blank" rel="noopener">{cta.label}<span class="visually-hidden"> (opens in a new tab)</span><span class="o-arrow" aria-hidden="true">&#8599;</span></a>
+      </li>
+    </ol>
+  </div>
+  <div class="m-screen" aria-hidden="true">
+    <div class="m-frame">
+      {steps.map((s, i) => (
+        <div class:list={['m-shot', { 'is-on': i === 0 }]}>
+          <SmartImage src={s.img} alt="" widths={[960, 1280, 1920]} sizes="55vw" />
+        </div>
       ))}
     </div>
-    <a class="o-cta" href={cta.href} target="_blank" rel="noopener">{cta.label}<span aria-hidden="true">&rarr;</span></a>
-  </div>
-  <div class="o-screens">
-    {steps.map((s, i) => (
-      <div role="tabpanel" id={`${id}-panel-${i}`} aria-labelledby={`${id}-tab-${i}`} hidden={i > 0} class="o-panel">
-        <SmartImage src={s.img} alt={s.alt} widths={[640, 960, 1280]} sizes="(max-width: 860px) 92vw, 620px" />
-      </div>
-    ))}
   </div>
 </div>
 
 <style>
-  .order { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: var(--space-4); align-items: start; margin-top: var(--space-3); padding: var(--space-4); border-radius: var(--radius); border: 1px solid var(--line); background: radial-gradient(120% 90% at 85% 50%, rgba(110, 231, 183, 0.1), transparent 60%), var(--surface); }
-  .o-copy { display: grid; gap: var(--space-3); justify-items: start; }
+  .mission { display: grid; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); gap: var(--space-5); margin-top: var(--space-4); }
 
-  /* A line runs down the left, through the step numbers, to show the order. */
-  .o-steps { position: relative; display: grid; gap: 10px; width: 100%; padding-left: 44px; }
-  .o-steps::before { content: ''; position: absolute; left: 13px; top: 12px; bottom: 12px; width: 2px; background: var(--accent-line); }
-  .o-step { position: relative; display: grid; gap: 2px; text-align: left; width: 100%; min-height: 44px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); color: var(--text); font: inherit; cursor: pointer; }
-  .o-step:hover { border-color: var(--line-2); background: rgba(255, 255, 255, 0.06); }
-  .o-step[aria-selected='true'] { border-color: var(--accent); background: var(--accent-soft); }
-  .o-num { position: absolute; left: -44px; top: 50%; translate: 0 -50%; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); background: var(--surface-2); border: 1px solid var(--line-2); }
-  .o-step[aria-selected='true'] .o-num { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
-  .o-title { font-family: var(--display); font-size: 18px; font-weight: 600; }
-  .o-text { font-size: 15px; line-height: 1.5; color: var(--text-2); }
+  /* The trajectory: a faint dashed track, a solid fill up to the step in view, and a glowing craft at its tip. */
+  .m-path { position: relative; padding-left: 56px; }
+  .m-steps { list-style: none; margin: 0; padding: 0; }
+  .m-track { position: absolute; left: 17px; top: 18px; bottom: 60px; width: 2px; background: repeating-linear-gradient(to bottom, var(--line-2) 0 6px, transparent 6px 12px); }
+  .m-fill { position: absolute; inset: 0 0 auto 0; height: var(--progress, 0%); background: var(--accent); }
+  .m-craft { position: absolute; left: 50%; top: var(--progress, 0%); width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 0 18px var(--accent); }
+
+  .m-step { position: relative; min-height: 62vh; display: grid; align-content: start; gap: 8px; padding-top: 4px; opacity: 0.45; transition: opacity 0.4s; }
+  .m-step.is-on { opacity: 1; }
+  .m-num { position: absolute; left: -56px; top: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--text); background: var(--surface-2); border: 1px solid var(--line-2); transition: background-color 0.4s, color 0.4s, border-color 0.4s; }
+  .m-step.is-on .m-num { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .m-step h3 { font-size: 26px; }
+  .m-step p { font-size: 17px; line-height: 1.6; color: var(--text-2); max-width: 420px; }
+  .m-pic { display: none; }
+  .m-end { padding-top: var(--space-2); }
+
+  .m-screen { position: relative; }
+  .m-frame { position: sticky; top: calc(50vh - min(19vw, 300px)); display: grid; }
+  .m-shot { grid-area: 1 / 1; opacity: 0; transition: opacity 0.5s ease; }
+  .m-shot.is-on { opacity: 1; }
+  .m-shot :global(img), .m-pic :global(img) { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: var(--radius); border: 1px solid var(--line-2); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); }
 
   .o-cta { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 8px 0 22px; border-radius: 999px; background: var(--text); color: var(--bg); font-weight: 600; text-decoration: none; }
-  .o-cta span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); }
-  .o-cta:hover span { translate: 3px 0; }
+  .o-arrow { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); }
+  .o-cta:hover .o-arrow { translate: 2px -2px; }
 
-  .o-screens { position: sticky; top: 96px; }
-  .o-panel[hidden] { display: none; }
-  .o-panel :global(img) { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: var(--radius); border: 1px solid var(--line-2); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
-
+  /* Small screens: one column, each step carries its own screen above its text. */
   @media (max-width: 860px) {
-    .order { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
-    .o-screens { position: static; order: -1; }
+    .mission { grid-template-columns: minmax(0, 1fr); }
+    .m-screen { display: none; }
+    .m-path { padding-left: 48px; }
+    .m-track { left: 15px; }
+    .m-num { left: -48px; width: 32px; height: 32px; }
+    .m-step { min-height: 0; padding-bottom: var(--space-5); }
+    .m-pic { display: block; margin-bottom: 8px; }
+    .m-step h3 { font-size: 22px; }
   }
-  @media (prefers-reduced-motion: no-preference) { .o-cta span { transition: translate 0.2s; } }
+  @media (prefers-reduced-motion: no-preference) { .o-arrow { transition: translate 0.2s; } }
 </style>
 
 <script>
-  // Tabs: click or arrow keys pick a step; only the chosen step's screen shows.
-  document.querySelectorAll<HTMLElement>('[data-order-steps]').forEach((root) => {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
-    const panels = Array.from(root.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
-    const select = (index: number, focus = false) => {
-      tabs.forEach((tab, i) => {
-        const on = i === index;
-        tab.setAttribute('aria-selected', String(on));
-        tab.tabIndex = on ? 0 : -1;
-        panels[i].hidden = !on;
-      });
-      if (focus) tabs[index].focus();
+  // A step is in view once its title passes the reading line, a little below the middle. The
+  // line fills to the reading point, so it moves smoothly in both directions.
+  document.querySelectorAll<HTMLElement>('[data-mission]').forEach((root) => {
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('.m-step'));
+    const shots = Array.from(root.querySelectorAll<HTMLElement>('.m-shot'));
+    const track = root.querySelector<HTMLElement>('.m-track');
+    let active = 0;
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const line = innerHeight * 0.62;
+      let next = 0;
+      steps.forEach((step, i) => { if (step.getBoundingClientRect().top <= line) next = i; });
+      if (next !== active) {
+        active = next;
+        steps.forEach((step, i) => step.classList.toggle('is-on', i === active));
+        shots.forEach((shot, i) => shot.classList.toggle('is-on', i === active));
+      }
+      if (track) {
+        const box = track.getBoundingClientRect();
+        const progress = Math.min(1, Math.max(0, (line - box.top) / box.height));
+        track.style.setProperty('--progress', `${(progress * 100).toFixed(1)}%`);
+      }
     };
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => select(i));
-      tab.addEventListener('keydown', (event) => {
-        const moves: Record<string, number> = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
-        if (event.key in moves) { event.preventDefault(); select((i + moves[event.key] + tabs.length) % tabs.length, true); }
-        if (event.key === 'Home') { event.preventDefault(); select(0, true); }
-        if (event.key === 'End') { event.preventDefault(); select(tabs.length - 1, true); }
-      });
-    });
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    update();
   });
 </script>

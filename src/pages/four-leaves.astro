@@ -6,14 +6,14 @@ import CardGrid from '../components/CardGrid.astro';
 import ChangeCards from '../components/ChangeCards.astro';
 import OrderSteps from '../components/OrderSteps.astro';
 import type { OrderStep } from '../components/OrderSteps.astro';
-import Shot from '../components/Shot.astro';
+import Slides from '../components/Slides.astro';
+import type { Slide } from '../components/Slides.astro';
 import type { Card } from '../components/CardGrid.astro';
 import type { Change } from '../components/ChangeCards.astro';
 import type { RowArtName } from '../components/row-art';
 import { nextCaseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 
-import afterHome from '../assets/four-leaves/after-home.webp';
 import beforeOrder from '../assets/four-leaves/before-order.webp';
 import beforeLook from '../assets/four-leaves/before-look.webp';
 import beforeLocation from '../assets/four-leaves/before-location.webp';
@@ -30,6 +30,15 @@ import lookHero from '../assets/four-leaves/look-1-hero.webp';
 import lookCakes from '../assets/four-leaves/look-2-cakes.webp';
 import lookBuns from '../assets/four-leaves/look-3-buns.webp';
 import lookStory from '../assets/four-leaves/look-4-story.webp';
+import introHome from '../assets/four-leaves/intro-1-home.webp';
+import introCakes from '../assets/four-leaves/intro-2-cakes.webp';
+import introCake from '../assets/four-leaves/intro-3-cake.webp';
+import introStory from '../assets/four-leaves/intro-4-story.webp';
+import introOutlets from '../assets/four-leaves/intro-5-outlets.webp';
+import introRewards from '../assets/four-leaves/intro-6-rewards.webp';
+import limitRoom from '../assets/four-leaves/limit-room.webp';
+import limitGrower from '../assets/four-leaves/limit-grower.webp';
+import limitCustomer from '../assets/four-leaves/limit-customer.webp';
 import stepCakes from '../assets/four-leaves/step-1-cakes.webp';
 import stepCake from '../assets/four-leaves/step-2-cake.webp';
 import stepOrder from '../assets/four-leaves/step-3-order.webp';
@@ -38,6 +47,16 @@ import stepDetails from '../assets/four-leaves/step-5-details.webp';
 import stepReview from '../assets/four-leaves/step-6-review.webp';
 
 const liveSite = 'https://sayhien.github.io/four-leaves-redesign/';
+const oldSite = 'https://fourleaves.com.sg/';
+
+const tour: Slide[] = [
+  { src: introHome, alt: 'New home page: a green header with a scalloped edge, a strawberry cake and an Order a cake button' },
+  { src: introCakes, alt: 'New Order a cake page with filters for feeding, flavour and shape above the cakes' },
+  { src: introCake, alt: 'New cake page with photos, a description and three sizes with prices' },
+  { src: introStory, alt: 'New Our story page about Four Leaves since 1981, with the bakers and the factory' },
+  { src: introOutlets, alt: 'New Find an outlet page with a search box, a map of Singapore and a list of outlets' },
+  { src: introRewards, alt: 'New Rewards page showing what points are worth as money off' },
+];
 
 const sections = [
   { id: 'introduction', title: 'Introduction' },
@@ -143,9 +162,9 @@ const measures: string[][] = [
 const measureArt: RowArtName[] = ['cakeOrders', 'dropOff', 'signUps', 'orderTime'];
 
 const limits: Card[] = [
-  { title: 'No customer research', text: 'I did not talk to customers. The problems come from my review against the ten usability rules.', label: 'Method' },
-  { title: 'Most media is AI generated', text: 'Only the cake, career and company photos are real. The films, grower photos and quote are AI generated to show the idea.', label: 'Media' },
-  { title: 'Next step', text: 'Test with five customers. Ask where they would order a cake, and time the first order.', label: 'Learning' },
+  { title: 'No customer research', text: 'I did not talk to customers. The problems come from my review against the ten usability rules.', label: 'Method', img: limitRoom },
+  { title: 'Most media is AI generated', text: 'Only the cake, career and company photos are real. The films, grower photos and quote are AI generated to show the idea.', label: 'Media', img: limitGrower },
+  { title: 'Next step', text: 'Test with five customers. Ask where they would order a cake, and time the first order.', label: 'Learning', img: limitCustomer },
 ];
 
 const next = nextCaseLinks('four-leaves');
@@ -170,8 +189,13 @@ const next = nextCaseLinks('four-leaves');
     <h2>Introduction</h2>
     <p class="big">Four Leaves has baked in Singapore since 1981. Cakes earn most of its money. But to order a cake, people must leave the main website for a second shop.</p>
     <p>I redesigned the website to fix this. This is a concept. I have no link with the company, and I did not talk to customers.</p>
-    <p><a href={liveSite} target="_blank" rel="noopener">Try the redesigned website</a></p>
-    <Shot src={afterHome} alt="The new Four Leaves home page: a green header with a scalloped edge, a film of the bakers, and an Order a cake button" caption="The new home page. The Order cakes button is in the header on every page." frame />
+    <ul class="links">
+      <li><a href={liveSite} target="_blank" rel="noopener">Try the redesigned website</a></li>
+    </ul>
+    <figure class="tour">
+      <Slides slides={tour} label="pages of the redesign" frame />
+      <figcaption>The redesign, page by page. The Order cakes button is in the header on every page.</figcaption>
+    </figure>
   </section>
 
   <section id="discover" class="sec">
@@ -179,6 +203,9 @@ const next = nextCaseLinks('four-leaves');
     <p class="sn">{n('discover')}</p>
     <h2>Discover</h2>
     <p>I used the main site and the online shop as a new customer who wants a cake. I checked each page against Nielsen’s ten usability rules.</p>
+    <ul class="links">
+      <li><a href={oldSite} target="_blank" rel="noopener">See the current Four Leaves website</a></li>
+    </ul>
     <h3 class="sub">Nine problems, most serious first</h3>
     <p>Critical stops an order. High gives less reason to order. Medium adds effort or doubt. These ratings are my judgement.</p>
     <DataTable caption="Nine problems on the current Four Leaves websites, most serious first" head={['Problem', 'What I saw', 'Rule it breaks']} rows={findings} art={findingArt} tags={findingTags} />
@@ -227,6 +254,8 @@ const next = nextCaseLinks('four-leaves');
 </CaseStudy>
 
 <style>
+  .tour { margin: var(--space-3) 0 0; }
+  .tour figcaption { font-size: 14px; color: var(--muted); margin-top: var(--space-1); }
   .embed { margin: var(--space-3) 0 0; }
   .embed .shot-frame { background: #fff; }
   .embed iframe { display: block; width: 100%; height: min(78vh, 760px); border: 0; background: #fff; }

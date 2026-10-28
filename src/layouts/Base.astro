@@ -32,6 +32,14 @@ const caseStudies = projects.filter((p) => p.href);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <!-- Images start hidden and fade in once loaded, so they never pop in or paint half way.
+         Only with scripts on; if the fade script below never runs, images show after the page loads. -->
+    <script is:inline>
+      document.documentElement.classList.add('img-fade');
+      window.addEventListener('load', () => {
+        if (!window.imgFadeReady) document.documentElement.classList.remove('img-fade');
+      });
+    </script>
   </head>
   <body>
     <StarSky />
@@ -92,17 +100,14 @@ const caseStudies = projects.filter((p) => p.href);
       if (revealing && slot) startHeaderReveal(revealing, slot);
     </script>
     <script>
-      // Ghost loading: shimmer until each image arrives, then fade it in.
+      // Fade each image in once it has fully loaded. Images already loaded fade in at once.
+      const show = (img: HTMLImageElement) => img.classList.add('is-loaded');
       document.querySelectorAll('img').forEach((img) => {
-        if (img.complete && img.naturalWidth > 0) return;
-        img.classList.add('is-loading');
-        const done = () => {
-          img.classList.remove('is-loading');
-          img.classList.add('is-loaded');
-        };
-        img.addEventListener('load', done, { once: true });
-        img.addEventListener('error', () => img.classList.remove('is-loading'), { once: true });
+        if (img.complete) { show(img); return; }
+        img.addEventListener('load', () => show(img), { once: true });
+        img.addEventListener('error', () => show(img), { once: true });
       });
+      (window as Window & { imgFadeReady?: boolean }).imgFadeReady = true;
     </script>
   </body>
 </html>

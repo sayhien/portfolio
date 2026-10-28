@@ -1,0 +1,69 @@
+---
+// A few pictures shown one at a time, with previous and next buttons and a
+// count. One picture shows on its own with no buttons. `frame` puts the
+// pictures in the dark browser frame used across the site.
+import SmartImage from './SmartImage.astro';
+import type { ImageSource } from './SmartImage.astro';
+
+export type Slide = { src: ImageSource; alt: string };
+interface Props {
+  slides: Slide[];
+  /** Names the set for screen readers, such as "pages of the redesign". */
+  label: string;
+  frame?: boolean;
+  sizes?: string;
+  class?: string;
+}
+const { slides, label, frame = false, sizes = '(max-width: 760px) 92vw, 900px', class: className } = Astro.props;
+const many = slides.length > 1;
+---
+<div class:list={['slides', className]} data-slides={many ? '' : undefined}>
+  <div class:list={['s-view', { 'shot-frame': frame }]}>
+    {frame && <div class="shot-frame-bar" aria-hidden="true"><i></i><i></i><i></i></div>}
+    {slides.map((pic, n) => (
+      <div class="s-slide" hidden={n > 0}>
+        <SmartImage src={pic.src} alt={pic.alt} widths={[640, 960, 1280, 1920]} sizes={sizes} />
+      </div>
+    ))}
+    <slot />
+  </div>
+  {many && (
+    <div class="s-nav">
+      <button type="button" class="s-btn" data-step="-1" aria-label={`Previous of ${label}`}>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <span class="s-count" aria-live="polite">1 of {slides.length}</span>
+      <button type="button" class="s-btn" data-step="1" aria-label={`Next of ${label}`}>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+  )}
+</div>
+
+<style>
+  .s-view { position: relative; }
+  .s-slide[hidden] { display: none; }
+  .s-slide :global(img) { display: block; width: 100%; height: auto; }
+  .s-nav { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+  /* Icons, not text arrows, so they sit exactly in the middle of the circle on every device. */
+  .s-btn { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text); cursor: pointer; }
+  .s-btn svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .s-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .s-count { font-family: var(--mono); font-size: 13px; color: var(--text-2); min-width: 52px; text-align: center; }
+</style>
+
+<script>
+  // Previous and next swap the shown picture, wrapping round.
+  document.querySelectorAll<HTMLElement>('[data-slides]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('.s-slide'));
+    const count = root.querySelector<HTMLElement>('.s-count');
+    let shown = 0;
+    root.querySelectorAll<HTMLButtonElement>('.s-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        shown = (shown + Number(button.dataset.step) + slides.length) % slides.length;
+        slides.forEach((slide, index) => { slide.hidden = index !== shown; });
+        if (count) count.textContent = `${shown + 1} of ${slides.length}`;
+      });
+    });
+  });
+</script>

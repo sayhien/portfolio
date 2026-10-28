@@ -124,22 +124,20 @@ p { margin: 0; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-/* Ghost loading: a soft shimmer fills an image's reserved space until it
-   arrives, then the image fades in. Space is reserved by width and height
-   attributes, so nothing jumps while loading. */
-img.is-loading {
-  background: linear-gradient(100deg, var(--surface-2) 30%, var(--surface) 50%, var(--surface-2) 70%) 0 0 / 300% 100%;
-  animation: shimmer 1.4s linear infinite;
-}
-img.is-loaded { animation: img-in 0.45s ease-out; }
-@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
-@keyframes img-in { from { opacity: 0; } }
+/* Images fade in once fully loaded, instead of popping in or painting half
+   way. Space is reserved by width and height attributes, so nothing jumps. */
+.img-fade img { opacity: 0; transition: opacity 0.6s ease-out; }
+.img-fade img.is-loaded { opacity: 1; }
 
 /* Feature rows: the framed video first at full width, so the prototype can be
    seen clearly, then the points it shows underneath. */
 .feature-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); margin-top: var(--space-3); }
 .feature-row > :first-child { order: 2; }
 .feature-row > figure { margin: 0; }
+
+/* Every link that opens a new tab carries the same small arrow, so people know before they click. */
+a[target='_blank']:not(.o-cta)::after { content: '\2197' / ''; display: inline-block; margin-left: 0.3em; color: var(--accent); transition: transform 0.2s; }
+a[target='_blank']:not(.o-cta):hover::after { transform: translate(2px, -2px); }
 
 ::selection { background: var(--accent); color: var(--on-accent); }
 

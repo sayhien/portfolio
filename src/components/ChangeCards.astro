@@ -2,12 +2,13 @@
 // Problem and fix cards, one per row. Each card names the problem and the
 // fix, then shows a large cutout of the new design with a smaller cutout of
 // the old one overlapping its lower left corner. A fix with several pictures
-// gets previous and next buttons. A problem with nothing to show on the old
-// site gets an empty frame that says so.
+// gets previous and next buttons (see Slides). A problem with nothing to show
+// on the old site gets an empty frame that says so.
 import SmartImage from './SmartImage.astro';
-import type { ImageSource } from './SmartImage.astro';
+import Slides from './Slides.astro';
+import type { Slide } from './Slides.astro';
 
-type Picture = { src: ImageSource; alt: string };
+type Picture = Slide;
 export type Change = {
   problem: string;
   title: string;
@@ -23,7 +24,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 <ul class="changes">
-  {items.map((c, i) => (
+  {items.map((c) => (
     <li class="change">
       <div class="c-copy">
         <p class="c-problem"><span>Problem</span>{c.problem}</p>
@@ -31,22 +32,9 @@ const { items } = Astro.props;
         <p class="c-text">{c.text}</p>
       </div>
       <div class="c-visual">
-        <figure class="c-after" data-slides={c.after.length > 1 ? '' : undefined}>
-          <div class="c-track">
-            {c.after.map((pic, n) => (
-              <div class="c-slide" hidden={n > 0}>
-                <SmartImage src={pic.src} alt={pic.alt} widths={[640, 960, 1280]} sizes="(max-width: 700px) 92vw, 720px" />
-              </div>
-            ))}
-          </div>
+        <figure class="c-after">
+          <Slides slides={c.after} label={`pictures of ${c.title}`} sizes="(max-width: 700px) 92vw, 720px" />
           <figcaption class="chip">After</figcaption>
-          {c.after.length > 1 && (
-            <div class="c-nav">
-              <button type="button" class="c-btn" data-step="-1" aria-label={`Previous picture of ${c.title}`}>&larr;</button>
-              <span class="c-count" aria-live="polite">1 of {c.after.length}</span>
-              <button type="button" class="c-btn" data-step="1" aria-label={`Next picture of ${c.title}`}>&rarr;</button>
-            </div>
-          )}
         </figure>
         <figure class="c-before">
           {c.before
@@ -74,20 +62,13 @@ const { items } = Astro.props;
   figure { position: relative; margin: 0; }
   .c-after { width: 76%; margin-left: auto; }
   .c-before { position: absolute; left: 0; bottom: 0; width: 38%; }
-  figure :global(img), .c-empty { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; }
+  .c-visual figure :global(img), .c-empty { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; }
   .c-after :global(img) { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
   .c-before :global(img), .c-empty { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5); }
   .c-empty { display: grid; place-items: center; background: var(--surface-2); border: 1px dashed var(--muted); }
   .c-empty p { font-size: 15px; color: var(--text-2); text-align: center; padding: 0 12px; }
-  .c-slide[hidden] { display: none; }
   .chip { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
   .chip-before { background: #2a2f36; color: var(--text); border: 1px solid var(--line-2); }
-
-  /* Previous and next sit under the picture, clear of the old site cutout. */
-  .c-nav { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 12px; }
-  .c-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text); font-size: 18px; cursor: pointer; }
-  .c-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .c-count { font-family: var(--mono); font-size: 13px; color: var(--text-2); min-width: 52px; text-align: center; }
 
   @media (max-width: 700px) {
     .change { padding: var(--space-2); }
@@ -98,18 +79,3 @@ const { items } = Astro.props;
   }
 </style>
 
-<script>
-  // Previous and next swap which picture of the fix is shown, wrapping round.
-  document.querySelectorAll<HTMLElement>('[data-slides]').forEach((figure) => {
-    const slides = Array.from(figure.querySelectorAll<HTMLElement>('.c-slide'));
-    const count = figure.querySelector<HTMLElement>('.c-count');
-    let shown = 0;
-    figure.querySelectorAll<HTMLButtonElement>('.c-btn').forEach((button) => {
-      button.addEventListener('click', () => {
-        shown = (shown + Number(button.dataset.step) + slides.length) % slides.length;
-        slides.forEach((slide, index) => { slide.hidden = index !== shown; });
-        if (count) count.textContent = `${shown + 1} of ${slides.length}`;
-      });
-    });
-  });
-</script>

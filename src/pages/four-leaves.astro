@@ -5,6 +5,7 @@ import DataTable from '../components/DataTable.astro';
 import CardGrid from '../components/CardGrid.astro';
 import ChangeCards from '../components/ChangeCards.astro';
 import OrderSteps from '../components/OrderSteps.astro';
+import type { OrderStep } from '../components/OrderSteps.astro';
 import Shot from '../components/Shot.astro';
 import type { Card } from '../components/CardGrid.astro';
 import type { Change } from '../components/ChangeCards.astro';
@@ -13,21 +14,28 @@ import { nextCaseLinks } from '../data/site';
 import { sectionNumber } from '../layouts/sections';
 
 import afterHome from '../assets/four-leaves/after-home.webp';
-import stepsCake from '../assets/four-leaves/steps-cake.webp';
 import beforeOrder from '../assets/four-leaves/before-order.webp';
 import beforeLook from '../assets/four-leaves/before-look.webp';
-import beforeOrigin from '../assets/four-leaves/before-origin.webp';
 import beforeLocation from '../assets/four-leaves/before-location.webp';
 import beforePoints from '../assets/four-leaves/before-points.webp';
 import beforeMailing from '../assets/four-leaves/before-mailing.webp';
 import beforeApply from '../assets/four-leaves/before-apply.webp';
 import fixOrder from '../assets/four-leaves/fix-order.webp';
-import fixLook from '../assets/four-leaves/fix-look.webp';
 import fixOrigin from '../assets/four-leaves/fix-origin.webp';
 import fixLocation from '../assets/four-leaves/fix-location.webp';
 import fixPoints from '../assets/four-leaves/fix-points.webp';
 import fixMailing from '../assets/four-leaves/fix-mailing.webp';
 import fixApply from '../assets/four-leaves/fix-apply.webp';
+import lookHero from '../assets/four-leaves/look-1-hero.webp';
+import lookCakes from '../assets/four-leaves/look-2-cakes.webp';
+import lookBuns from '../assets/four-leaves/look-3-buns.webp';
+import lookStory from '../assets/four-leaves/look-4-story.webp';
+import stepCakes from '../assets/four-leaves/step-1-cakes.webp';
+import stepCake from '../assets/four-leaves/step-2-cake.webp';
+import stepOrder from '../assets/four-leaves/step-3-order.webp';
+import stepCollection from '../assets/four-leaves/step-4-collection.webp';
+import stepDetails from '../assets/four-leaves/step-5-details.webp';
+import stepReview from '../assets/four-leaves/step-6-review.webp';
 
 const liveSite = 'https://sayhien.github.io/four-leaves-redesign/';
 
@@ -65,58 +73,65 @@ const changes: Change[] = [
     problem: 'Ordering is buried',
     title: 'One Order button on every page',
     text: 'People browse and buy on one website. The “Order cakes” button stays in the header on every page.',
-    before: beforeOrder, beforeAlt: 'Old header: eight links of the same size around the logo, with Shop Online among them',
-    after: fixOrder, afterAlt: 'New header with an Order cakes button, above an Order a cake button on the home page',
+    before: { src: beforeOrder, alt: 'Old header: eight links of the same size around the logo, with Shop Online among them' },
+    after: [{ src: fixOrder, alt: 'New header with an Order cakes button, above an Order a cake button on the home page' }],
   },
   {
     problem: 'Disjointed and dated look',
     title: 'One warm patisserie look',
-    text: 'A French patisserie style with Asian nostalgia. One serif for headings and one rounded Japanese font for text.',
-    before: beforeLook, beforeAlt: 'Old online shop: a black top bar, small grey menu and a flat green banner',
-    after: fixLook, afterAlt: 'New cake cards on a cream page, each with sizes, prices and points',
+    text: 'A French patisserie style with Asian nostalgia: a scalloped awning edge, cream pages, one serif for headings and one rounded Japanese font for text. Use the arrows to see more pages.',
+    before: { src: beforeLook, alt: 'Old online shop: a black top bar, small grey menu and a flat green banner' },
+    after: [
+      { src: lookHero, alt: 'New home page: a green header with a scalloped edge above a large strawberry cake' },
+      { src: lookCakes, alt: 'New cake cards on a cream page, each with sizes, prices and points' },
+      { src: lookBuns, alt: 'New bread and buns section with arched cards' },
+      { src: lookStory, alt: 'New our story section with a factory photo and a timeline from 1981' },
+    ],
   },
   {
     problem: 'Nothing makes you want the cake',
     title: 'Stories of where it begins',
     text: 'Short films and photos show the growers and farms. A face and a place make quality easy to believe.',
-    before: beforeOrigin, beforeAlt: 'Old cake grid: a photo and a name only',
-    after: fixOrigin, afterAlt: 'New Where it begins section with a strawberry greenhouse and a peach grower',
+    beforeEmpty: 'The old site has no story about ingredients',
+    after: [{ src: fixOrigin, alt: 'New Where it begins section with a strawberry greenhouse and a peach grower' }],
   },
   {
     problem: 'Location is hard to use',
     title: 'Outlets on a map',
-    text: 'A map of Singapore shows each region. Every outlet has a Directions link that opens the map app.',
-    before: beforeLocation, beforeAlt: 'Old outlet list: names only, in two long columns',
-    after: fixLocation, afterAlt: 'New outlet finder with a map of Singapore and a Directions link for each outlet',
+    text: 'Tap a region on the map to see its outlets. Every outlet has a Directions link that opens the map app.',
+    before: { src: beforeLocation, alt: 'Old outlet card: an address, a Click here for location link, phone numbers and opening hours' },
+    after: [{ src: fixLocation, alt: 'New outlet finder with the north region picked on the map and a Directions link beside each outlet' }],
   },
   {
     problem: 'Points are hard to value',
     title: 'Points shown as money',
     text: 'Each voucher shows its points and how much money comes back, up to 6%.',
-    before: beforePoints, beforeAlt: 'Old rewards page: $2 spent equals 1 point, and a table of points for vouchers',
-    after: fixPoints, afterAlt: 'New rewards page: three vouchers, each with the percentage returned',
+    before: { src: beforePoints, alt: 'Old rewards page: $2 spent equals 1 point, and a table of points for vouchers' },
+    after: [{ src: fixPoints, alt: 'New voucher cards: $10 off returns 5%, and $20 off, marked best value, returns 6.25%' }],
   },
   {
     problem: 'Mailing list is not inviting',
     title: 'A mailing list with reasons',
     text: 'Small drawings show what people get: new cakes, seasonal bakes and outlet openings.',
-    before: beforeMailing, beforeAlt: 'Old mailing list: an email box on a photo of cakes',
-    after: fixMailing, afterAlt: 'New mailing list with drawings of new cakes, seasonal bakes and outlet openings',
+    before: { src: beforeMailing, alt: 'Old mailing list: an email box on a photo of cakes' },
+    after: [{ src: fixMailing, alt: 'New mailing list with drawings of new cakes, seasonal bakes and outlet openings' }],
   },
   {
     problem: 'Apply is far from the role',
     title: 'Apply inside each role',
     text: 'Each role has its own “Apply for this role” button, right below the role details.',
-    before: beforeApply, beforeAlt: 'Old careers page: role details with no apply button nearby',
-    after: fixApply, afterAlt: 'New role card with an Apply for this role button under the details',
+    before: { src: beforeApply, alt: 'Old careers page: role details with no apply button nearby' },
+    after: [{ src: fixApply, alt: 'New role card: what you will do, who we are looking for, then an Apply for this role button' }],
   },
 ];
 
-const orderSteps = [
-  { title: 'Choose', text: 'Pick a cake and a size. The price changes at once.' },
-  { title: 'Personalise', text: 'Add a free message to the cake.' },
-  { title: 'Collection', text: 'Choose an outlet, a date and a two hour slot.' },
-  { title: 'Collect', text: 'Show your order at the outlet. You do not need an account.' },
+const orderSteps: OrderStep[] = [
+  { title: 'Cakes at the front', text: 'Seven signature cakes sit right below the home page hero, with sizes and prices.', img: stepCakes, alt: 'Home page with the Order cakes button in the header and signature cakes below the hero' },
+  { title: 'Size and message', text: 'Pick a size. The price changes at once. Add a free message.', img: stepCake, alt: 'Cake page with three sizes, a message field with Happy birthday, Mum, and an Add to order button' },
+  { title: 'Your order', text: 'See the total and the points this order earns.', img: stepOrder, alt: 'Your order page with the cake, its message, the total and 19 points earned' },
+  { title: 'Collection', text: 'Choose an outlet, a day and a two hour slot.', img: stepCollection, alt: 'Collection step with Causeway Point and 31 October picked' },
+  { title: 'Your details', text: 'Order as a guest. No account needed.', img: stepDetails, alt: 'Your details step with name, mobile and email filled in' },
+  { title: 'Check and pay', text: 'One last look at the cake, the outlet and the time.', img: stepReview, alt: 'Check your order page showing Causeway Point, Saturday 31 October, 11am to 1pm' },
 ];
 
 const measures: string[][] = [
@@ -130,7 +145,6 @@ const measureArt: RowArtName[] = ['cakeOrders', 'dropOff', 'signUps', 'orderTime
 const limits: Card[] = [
   { title: 'No customer research', text: 'I did not talk to customers. The problems come from my review against the ten usability rules.', label: 'Method' },
   { title: 'Most media is AI generated', text: 'Only the cake, career and company photos are real. The films, grower photos and quote are AI generated to show the idea.', label: 'Media' },
-  { title: 'The points terms do not match', text: 'The terms say 120 points for a $20 voucher. The rewards page says 160. I would tell the client before launch.', label: 'Found' },
   { title: 'Next step', text: 'Test with five customers. Ask where they would order a cake, and time the first order.', label: 'Learning' },
 ];
 
@@ -184,8 +198,9 @@ const next = nextCaseLinks('four-leaves');
   <section id="ordering" class="sec">
     <p class="sn">{n('ordering')}</p>
     <h2>Ordering a Cake</h2>
-    <p>Ordering now takes four steps, on one website.</p>
-    <OrderSteps steps={orderSteps} img={stepsCake} alt="A strawberry cake with whole strawberries on top and cut strawberries around the side" cta={{ label: 'Try ordering a cake', href: `${liveSite}#cakes` }} />
+    <p class="big">Cakes earn the most money, so they now sit at the front, right below the home page hero.</p>
+    <p>The “Order cakes” button stays in the header on every page. From there, ordering takes a few short steps on one website. Pick a step to see its screen.</p>
+    <OrderSteps steps={orderSteps} cta={{ label: 'Try ordering a cake', href: `${liveSite}#cakes` }} />
     <h3 class="sub">Try the redesign here</h3>
     <figure class="embed">
       <div class="shot-frame">

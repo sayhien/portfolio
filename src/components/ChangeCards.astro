@@ -1,19 +1,21 @@
 ---
-// Problem and fix cards. Each card names the problem, the fix in one line,
-// and shows a cutout of the new design with a small cutout of the old one on
-// top, so text and picture tell the same story. Cards zigzag in two columns,
-// like the persona cards, and stack on small screens.
+// Problem and fix cards, one per row. Each card names the problem and the
+// fix, then shows a large cutout of the new design with a smaller cutout of
+// the old one overlapping its lower left corner. A fix with several pictures
+// gets previous and next buttons. A problem with nothing to show on the old
+// site gets an empty frame that says so.
 import SmartImage from './SmartImage.astro';
 import type { ImageSource } from './SmartImage.astro';
 
+type Picture = { src: ImageSource; alt: string };
 export type Change = {
   problem: string;
   title: string;
   text: string;
-  before: ImageSource;
-  beforeAlt: string;
-  after: ImageSource;
-  afterAlt: string;
+  /** Leave out when the old site had nothing, and say why in beforeEmpty. */
+  before?: Picture;
+  beforeEmpty?: string;
+  after: Picture[];
 };
 interface Props {
   items: Change[];
@@ -22,17 +24,34 @@ const { items } = Astro.props;
 ---
 <ul class="changes">
   {items.map((c, i) => (
-    <li class="change" style={`--row:${i + 1};--col:${(i % 2) + 1}`}>
-      <p class="c-problem"><span>Problem</span>{c.problem}</p>
-      <h3>{c.title}</h3>
-      <p class="c-text">{c.text}</p>
+    <li class="change">
+      <div class="c-copy">
+        <p class="c-problem"><span>Problem</span>{c.problem}</p>
+        <h3>{c.title}</h3>
+        <p class="c-text">{c.text}</p>
+      </div>
       <div class="c-visual">
-        <figure class="c-after">
-          <SmartImage src={c.after} alt={c.afterAlt} widths={[480, 840]} sizes="(max-width: 700px) 90vw, 440px" />
+        <figure class="c-after" data-slides={c.after.length > 1 ? '' : undefined}>
+          <div class="c-track">
+            {c.after.map((pic, n) => (
+              <div class="c-slide" hidden={n > 0}>
+                <SmartImage src={pic.src} alt={pic.alt} widths={[640, 960, 1280]} sizes="(max-width: 700px) 92vw, 720px" />
+              </div>
+            ))}
+          </div>
           <figcaption class="chip">After</figcaption>
+          {c.after.length > 1 && (
+            <div class="c-nav">
+              <button type="button" class="c-btn" data-step="-1" aria-label={`Previous picture of ${c.title}`}>&larr;</button>
+              <span class="c-count" aria-live="polite">1 of {c.after.length}</span>
+              <button type="button" class="c-btn" data-step="1" aria-label={`Next picture of ${c.title}`}>&rarr;</button>
+            </div>
+          )}
         </figure>
         <figure class="c-before">
-          <SmartImage src={c.before} alt={c.beforeAlt} widths={[320, 640]} sizes="(max-width: 700px) 50vw, 240px" />
+          {c.before
+            ? <SmartImage src={c.before.src} alt={c.before.alt} widths={[400, 800]} sizes="(max-width: 700px) 50vw, 380px" />
+            : <div class="c-empty"><p>{c.beforeEmpty ?? 'Not on the old site'}</p></div>}
           <figcaption class="chip chip-before">Before</figcaption>
         </figure>
       </div>
@@ -41,26 +60,56 @@ const { items } = Astro.props;
 </ul>
 
 <style>
-  .changes { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap-card); row-gap: calc(var(--gap-card) / 2); }
-  .change { grid-row: var(--row) / span 2; grid-column: var(--col); display: grid; align-content: start; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-3); }
-  .c-problem { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2); }
+  .changes { list-style: none; padding: 0; margin: var(--space-3) 0 0; display: grid; gap: var(--gap-card); }
+  .change { display: grid; gap: var(--space-3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-4); }
+  .c-copy { display: grid; gap: 10px; max-width: 720px; }
+  .c-problem { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 15px; color: var(--text-2); }
   .c-problem span { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-  .change h3 { font-size: 24px; color: var(--accent); }
-  .c-text { font-size: 16px; line-height: 1.55; color: var(--text); }
+  .change h3 { font-size: 28px; color: var(--accent); }
+  .c-text { font-size: 17px; line-height: 1.6; color: var(--text); }
 
-  /* The new design sits large on a soft circle; the old one overlaps its lower corner. */
-  .c-visual { position: relative; margin-top: var(--space-2); padding: 18px 0 64px 18%; }
-  .c-visual::before { content: ''; position: absolute; inset: 0 8% 8% 22%; border-radius: 50%; background: radial-gradient(circle, var(--accent-soft), transparent 70%); }
+  /* The new design sits large on the right; the old one tucks under its lower left corner, overlapping a little. */
+  .c-visual { position: relative; padding: 0 0 18% 0; }
+  .c-visual::before { content: ''; position: absolute; inset: -4% 0 0 20%; border-radius: 50%; background: radial-gradient(circle, var(--accent-soft), transparent 68%); pointer-events: none; }
   figure { position: relative; margin: 0; }
-  figure :global(img) { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; }
+  .c-after { width: 76%; margin-left: auto; }
+  .c-before { position: absolute; left: 0; bottom: 0; width: 38%; }
+  figure :global(img), .c-empty { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; border-radius: 10px; border: 1px solid var(--line-2); background: #fff; }
   .c-after :global(img) { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
-  .c-before { position: absolute; left: 0; bottom: 0; width: 52%; }
-  .c-before :global(img) { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5); }
-  .chip { position: absolute; top: 8px; left: 8px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
+  .c-before :global(img), .c-empty { box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5); }
+  .c-empty { display: grid; place-items: center; background: var(--surface-2); border: 1px dashed var(--muted); }
+  .c-empty p { font-size: 15px; color: var(--text-2); text-align: center; padding: 0 12px; }
+  .c-slide[hidden] { display: none; }
+  .chip { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
   .chip-before { background: #2a2f36; color: var(--text); border: 1px solid var(--line-2); }
 
+  /* Previous and next sit under the picture, clear of the old site cutout. */
+  .c-nav { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+  .c-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--text); font-size: 18px; cursor: pointer; }
+  .c-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .c-count { font-family: var(--mono); font-size: 13px; color: var(--text-2); min-width: 52px; text-align: center; }
+
   @media (max-width: 700px) {
-    .changes { grid-template-columns: minmax(0, 1fr); row-gap: var(--gap-card); }
-    .change { grid-row: auto; grid-column: auto; padding: var(--space-2); }
+    .change { padding: var(--space-2); }
+    .change h3 { font-size: 22px; }
+    .c-after { width: 88%; }
+    .c-before { width: 50%; }
+    .c-visual { padding-bottom: 24%; }
   }
 </style>
+
+<script>
+  // Previous and next swap which picture of the fix is shown, wrapping round.
+  document.querySelectorAll<HTMLElement>('[data-slides]').forEach((figure) => {
+    const slides = Array.from(figure.querySelectorAll<HTMLElement>('.c-slide'));
+    const count = figure.querySelector<HTMLElement>('.c-count');
+    let shown = 0;
+    figure.querySelectorAll<HTMLButtonElement>('.c-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        shown = (shown + Number(button.dataset.step) + slides.length) % slides.length;
+        slides.forEach((slide, index) => { slide.hidden = index !== shown; });
+        if (count) count.textContent = `${shown + 1} of ${slides.length}`;
+      });
+    });
+  });
+</script>

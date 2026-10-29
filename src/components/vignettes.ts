@@ -58,6 +58,15 @@ const pill = (x: number, y: number, w: number, tone: Tone, text: string, motion 
 /** Moment (seconds) to hold a timed scene at when motion is reduced. */
 export const vignetteRest: Partial<Record<VignetteName, number>> = cardSceneRest;
 
+/** The part of the 68 unit tall grid a scene uses, as [top, height], so its frame fits what it shows.
+    Measured across each scene's whole loop, with a little room around it. Scenes not listed use the full grid. */
+export const vignetteBox: Partial<Record<VignetteName, [number, number]>> = {
+  angularFit: [3, 56], audienceFaces: [9, 40], deviceWiden: [0, 62], familiarPatterns: [3, 57], ctoApproval: [4, 51],
+  ratioStretch: [2, 58], leftAlignedText: [2, 56], stableIcons: [3, 63], latestLibrary: [5, 49], styleLinks: [0, 64],
+  dynamicHeight: [2, 51], layerNames: [-2, 59],
+  passiveProof: [2, 54], integrationWorry: [12, 34], samePage: [3, 60], featureCards: [4, 48], securityBadges: [4, 38],
+};
+
 export const vignettes: Record<VignetteName, string> = {
   ...cardScenes,
   frameworks: `
@@ -211,7 +220,6 @@ export const vignettes: Record<VignetteName, string> = {
     <rect class="uv-panel" x="12" y="12" width="40" height="5" rx="2"/>
     <circle class="uv-panel" cx="41" cy="33" r="10"/><path class="uv-solid" d="M38 28l8 5-8 5Z"/>
     ${pill(80, 22, 36, 'warn', 'Static', 'uv-done uv-later')}
-    <text class="uv-note" x="6" y="63">Look, but cannot try</text>
     <path class="uv-pointer uv-cursor" style="--cx:44px; --cy:36px" d="M0 0v11l3-2.4 2.2 4.8 2.3-1-2.2-4.8 3.9-.4Z"/>`,
   weakProof: `
     <text class="uv-note" x="8" y="13">Trusted by</text>
@@ -221,8 +229,7 @@ export const vignettes: Record<VignetteName, string> = {
     <rect class="uv-panel" x="6" y="16" width="34" height="26" rx="5"/><text class="uv-note" x="23" y="27" text-anchor="middle">Your</text><text class="uv-note" x="23" y="36" text-anchor="middle">tools</text>
     <path class="uv-dash" d="M40 29h40"/>
     <rect class="uv-soft" x="80" y="16" width="34" height="26" rx="5"/><text class="uv-key uv-small" x="97" y="32" text-anchor="middle">Chatbot</text>
-    <g class="uv-blink-soft"><circle class="uv-pill-warn" cx="60" cy="29" r="9"/><text class="uv-amber" x="60" y="33" text-anchor="middle">?</text></g>
-    <text class="uv-note" x="60" y="60" text-anchor="middle">Will it fit our setup?</text>`,
+    <g class="uv-blink-soft"><circle class="uv-pill-warn" cx="60" cy="29" r="9"/><text class="uv-amber" x="60" y="33" text-anchor="middle">?</text></g>`,
   samePage: `
     <circle class="uv-panel" cx="12" cy="12" r="5"/><text class="uv-note" x="21" y="15">Dev</text>
     <circle class="uv-panel" cx="12" cy="33" r="5"/><text class="uv-note" x="21" y="36">Ops</text>
@@ -232,8 +239,7 @@ export const vignettes: Record<VignetteName, string> = {
     <circle r="3" class="uv-solid uv-dot uv-later" style="--k:1; offset-path: path('M46 33h32')"/>
     <circle r="3" class="uv-solid uv-dot uv-later" style="--k:2; offset-path: path('M46 54C62 54 62 33 78 33')"/>
     <rect class="uv-well" x="80" y="10" width="34" height="46" rx="4"/>
-    <rect class="uv-panel" x="85" y="16" width="24" height="4" rx="2"/><rect class="uv-panel" x="85" y="24" width="24" height="4" rx="2"/><rect class="uv-panel" x="85" y="32" width="18" height="4" rx="2"/>
-    <text class="uv-note" x="97" y="65" text-anchor="middle">One page</text>`,
+    <rect class="uv-panel" x="85" y="16" width="24" height="4" rx="2"/><rect class="uv-panel" x="85" y="24" width="24" height="4" rx="2"/><rect class="uv-panel" x="85" y="32" width="18" height="4" rx="2"/>`,
 
   heroSection: `
     <rect class="uv-well" x="4" y="4" width="112" height="60" rx="5"/>
@@ -249,8 +255,7 @@ export const vignettes: Record<VignetteName, string> = {
     <rect class="uv-panel" x="8" y="8" width="32" height="14" rx="3"/><rect class="uv-panel" x="44" y="8" width="32" height="14" rx="3"/><rect class="uv-panel" x="80" y="8" width="32" height="14" rx="3"/>
     <rect class="uv-panel" x="8" y="26" width="32" height="14" rx="3"/><rect class="uv-panel" x="44" y="26" width="32" height="14" rx="3"/><rect class="uv-panel" x="80" y="26" width="32" height="14" rx="3"/>
     <g class="uv-open"><rect class="uv-soft" x="44" y="8" width="32" height="40" rx="3"/><rect class="uv-solid" x="49" y="13" width="18" height="3" rx="1.5"/>
-      <rect class="uv-panel" x="49" y="24" width="22" height="3" rx="1.5"/><rect class="uv-panel" x="49" y="31" width="22" height="3" rx="1.5"/><rect class="uv-panel" x="49" y="38" width="14" height="3" rx="1.5"/></g>
-    <text class="uv-note" x="60" y="62" text-anchor="middle">Technical details open on tap</text>`,
+      <rect class="uv-panel" x="49" y="24" width="22" height="3" rx="1.5"/><rect class="uv-panel" x="49" y="31" width="22" height="3" rx="1.5"/><rect class="uv-panel" x="49" y="38" width="14" height="3" rx="1.5"/></g>`,
   useCaseTable: `
     <rect class="uv-well" x="6" y="6" width="108" height="50" rx="4"/><rect class="uv-panel" x="6" y="6" width="108" height="11" rx="4"/>
     <path class="uv-axis" d="M40 17v39M6 30h108M6 43h108"/>
@@ -272,8 +277,7 @@ export const vignettes: Record<VignetteName, string> = {
     <circle r="2.6" class="uv-solid uv-dot uv-later" style="--k:2; offset-path: path('M104 22L68 44')"/>
     <rect class="uv-solid" x="38" y="44" width="44" height="16" rx="5"/><text class="uv-on" x="60" y="55" text-anchor="middle">Chatbot</text>`,
   securityBadges: `
-    <path class="uv-panel" d="M22 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in1" d="M17 22l3.5 3.5 7-8"/><path class="uv-panel" d="M60 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in2" d="M55 22l3.5 3.5 7-8"/><path class="uv-panel" d="M98 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in3" d="M93 22l3.5 3.5 7-8"/>
-    <text class="uv-note" x="60" y="60" text-anchor="middle">Certified and open to check</text>`,
+    <path class="uv-panel" d="M22 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in1" d="M17 22l3.5 3.5 7-8"/><path class="uv-panel" d="M60 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in2" d="M55 22l3.5 3.5 7-8"/><path class="uv-panel" d="M98 8l12 4v10c0 8-5 13-12 16-7-3-12-8-12-16V12Z"/><path class="uv-check uv-in3" d="M93 22l3.5 3.5 7-8"/>`,
   talkToSales: `
     <rect class="uv-soft uv-ping" x="22" y="22" width="76" height="24" rx="12"/>
     <rect class="uv-solid" x="22" y="22" width="76" height="24" rx="12"/>

@@ -1,6 +1,6 @@
 ---
 import CaseStudy from '../layouts/CaseStudy.astro';
-import SpaceBand from '../components/SpaceBand.astro';
+import ConstellationBand from '../components/ConstellationBand.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import StepList from '../components/StepList.astro';
@@ -129,7 +129,7 @@ const next = nextCaseLinks('docdoc-library');
   </section>
 
   <section id="criteria" class="sec">
-    <SpaceBand name="zodiac" />
+    <ConstellationBand />
     <h2>Component Criteria</h2>
     <p>Every new component went through the same three stages. I set the criteria, applied them to the card, then tested the result before release.</p>
     <StepList items={criteria} />

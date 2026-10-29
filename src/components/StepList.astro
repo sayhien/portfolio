@@ -21,8 +21,10 @@ interface Props {
   items: (Step | Stage)[];
   /** Pictures stack under the text instead of beside it (for wide diagrams). */
   stacked?: boolean;
+  /** How stage markers look (options being compared; one will be kept). */
+  stageLook?: 1 | 2 | 3 | 4;
 }
-const { items, stacked = false } = Astro.props;
+const { items, stacked = false, stageLook = 1 } = Astro.props;
 const isStage = (item: Step | Stage): item is Stage => 'stage' in item;
 
 // Count stages, and steps within each stage (or the whole rail when there are no stages).
@@ -34,19 +36,20 @@ const rows = items.map((item, index) => {
     stageNumber += 1; stepNumber = 0;
     const next = items.slice(index + 1).findIndex(isStage);
     stepsInGroup = (next < 0 ? items.length : index + 1 + next) - index - 1;
-    return { item, count: `${stageNumber}/${stageCount}` };
+    return { item, count: `${stageNumber}/${stageCount}`, kicker: `Stage ${stageNumber} of ${stageCount}` };
   }
   stepNumber += 1;
-  return { item, count: `${stepNumber}/${grouped ? stepsInGroup : items.length}` };
+  return { item, count: `${stepNumber}/${grouped ? stepsInGroup : items.length}`, kicker: '' };
 });
 const StepTitle = grouped ? 'h4' : 'h3';
 ---
-<ol class:list={['rail', { stacked, grouped }]} data-rail>
-  {rows.map(({ item, count }) => isStage(item) ? (
+<ol class:list={['rail', { stacked, grouped }]} data-rail data-look={stageLook}>
+  {rows.map(({ item, count, kicker }) => isStage(item) ? (
     <li class="step stage" data-rail-step>
       <span class="node" aria-hidden="true">{count}</span>
       <div class="body">
         <div class="copy">
+          <p class="kicker">{kicker}</p>
           <h3>{item.stage}</h3>
           {item.text && <p>{item.text}</p>}
         </div>
@@ -106,12 +109,38 @@ const StepTitle = grouped ? 'h4' : 'h3';
   h3 { font-size: 22px; line-height: 1.3; }
   h4 { font-size: 20px; line-height: 1.3; }
 
-  /* Stage markers: a larger node and a bigger heading, with no box around it. */
-  .stage { --stage-node: 48px; }
+  /* Stage markers: a larger node and a bigger heading, with no box around it, and extra room before the next step. */
+  .stage { --stage-node: 48px; padding-bottom: var(--space-4); }
   .stage .node { width: var(--stage-node); height: var(--stage-node); margin-left: calc((var(--node) - var(--stage-node)) / 2); font-size: 13px; }
-  .stage h3 { font-size: clamp(24px, 2.4vw, 30px); }
-  .stage .copy p { max-width: 600px; }
-  .grouped .stage:not(:first-child) { margin-top: var(--space-4); }
+  .stage h3 { font-size: clamp(28px, 3vw, 38px); line-height: 1.15; }
+  .stage .copy { gap: var(--space-2); }
+  .stage .copy p { max-width: 600px; font-size: 18px; }
+  .stage .copy .kicker { display: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .grouped .stage:not(:first-child) { margin-top: var(--space-5); }
+
+  /* Look 1, mission patch: a large round badge on the line with rings around it. */
+  [data-look='1'] .stage { --stage-node: 76px; }
+  [data-look='1'] .stage .node { font-size: 18px; box-shadow: 0 0 0 6px var(--bg), 0 0 0 7px var(--accent-line), 0 0 30px rgba(110, 231, 183, 0.25); }
+  [data-look='1'] .stage .body { padding-top: 16px; }
+
+  /* Look 2, soft wash: a mint wash fading to the right behind the heading, with a stage kicker. */
+  [data-look='2'] .stage .body { background: linear-gradient(90deg, rgba(110, 231, 183, 0.14), transparent 75%); border-radius: 0 16px 16px 0; padding: 28px 32px; margin-left: -12px; }
+  [data-look='2'] .stage .kicker { display: block; }
+
+  /* Look 3, orbit: a dot circles the stage node, and a short line leads to the heading. */
+  [data-look='3'] .stage .node::before { content: ''; position: absolute; inset: -12px; border-radius: 50%; border: 1px dashed var(--accent-line); }
+  [data-look='3'] .stage .node::after { content: ''; position: absolute; left: 50%; top: -15px; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transform-origin: 3.5px calc(var(--stage-node) / 2 + 15px); animation: stage-orbit 4s linear infinite; }
+  @keyframes stage-orbit { to { transform: rotate(360deg); } }
+  [data-look='3'] .stage .kicker { display: block; }
+  [data-look='3'] .stage .body { position: relative; padding-left: 8px; }
+  [data-look='3'] .stage .body::before { content: ''; position: absolute; left: -24px; top: 24px; width: 26px; height: 1px; background: var(--accent-line); }
+
+  /* Look 4, chapter divider: a hairline runs from the node across the page, with large type below it. */
+  [data-look='4'] .stage .kicker { display: block; }
+  [data-look='4'] .stage .body { position: relative; padding-top: 52px; }
+  [data-look='4'] .stage .body::before { content: ''; position: absolute; left: -24px; right: 0; top: 24px; height: 1px; background: linear-gradient(90deg, var(--accent), var(--line-2) 40%, transparent); }
+  [data-look='4'] .stage h3 { font-size: clamp(32px, 3.6vw, 46px); }
+  [data-look='4'].grouped .stage:not(:first-child) { margin-top: 96px; }
 
   /* A step with a spot illustration: line, then picture, then text. */
   .has-vig .body { grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
@@ -130,6 +159,9 @@ const StepTitle = grouped ? 'h4' : 'h3';
     .has-vig .body { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
     .has-vig .vig { max-width: 320px; }
     .stage { --stage-node: 40px; }
+    [data-look='1'] .stage { --stage-node: 56px; }
+    [data-look='1'] .stage .node { font-size: 14px; }
+    [data-look='2'] .stage .body { padding: 20px; }
   }
 </style>
 

@@ -123,10 +123,10 @@ const { answer } = Astro.props;
   /* At rest (and for reduced motion) the problem state shows. */
   .fix { opacity: 0; }
   /* Problem, then fix: loops only while on screen. */
-  .is-live .prob { animation: prob-phase 6s ease-in-out infinite; }
-  .is-live .fix { animation: fix-phase 6s ease-in-out infinite; }
-  .is-live .boxl { animation: merge-left 6s ease-in-out infinite; }
-  .is-live .boxr { animation: merge-right 6s ease-in-out infinite; }
+  .is-live .prob { animation: prob-phase 4.8s cubic-bezier(0.2, 0.9, 0.25, 1) infinite; }
+  .is-live .fix { animation: fix-phase 4.8s cubic-bezier(0.2, 0.9, 0.25, 1) infinite; }
+  .is-live .boxl { animation: merge-left 4.8s cubic-bezier(0.2, 0.9, 0.25, 1) infinite; }
+  .is-live .boxr { animation: merge-right 4.8s cubic-bezier(0.2, 0.9, 0.25, 1) infinite; }
   @keyframes prob-phase { 0%, 42% { opacity: 1; transform: none; } 50%, 92% { opacity: 0; transform: scale(0.85); } 100% { opacity: 1; transform: none; } }
   @keyframes fix-phase { 0%, 46% { opacity: 0; transform: scale(0.85); } 54%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
   @keyframes merge-left { 0%, 42% { transform: none; } 52%, 92% { transform: translateX(22px); } 100% { transform: none; } }

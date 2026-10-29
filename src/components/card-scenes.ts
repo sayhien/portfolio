@@ -370,21 +370,16 @@ cardSceneRest.contextFit = 4.5;
   cardSceneRest.styleLinks = 4.8;
 }
 {
-  const t: Track = { t: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.88, 1], dur: 8 };
-  const rowsShown = [4, 4, 4, 6, 6, 3, 3, 4], wrap = [0, 0, 1, 1, 1, 0, 0, 0];
-  const x = 30, w = 60, y = 6, c = columns(x, w);
-  let out = el('rect', { class: 'uv-card', x, y, width: w, height: rowsShown.map((r, k) => cardHeight(r) + wrap[k] * 3.5), rx: 2.5 }, t);
-  for (let i = 0; i < 6; i++) {
-    const rowY = wrap.map((wr) => y + 4.6 + i * PITCH + (i > 1 ? wr * 3.5 : 0));
-    const shown = rowsShown.map((r) => (r > i ? 1 : 0));
-    out += el('rect', { class: 'uv-cbar-l', x: c.labelX, y: rowY, width: c.labelW * 0.8, height: 2, rx: 1, opacity: shown }, t);
-    out += el('rect', { class: 'uv-cbar-v', x: c.valueX, y: rowY, width: i === 1 ? wrap.map((wr) => (wr ? c.valueW : c.valueW * 0.5)) : c.valueW * 0.65, height: 2, rx: 1, opacity: shown }, t);
-    if (i === 1) out += el('rect', { class: 'uv-cbar-v', x: c.valueX, y: y + 4.6 + PITCH + 3.5, width: c.valueW * 0.6, height: 2, rx: 1, opacity: wrap }, t);
-  }
-  const h = rowsShown.map((r, k) => cardHeight(r) + wrap[k] * 3.5);
-  out += el('path', { class: 'uv-goal-thin', d: h.map((hh) => `M96 ${y}v${hh}M94 ${y}h4M94 ${y + hh}h4`) }, t);
-  scenes.dynamicHeight = out;
-  cardSceneRest.dynamicHeight = 3.8;
+  // Dynamic sizing, shown like a Figma selection: a frame hugs the card and a tag shows its height as rows come and go.
+  const t: Track = { t: [0, 0.16, 0.32, 0.5, 0.66, 0.84, 1], dur: 7 };
+  const rows = [3, 3, 5, 5, 2, 2, 3];
+  const H = rows.map(cardHeight), x = 34, w = 52, y = 8;
+  const corners = [x - 1.5, x + w + 1.5].map((hx) => [0, 1].map((bottom) => el('rect', { class: 'uv-hug-handle', x: hx - 1.3, y: bottom ? H.map((h) => y + h + 1.5 - 1.3) : y - 1.5 - 1.3, width: 2.6, height: 2.6 }, t)).join('')).join('');
+  const tag = rows.map((r, k) => el('text', { class: 'uv-on uv-tiny', x: 60, y: 6.5, 'text-anchor': 'middle', opacity: rows.map((_, n) => (n === k ? 1 : 0)) }, t, `Hug ${Math.round(cardHeight(r) * 4)}`)).join('');
+  scenes.dynamicHeight = card({ x, y, w, rows, max: 5, track: t }) +
+    el('rect', { class: 'uv-hug', x: x - 1.5, y: y - 1.5, width: w + 3, height: H.map((h) => h + 3) }, t) + corners +
+    `<g>${shift(H.map((h) => `0 ${y + h + 5}`), t)}<rect class="uv-hug-tag" x="44" y="0" width="32" height="9" rx="2"/>${tag}</g>`;
+  cardSceneRest.dynamicHeight = 3;
 }
 {
   const t: Track = { t: [0, 0.15, 0.3, 0.45, 0.6, 0.85, 1], dur: 7 };

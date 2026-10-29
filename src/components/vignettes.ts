@@ -63,7 +63,7 @@ export const vignetteRest: Partial<Record<VignetteName, number>> = cardSceneRest
 export const vignetteBox: Partial<Record<VignetteName, [number, number]>> = {
   angularFit: [3, 56], audienceFaces: [9, 40], deviceWiden: [0, 62], familiarPatterns: [3, 57], ctoApproval: [4, 51],
   ratioStretch: [2, 58], leftAlignedText: [2, 56], stableIcons: [3, 63], latestLibrary: [5, 49], styleLinks: [0, 64],
-  dynamicHeight: [2, 51], layerNames: [-2, 59],
+  dynamicHeight: [3, 56], layerNames: [-2, 59],
   passiveProof: [2, 54], integrationWorry: [12, 34], samePage: [3, 60], featureCards: [4, 48], securityBadges: [4, 38],
 };
 

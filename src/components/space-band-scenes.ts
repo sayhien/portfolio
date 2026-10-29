@@ -197,32 +197,6 @@ vec3 scene(vec4 s, float t, out vec3 col, out float a){
   return here + sp*1.9;
 }`;
 
-// ---------------------------------------------------------------- Design library, component creation criteria
-// The same twelve stars glide into one zodiac figure after another. The same
-// components make every layout. Star places and lines come from space-band.ts.
-const ZODIAC = HEADER + COMMON + `
-uniform vec3 uStar[12];
-uniform vec3 uSegA[13], uSegB[13];
-uniform float uSegShow[13];
-uniform float uStarShow; // the current set of stars fading in, holding, then dimming away
-vec3 starTone(float k){ float m = mod(k, 4.); return m < 1. ? MINT : m < 2. ? mix(BLUE, WHITE, .4) : m < 3. ? YELLOW : WHITE; }
-vec3 scene(vec4 s, float t, out vec3 col, out float a){
-  vec4 r = rnd(s, 59.), q = rnd(s, 61.);
-  // The page's own star sky shows behind this film, so it only draws the figures.
-  if(s.x < .55){ // the twelve stars: like the background stars, only a touch brighter, with a faint halo
-    float k = floor(r.x*12.); vec3 c = uStar[int(k)];
-    col = mix(WHITE, starTone(k), .35);
-    if(r.y < .13){ a = .06*uStarShow; gSize = 1.3; return c + ball(q.xyz)*2.5; }
-    a = .009*(1. - q.x)*uStarShow; return c + ball(q.xyz)*(5. + q.x*12.);
-  }
-  // The lines that join the stars into a figure, drawn in as each figure forms
-  float j = floor(r.x*13.); int ji = int(j);
-  float v = r.y; float show = uSegShow[ji];
-  vec3 p = mix(uSegA[ji], uSegB[ji], v*min(1., show*1.6));
-  col = mix(MINT, WHITE, .3); a = .25*clamp(show, 0., 1.)*uStarShow*step(.25, fract(v*40.));
-  return p + ball(q.xyz)*1.2;
-}`;
-
 // ---------------------------------------------------------------- Breadcrumb, impact effort matrix
 // Quartz crystals stick out of a moon's surface here and there, twinkling, with
 // little ones littering the ground. The three biggest, brightest ones sit in front
@@ -428,5 +402,5 @@ vec3 scene(vec4 s, float time, out vec3 col, out float a){
   col = mix(YELLOW, WHITE, q.w); a = (1. - u)*step(.001, u); return far + sph(q.yz)*u*500.*q.w;
 }`;
 
-export const BAND_SHADERS = { delivery: DELIVERY, station: STATION, meteors: METEORS, rings: RINGS, zodiac: ZODIAC, crystals: CRYSTALS };
+export const BAND_SHADERS = { delivery: DELIVERY, station: STATION, meteors: METEORS, rings: RINGS, crystals: CRYSTALS };
 export type BandName = keyof typeof BAND_SHADERS;

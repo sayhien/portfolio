@@ -4,25 +4,61 @@
 // accent colour and each node lights up when its step is reached. On wide
 // screens a step's picture sits beside its text, swapping sides each step.
 // Without scripts, or with reduced motion, every node is simply lit.
+//
+// A rail can also be split into stages: a stage marker is a larger node with a
+// heading, and the steps after it count within that stage. A step can carry a
+// spot illustration (vignette), shown between the line and its text, or above
+// the text on phones.
 import SmartImage from './SmartImage.astro';
 import type { ImageSource } from './SmartImage.astro';
+import Vignette from './Vignette.astro';
+import type { VignetteName } from './vignettes';
 
 /** `tall` marks a portrait picture, such as a phone screen, so it is shown smaller. */
-export type Step = { title: string; text: string; img?: ImageSource; alt?: string; tall?: boolean };
+export type Step = { title: string; text: string; img?: ImageSource; alt?: string; tall?: boolean; vignette?: VignetteName };
+export type Stage = { stage: string; text?: string };
 interface Props {
-  items: Step[];
+  items: (Step | Stage)[];
   /** Pictures stack under the text instead of beside it (for wide diagrams). */
   stacked?: boolean;
 }
 const { items, stacked = false } = Astro.props;
+const isStage = (item: Step | Stage): item is Stage => 'stage' in item;
+
+// Count stages, and steps within each stage (or the whole rail when there are no stages).
+const stageCount = items.filter(isStage).length;
+const grouped = stageCount > 0;
+let stageNumber = 0, stepNumber = 0, stepsInGroup = 0;
+const rows = items.map((item, index) => {
+  if (isStage(item)) {
+    stageNumber += 1; stepNumber = 0;
+    const next = items.slice(index + 1).findIndex(isStage);
+    stepsInGroup = (next < 0 ? items.length : index + 1 + next) - index - 1;
+    return { item, count: `${stageNumber}/${stageCount}` };
+  }
+  stepNumber += 1;
+  return { item, count: `${stepNumber}/${grouped ? stepsInGroup : items.length}` };
+});
+const StepTitle = grouped ? 'h4' : 'h3';
 ---
-<ol class:list={['rail', { stacked }]} data-rail>
-  {items.map((step, index) => (
-    <li class:list={['step', { 'has-img': !!step.img }]} data-rail-step>
-      <span class="node" aria-hidden="true">{index + 1}/{items.length}</span>
+<ol class:list={['rail', { stacked, grouped }]} data-rail>
+  {rows.map(({ item, count }) => isStage(item) ? (
+    <li class="step stage" data-rail-step>
+      <span class="node" aria-hidden="true">{count}</span>
       <div class="body">
         <div class="copy">
-          <h3>{step.title}</h3>
+          <h3>{item.stage}</h3>
+          {item.text && <p>{item.text}</p>}
+        </div>
+      </div>
+    </li>
+  ) : ((step) => (
+    <li class:list={['step', { 'has-img': !!step.img, 'has-vig': !!step.vignette }]} data-rail-step>
+      <span class="node" aria-hidden="true">{count}</span>
+      <div class="body">
+        {step.vignette && <div class="vig"><Vignette name={step.vignette} /></div>}
+        <div class="copy">
+          <StepTitle>{step.title}</StepTitle>
           <p>{step.text}</p>
         </div>
         {step.img && (
@@ -32,7 +68,7 @@ const { items, stacked = false } = Astro.props;
         )}
       </div>
     </li>
-  ))}
+  ))(item as Step))}
 </ol>
 
 <style>
@@ -68,6 +104,17 @@ const { items, stacked = false } = Astro.props;
   .stacked .has-img:nth-child(even) .copy { order: 0; }
   .copy { display: grid; gap: var(--space-1); align-content: start; }
   h3 { font-size: 22px; line-height: 1.3; }
+  h4 { font-size: 20px; line-height: 1.3; }
+
+  /* Stage markers: a larger node and a bigger heading, with no box around it. */
+  .stage { --stage-node: 48px; }
+  .stage .node { width: var(--stage-node); height: var(--stage-node); margin-left: calc((var(--node) - var(--stage-node)) / 2); font-size: 13px; }
+  .stage h3 { font-size: clamp(24px, 2.4vw, 30px); }
+  .stage .copy p { max-width: 600px; }
+  .grouped .stage:not(:first-child) { margin-top: var(--space-4); }
+
+  /* A step with a spot illustration: line, then picture, then text. */
+  .has-vig .body { grid-template-columns: 240px minmax(0, 1fr); align-items: start; }
   .copy p { font-size: 16px; line-height: 1.6; color: var(--text-2); }
   .pic { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; background: var(--surface); }
   .pic.tall { justify-self: center; width: 100%; max-width: 260px; }
@@ -79,6 +126,10 @@ const { items, stacked = false } = Astro.props;
     .node { font-size: 10px; }
     .has-img .body { grid-template-columns: minmax(0, 1fr); }
     .has-img:nth-child(even) .copy { order: 0; }
+    /* On phones the picture sits above its text */
+    .has-vig .body { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+    .has-vig .vig { max-width: 320px; }
+    .stage { --stage-node: 40px; }
   }
 </style>
 

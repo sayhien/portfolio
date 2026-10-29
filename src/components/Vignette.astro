@@ -2,13 +2,14 @@
 // A small framed UI scene that explains a point at a glance (scenes in
 // vignettes.ts). Decorative: the text beside it says the same in words.
 // It only moves while on screen, and rests in a readable state with reduced motion.
-import { vignettes } from './vignettes';
+import { vignettes, vignetteRest } from './vignettes';
 import type { VignetteName } from './vignettes';
 
 interface Props { name: VignetteName }
 const { name } = Astro.props;
+const rest = vignetteRest[name];
 ---
-<span class="uv" data-vignette aria-hidden="true">
+<span class="uv" data-vignette data-rest={rest} aria-hidden="true">
   <svg viewBox="0 0 120 68" set:html={vignettes[name]} />
 </span>
 
@@ -43,6 +44,38 @@ const { name } = Astro.props;
   .uv-red { fill: var(--danger); } .uv-amber { fill: var(--warn); } .uv-blue { fill: var(--info); }
   .uv-pill-good { fill: var(--accent-soft); } .uv-pill-warn { fill: var(--warn-soft); }
   .uv-pill-bad { fill: var(--danger-soft); } .uv-pill-info { fill: var(--info-soft); }
+
+  /* The DocDoc card and the people in the design library scenes (card-scenes.ts) */
+  .uv-card { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.2; }
+  .uv-card.uv-mine { stroke: var(--accent); }
+  .uv-hover { fill: rgba(255, 255, 255, 0.07); }
+  .uv-press-fill { fill: rgba(110, 231, 183, 0.2); }
+  .uv-selected { fill: none; stroke: var(--accent); stroke-width: 1.4; }
+  .uv-cbar-l { fill: var(--text-2); }
+  .uv-cbar-v { fill: var(--muted); opacity: 0.6; }
+  .uv-ctext-l { font: 600 5.2px var(--sans); fill: var(--text); }
+  .uv-ctext-v { font: 400 5.2px var(--sans); fill: var(--text-2); }
+  .uv-tiny { font-size: 6.5px; }
+  .uv-chip-base { fill: var(--surface); }
+  .uv-tick-sm { fill: none; stroke: var(--on-accent); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-angular .uv-tick-sm, .uv-angular + .uv-tick-sm { stroke: #fff; }
+  .uv-angular { fill: #dd0031; }
+  .uv-device { fill: var(--bg); stroke: var(--text-2); stroke-width: 1.4; }
+  .uv-goal-thin { fill: none; stroke: var(--accent); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-guide { fill: none; stroke: var(--accent); stroke-width: 0.6; stroke-dasharray: 1.5 1.5; }
+  .uv-toggle { fill: none; stroke: var(--line-2); stroke-width: 1; }
+  .uv-toggle-on { fill: var(--accent); }
+  .uv-knob { fill: var(--text); }
+  .uv-eye-line { fill: none; stroke: var(--accent); stroke-width: 1; stroke-linecap: round; }
+  .uv-eye-line.dim { stroke: var(--muted); }
+  .uv-shirt { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 0.8; }
+  .uv-eye { fill: #1b1f24; }
+  .uv-blush { fill: #f08a8a; }
+  .uv-mouth { fill: none; stroke: #1b1f24; stroke-width: 1; stroke-linecap: round; }
+  .uv-brow { fill: none; stroke: #5a3b24; stroke-width: 1.2; stroke-linecap: round; }
+  .uv-nose { fill: none; stroke: #c99677; stroke-width: 0.9; stroke-linecap: round; }
+  .uv-smile { fill: #7a2e2e; stroke: #1b1f24; stroke-width: 0.6; }
+  .uv-teeth { fill: #fff; }
 
   /* Resting state, also what reduced motion shows */
   .uv-later { opacity: 0; }
@@ -125,11 +158,27 @@ const { name } = Astro.props;
 </style>
 
 <script>
-  // Scenes only move while they are on screen.
+  import { prefersReducedMotion } from './motion';
+
+  // Scenes only move while they are on screen. Timed scenes (data-rest) are
+  // paused off screen, and with reduced motion they hold their rest moment.
+  const scenes = document.querySelectorAll<HTMLElement>('[data-vignette]');
+  const timed = (scene: Element) => scene.querySelector('svg') as SVGSVGElement | null;
+  const reduced = prefersReducedMotion();
+  scenes.forEach((scene) => {
+    const svg = timed(scene);
+    if (!svg || !scene.hasAttribute('data-rest')) return;
+    svg.pauseAnimations();
+    if (reduced) svg.setCurrentTime(Number(scene.dataset.rest));
+  });
   const watcher = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => entry.target.classList.toggle('is-live', entry.isIntersecting));
+    entries.forEach((entry) => {
+      entry.target.classList.toggle('is-live', entry.isIntersecting);
+      const svg = timed(entry.target);
+      if (!svg || reduced || !entry.target.hasAttribute('data-rest')) return;
+      if (entry.isIntersecting) svg.unpauseAnimations(); else svg.pauseAnimations();
+    });
   }, { rootMargin: '60px' });
-  const scenes = document.querySelectorAll<SVGElement>('[data-vignette]');
   scenes.forEach((scene) => watcher.observe(scene));
 
   // A pill's label can be wider than drawn, since fonts differ by device. Once fonts
@@ -142,8 +191,9 @@ const { name } = Astro.props;
       const needed = label.getBBox().width + PILL_PADDING * 2;
       const width = pill.width.baseVal.value;
       if (needed <= width) return;
-      pill.setAttribute('x', String(pill.x.baseVal.value - (needed - width) / 2));
-      pill.setAttribute('width', String(needed));
+      const x = String(pill.x.baseVal.value - (needed - width) / 2);
+      const base = pill.previousElementSibling?.classList.contains('uv-chip-base') ? pill.previousElementSibling : null;
+      [pill, base].forEach((shape) => { shape?.setAttribute('x', x); shape?.setAttribute('width', String(needed)); });
     }));
   }
   document.fonts.ready.then(fitPills).catch((error) => console.warn('Spot illustration pills could not be sized', error));

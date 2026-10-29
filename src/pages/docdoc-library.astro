@@ -4,7 +4,7 @@ import SpaceBand from '../components/SpaceBand.astro';
 import CardGrid from '../components/CardGrid.astro';
 import type { Card } from '../components/CardGrid.astro';
 import StepList from '../components/StepList.astro';
-import type { Step } from '../components/StepList.astro';
+import type { Step, Stage } from '../components/StepList.astro';
 import Shot from '../components/Shot.astro';
 import { nextCaseLinks } from '../data/site';
 import { framerImage } from '../data/framer-images';
@@ -14,9 +14,7 @@ const sections = [
   { id: 'decision', title: 'Design System Decision' },
   { id: 'alignment', title: 'Company Documentation Alignment' },
   { id: 'expansion', title: 'Library Expansion Process' },
-  { id: 'creation-criteria', title: 'Component Creation Criteria' },
-  { id: 'card-criteria', title: 'Card Component: Criteria in Action' },
-  { id: 'testing-criteria', title: 'Component Testing Criteria' },
+  { id: 'criteria', title: 'Component Criteria' },
   { id: 'core', title: 'The Core of the Library' },
   { id: 'impact', title: 'Impact' },
 ];
@@ -41,34 +39,34 @@ const expansion: Step[] = [
   { title: 'Design integration and testing', text: 'I placed the card in the design flow and tested it with other components in different layouts. This showed where it could improve.', img: framerImage('jQi8RN4XfbyUVFSGzmZZAMb7vI.png'), alt: 'The card inside a full page layout' },
 ];
 
-const creation: Card[] = [
-  { icon: 'layers', title: 'Alignment', text: 'Does the component fit the DocDoc design system, both technically and visually?' },
-  { icon: 'users', title: 'Audience', text: 'Who is it for, so we can shape it around their needs?' },
-  { icon: 'compass', title: 'Responsiveness', text: 'Does it work well on screens of different sizes?' },
-  { icon: 'tool', title: 'Functionality', text: 'What does it do, what can users do with it, and how does it fit the layout?' },
-  { icon: 'bulb', title: 'Best practices', text: 'Which proven methods improve its design and how it works?' },
-  { icon: 'person', title: 'Decision maker', text: 'Feedback from our CTO was key, as he made the final call on design changes.' },
-];
+// Component criteria: three stages on one rail. Each step has a spot illustration of the card (card-scenes.ts).
+const criteria: (Step | Stage)[] = [
+  { stage: 'Set the criteria', text: 'I set up criteria so every new component was useful, efficient and consistent with the design system.' },
+  { title: 'Angular design system', text: 'Does the component fit the DocDoc design system, built on Angular Material, both technically and visually?', vignette: 'angularFit' },
+  { title: 'Audience', text: 'Who is it for, so we can shape it around their needs?', vignette: 'audienceFaces' },
+  { title: 'Responsiveness', text: 'Does it work well on screens of different sizes?', vignette: 'deviceWiden' },
+  { title: 'Functionality', text: 'What does it do, what can users do with it, and how does it fit the layout?', vignette: 'layoutParts' },
+  { title: 'Best practices', text: 'Which proven methods improve its design and how it works?', vignette: 'familiarPatterns' },
+  { title: 'Decision maker', text: 'Feedback from our CTO was key, as he made the final call on design changes.', vignette: 'ctoApproval' },
 
-const cardCriteria: Step[] = [
-  { title: 'Alignment', text: 'The Material 2 card only held a title and a paragraph. We needed rows of labels and values, so we customised it.', img: framerImage('s7XmPUdhwojltjIhBdrhM6PnVo0.png'), alt: 'Angular Material logo' },
-  { title: 'Target audience', text: 'Tables were an option, but cards were easier to scan in the member app. That suits healthcare users who need information fast.', img: framerImage('EOfXag1MF8MevIXHkrpWMv5cYU.png'), alt: 'Cards on a mobile screen', tall: true },
-  { title: 'Responsiveness', text: 'Labels and values keep a 0.7 to 1 ratio on both mobile and desktop.', img: framerImage('jXMuIcfiN2rB7fmcwYcqLwYy8k.png'), alt: 'Mobile and desktop cards with the same label to value ratio' },
-  { title: 'Functionality', text: 'Tapping the card opens more information on another page. An ellipsis button in the top right offers more options.', img: framerImage('LMU1Dhhb2PyIy3s5Yh55pwhgAc.png'), alt: 'The menu that opens from the card’s ellipsis button' },
-  { title: 'Best practices', text: 'Text in both columns is left aligned for easier reading. On desktop, values stay within 50 to 75 characters to reduce eye strain. The layout was inspired by Amazon’s product details, which users already know.', img: framerImage('1EbW05taIKQb1piHgmlxL28dsw.png'), alt: 'Amazon product details used as inspiration' },
-];
+  { stage: 'Apply them to the card', text: 'See how the criteria shaped the card component. The Material 2 card began plain, then gained what each criterion asked for.' },
+  { title: 'Scalable rows', text: 'The Material 2 card only held a title and a paragraph. We needed rows of labels and values, so we customised it. In Figma, row toggles add or remove rows, so one card fits more or less data.', vignette: 'scalableRows' },
+  { title: 'Target audience', text: 'Tables were an option, but cards were easier to scan in the member app. That suits healthcare users who need information fast.', vignette: 'tableToCards' },
+  { title: 'Responsiveness', text: 'Labels and values keep a 0.7 to 1 ratio on both mobile and desktop.', vignette: 'ratioStretch' },
+  { title: 'Functionality', text: 'Tapping the card opens more information on another page. An ellipsis button in the top right offers more options.', vignette: 'tapToOpen' },
+  { title: 'Best practices', text: 'Text in both columns is left aligned for easier reading. On desktop, values stay within 50 to 75 characters to reduce eye strain. The layout was inspired by Amazon’s product details, which users already know.', vignette: 'leftAlignedText' },
 
-const testing = [
-  { title: 'Width adjustability', text: 'Is the component’s width fixed, fill, or both?', file: '3yVbNvpLclVbOzyQzHXHT94tP4.png', alt: 'Cards keeping the same ratio across different screens' },
-  { title: 'Element stability', text: 'Do elements keep their place when the size changes?', file: 'LhnRlp4t9ZWyxulNoQNF058wKN8.png', alt: 'The ellipsis staying in the same place at different card widths' },
-  { title: 'Content consistency', text: 'Does the content stay the same across variants like default, hover and active?', file: 'fBnBssIs9xQktmxsvyXBsx73Cmg.png', alt: 'The same content in different card states' },
-  { title: 'Contextual integration', text: 'Does it work with the other components around it?', file: 'H1bH4dearkDcFajjC2rnazalAP8.png', alt: 'The card with other components in a layout' },
-  { title: 'Link consistency', text: 'Are components linked to the latest libraries, not old versions?', file: 'Los7MrYqNFYjomYaLCNukVUWArg.png', alt: 'Figma library links panel' },
-  { title: 'Style link', text: 'Are colours, icons and fonts linked to the style guide?', file: 'Uh4p7bsdm8m8uTjNaBVxLsZMEFE.png', alt: 'Figma style panel' },
-  { title: 'Dynamic sizing', text: 'Does the component resize itself to fit its content?', file: 'ZFdRq5K0MZsYBu9D7kpyRMEqnM.png', alt: 'A card growing taller as content is added' },
-  { title: 'Layer toggling', text: 'Can layers be turned on or off as the context needs?', file: 'i8aeB4nz4igLO2et3n26kaTTa4.png', alt: 'Figma toggle menu for layers' },
-  { title: 'Visibility and dimensions', text: 'When a layer is hidden, does its space disappear too?', file: 'sbID5gpX3W2hsEVRYNMIfVmCOg.png', alt: 'A card closing the gap when content is turned off' },
-  { title: 'Layer naming', text: 'Are all layers named clearly for the team?', file: 'pXQF88Iul99ibpxht1abJ6zdo.png', alt: 'Figma layer panel with clearly named layers' },
+  { stage: 'Test before release', text: 'Before any component went out, it had to pass ten checks.' },
+  { title: 'Width adjustability', text: 'Is the component’s width fixed, fill, or both?', vignette: 'widthStretch' },
+  { title: 'Element stability', text: 'Do elements keep their place when the size changes?', vignette: 'stableIcons' },
+  { title: 'Content consistency', text: 'Does the content stay the same across variants like default, hover and active?', vignette: 'cardStates' },
+  { title: 'Contextual integration', text: 'Does it work with the other components around it?', vignette: 'contextFit' },
+  { title: 'Link consistency', text: 'Are components linked to the latest libraries, not old versions?', vignette: 'latestLibrary' },
+  { title: 'Style link', text: 'Are colours, icons and fonts linked to the style guide?', vignette: 'styleLinks' },
+  { title: 'Dynamic sizing', text: 'Does the component resize itself to fit its content?', vignette: 'dynamicHeight' },
+  { title: 'Layer toggling', text: 'Can layers be turned on or off as the context needs?', vignette: 'layerToggles' },
+  { title: 'Visibility and dimensions', text: 'When a layer is hidden, does its space disappear too?', vignette: 'hiddenSpace' },
+  { title: 'Layer naming', text: 'Are all layers named clearly for the team?', vignette: 'layerNames' },
 ];
 
 const impact: Card[] = [
@@ -130,31 +128,11 @@ const next = nextCaseLinks('docdoc-library');
     <StepList items={expansion} />
   </section>
 
-  <section id="creation-criteria" class="sec">
+  <section id="criteria" class="sec">
     <SpaceBand name="zodiac" />
-    <h2>Component Creation Criteria</h2>
-    <p>I set up criteria so every new component was useful, efficient and consistent with the design system.</p>
-    <CardGrid items={creation} columns={3} />
-  </section>
-
-  <section id="card-criteria" class="sec">
-    <h2>Card Component: Criteria in Action</h2>
-    <p>See how the criteria shaped the card component.</p>
-    <StepList items={cardCriteria} />
-  </section>
-
-  <section id="testing-criteria" class="sec">
-    <h2>Component Testing Criteria</h2>
-    <p>Before any component went out, it had to pass ten checks.</p>
-    <ul class="checks">
-      {testing.map((check) => (
-        <li>
-          <img src={framerImage(check.file)} alt={check.alt} loading="lazy" decoding="async" />
-          <h3>{check.title}</h3>
-          <p>{check.text}</p>
-        </li>
-      ))}
-    </ul>
+    <h2>Component Criteria</h2>
+    <p>Every new component went through the same three stages. I set the criteria, applied them to the card, then tested the result before release.</p>
+    <StepList items={criteria} />
     <div class="takeaway">
       <b>Production ready components</b>
       <p>Every component the team received was ready for production, with fewer bugs and inconsistencies.</p>
@@ -184,12 +162,4 @@ const next = nextCaseLinks('docdoc-library');
   .side :global(figure) { margin-top: 0; }
   @media (max-width: 760px) { .side { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); } }
 
-  /* Ten checks in two columns: picture on the left, question on the right. */
-  .checks { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
-  .checks li { display: grid; grid-template-columns: 160px minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: var(--space-2); row-gap: 6px; align-content: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--space-2); }
-  .checks img { grid-row: 1 / span 2; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; border-radius: 8px; background: var(--surface-2); }
-  .checks h3 { font-size: 18px; align-self: end; }
-  .checks p { font-size: 15px; line-height: 1.5; color: var(--text-2); }
-  @media (max-width: 900px) { .checks { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 480px) { .checks li { grid-template-columns: 112px minmax(0, 1fr); } }
 </style>

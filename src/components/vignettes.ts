@@ -27,7 +27,12 @@
 //   uv-ping   ring that spreads out        uv-nudge arrow that nudges right
 //   uv-hit    lights up when the pointer clicks (pair with uv-cursor; aim it with --cx and --cy)
 
+import { cardScenes, cardSceneRest } from './card-scenes';
+import type { CardSceneName } from './card-scenes';
+
 export type VignetteName =
+  // Design library: the card at each criterion and test (scenes in card-scenes.ts)
+  | CardSceneName
   // ESG reporting module: key requirements
   | 'frameworks' | 'dataSync' | 'assignTasks' | 'trackProgress' | 'teamChat'
   // Four Leaves: problems found
@@ -50,7 +55,11 @@ const labelFor: Record<Tone, string> = { good: 'key', warn: 'amber', bad: 'red',
 const pill = (x: number, y: number, w: number, tone: Tone, text: string, motion = '', style = '') =>
   `<g class="${motion}"${style ? ` style="${style}"` : ''}><rect x="${x}" y="${y}" width="${w}" height="16" rx="8" class="uv-pill-${tone}"/><text x="${x + w / 2}" y="${y + 11}" text-anchor="middle" class="uv-${labelFor[tone]} uv-chip">${text}</text></g>`;
 
+/** Moment (seconds) to hold a timed scene at when motion is reduced. */
+export const vignetteRest: Partial<Record<VignetteName, number>> = cardSceneRest;
+
 export const vignettes: Record<VignetteName, string> = {
+  ...cardScenes,
   frameworks: `
     <g class="uv-left"><rect class="uv-well" x="10" y="16" width="40" height="36" rx="5"/><text x="30" y="38" text-anchor="middle" class="uv-blue">GRI</text></g>
     <g class="uv-right"><rect class="uv-well" x="70" y="16" width="40" height="36" rx="5"/><text x="90" y="38" text-anchor="middle" class="uv-key">IFRS</text></g>

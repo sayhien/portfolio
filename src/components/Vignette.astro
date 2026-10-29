@@ -2,20 +2,27 @@
 // A small framed UI scene that explains a point at a glance (scenes in
 // vignettes.ts). Decorative: the text beside it says the same in words.
 // It only moves while on screen, and rests in a readable state with reduced motion.
-import { vignettes } from './vignettes';
+import { vignettes, vignetteRest, vignetteBox } from './vignettes';
 import type { VignetteName } from './vignettes';
 
 interface Props { name: VignetteName }
 const { name } = Astro.props;
+const rest = vignetteRest[name];
+const box = vignetteBox[name];
 ---
-<span class="uv" data-vignette aria-hidden="true">
-  <svg viewBox="0 0 120 68" set:html={vignettes[name]} />
+<span class:list={['uv', { 'is-fit': box }]} data-vignette={name} data-rest={rest} aria-hidden="true">
+  <svg viewBox={box ? `0 ${box[0]} 120 ${box[1]}` : '0 0 120 68'} set:html={vignettes[name]} />
 </span>
 
 <style is:global>
-  .uv { display: block; aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 6px; box-sizing: border-box; }
+  .uv { --uv-snap: cubic-bezier(0.2, 0.9, 0.25, 1); display: block; aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 6px; box-sizing: border-box; }
   .uv svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  /* A scene that uses only part of the grid: the frame takes the scene's own shape */
+  .uv.is-fit { aspect-ratio: auto; }
+  .uv.is-fit svg { height: auto; }
   :where(.uv svg *) { transform-box: fill-box; transform-origin: center; }
+  /* Timed (SMIL) transforms carry their own pivot, so they keep the plain SVG origin */
+  .uv svg :has(> animateTransform) { transform-box: view-box; transform-origin: 0 0; }
 
   /* Look */
   .uv-panel { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.5; }
@@ -42,7 +49,41 @@ const { name } = Astro.props;
   .uv-arrow { fill: none; stroke: var(--on-accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .uv-red { fill: var(--danger); } .uv-amber { fill: var(--warn); } .uv-blue { fill: var(--info); }
   .uv-pill-good { fill: var(--accent-soft); } .uv-pill-warn { fill: var(--warn-soft); }
+  .uv-hug { fill: none; stroke: var(--accent); stroke-width: 0.8; }
+  .uv-hug-handle { fill: var(--bg); stroke: var(--accent); stroke-width: 0.6; }
+  .uv-hug-tag { fill: var(--accent); }
+  .uv-pill-edge { stroke: var(--accent); stroke-width: 1.5; }
   .uv-pill-bad { fill: var(--danger-soft); } .uv-pill-info { fill: var(--info-soft); }
+
+  /* The DocDoc card and the people in the design library scenes (card-scenes.ts) */
+  .uv-card { fill: var(--surface-2); stroke: var(--line-2); stroke-width: 1.2; }
+  .uv-card.uv-mine { stroke: var(--accent); }
+  .uv-hover { fill: rgba(255, 255, 255, 0.07); }
+  .uv-press-fill { fill: rgba(110, 231, 183, 0.2); }
+  .uv-selected { fill: none; stroke: var(--accent); stroke-width: 1.4; }
+  .uv-cbar-l { fill: var(--text-2); }
+  .uv-cbar-v { fill: var(--muted); opacity: 0.6; }
+  .uv-ctext-l { font: 600 5.2px var(--sans); fill: var(--text); }
+  .uv-ctext-v { font: 400 5.2px var(--sans); fill: var(--text-2); }
+  .uv-tiny { font-size: 6.5px; }
+  .uv-layer { font-size: 5.8px; }
+  .uv-chip-base { fill: var(--surface); }
+  .uv-tick-sm { fill: none; stroke: var(--on-accent); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-angular .uv-tick-sm, .uv-angular + .uv-tick-sm { stroke: #fff; }
+  .uv-angular { fill: #dd0031; }
+  .uv-device { fill: var(--bg); stroke: var(--text-2); stroke-width: 1.4; }
+  .uv-goal-thin { fill: none; stroke: var(--accent); stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+  .uv-guide { fill: none; stroke: var(--accent); stroke-width: 0.6; stroke-dasharray: 1.5 1.5; }
+  .uv-toggle { fill: none; stroke: var(--line-2); stroke-width: 1; }
+  .uv-toggle-on { fill: var(--accent); }
+  .uv-knob { fill: var(--text); }
+  .uv-eye-line { fill: none; stroke: var(--accent); stroke-width: 1; stroke-linecap: round; }
+  .uv-eye-line.dim { stroke: var(--muted); }
+  .uv-eye { fill: #1b1f24; }
+  .uv-blush { fill: #f08a8a; }
+  .uv-cloth { fill: #2c4d43; }
+  .uv-mouth-soft { fill: none; stroke: #2a1d17; stroke-width: 0.9; stroke-linecap: round; }
+  .uv-avatar-ring { fill: var(--surface-2); }
 
   /* Resting state, also what reduced motion shows */
   .uv-later { opacity: 0; }
@@ -53,68 +94,68 @@ const { name } = Astro.props;
   /* Motion: everything loops, and only while the scene is on screen */
   .uv:not(.is-live) [class*='uv-'] { animation-play-state: paused; }
 
-  .uv-left { animation: uv-left 4s ease-in-out infinite; } .uv-right { animation: uv-right 4s ease-in-out infinite; } .uv-merge { animation: uv-merge 4s ease-in-out infinite; }
+  .uv-left { animation: uv-left 3.2s var(--uv-snap) infinite; } .uv-right { animation: uv-right 3.2s var(--uv-snap) infinite; } .uv-merge { animation: uv-merge 3.2s var(--uv-snap) infinite; }
   @keyframes uv-left { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(24px); opacity: 0; } 100% { transform: none; } }
   @keyframes uv-right { 0%, 15% { transform: none; } 45%, 80% { transform: translateX(-24px); opacity: 0; } 100% { transform: none; } }
   @keyframes uv-merge { 0%, 35% { opacity: 0; transform: scale(0.8); } 50%, 82% { opacity: 1; transform: none; } 95%, 100% { opacity: 0; } }
 
-  .uv-dot { animation: uv-travel 2.4s linear infinite; animation-delay: calc(var(--k, 0) * 0.8s); }
+  .uv-dot { animation: uv-travel 1.92s linear infinite; animation-delay: calc(var(--k, 0) * 0.8s); }
   @keyframes uv-travel { from { offset-distance: 0%; opacity: 1; } 90% { opacity: 1; } to { offset-distance: 100%; opacity: 0; } }
 
-  .uv-cycle { animation: uv-cycle calc(var(--of, 3) * 1.5s) ease-in-out infinite; animation-delay: calc(var(--k, 0) * 1.5s); }
+  .uv-cycle { animation: uv-cycle calc(var(--of, 3) * 1.2s) var(--uv-snap) infinite; animation-delay: calc(var(--k, 0) * 1.2s); }
   @keyframes uv-cycle { 0% { opacity: 0; transform: translateY(6px); } 6% { opacity: 1; transform: none; } 30% { opacity: 1; transform: none; } 36%, 100% { opacity: 0; transform: translateY(-6px); } }
   /* With two states each one holds for half the loop */
   .uv-cycle[style*='--of:2'] { animation-name: uv-cycle-2; }
   @keyframes uv-cycle-2 { 0% { opacity: 0; transform: translateY(6px); } 8%, 44% { opacity: 1; transform: none; } 52%, 100% { opacity: 0; transform: translateY(-6px); } }
 
-  .uv-grow { transform: scaleX(0.4); animation: uv-grow 4s ease-in-out infinite; }
+  .uv-grow { transform: scaleX(0.4); animation: uv-grow 3.2s var(--uv-snap) infinite; }
   @keyframes uv-grow { 0% { transform: scaleX(0.05); } 25% { transform: scaleX(0.4); } 50% { transform: scaleX(0.7); } 70%, 90% { transform: scaleX(1); } 100% { transform: scaleX(0.05); } }
-  .uv-done { animation: uv-done 4s ease-in-out infinite; }
+  .uv-done { animation: uv-done 3.2s var(--uv-snap) infinite; }
   @keyframes uv-done { 0%, 66% { opacity: 0; transform: scale(0.4); } 72%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
-  .uv-in1 { animation: uv-in1 4.5s ease-out infinite; } .uv-in2 { animation: uv-in2 4.5s ease-out infinite; } .uv-in3 { animation: uv-in3 4.5s ease-out infinite; }
+  .uv-in1 { animation: uv-in1 3.6s var(--uv-snap) infinite; } .uv-in2 { animation: uv-in2 3.6s var(--uv-snap) infinite; } .uv-in3 { animation: uv-in3 3.6s var(--uv-snap) infinite; }
   @keyframes uv-in1 { 0% { opacity: 0; transform: translateY(6px); } 8%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
   @keyframes uv-in2 { 0%, 28% { opacity: 0; transform: translateY(6px); } 36%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
   @keyframes uv-in3 { 0%, 56% { opacity: 0; transform: translateY(6px); } 64%, 88% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
-  .uv-rise { animation: uv-rise 4s ease-in-out infinite; animation-delay: calc(var(--k, 0) * 0.25s); }
+  .uv-rise { animation: uv-rise 3.2s var(--uv-snap) infinite; animation-delay: calc(var(--k, 0) * 0.25s); }
   @keyframes uv-rise { 0%, 10% { transform: scaleY(0.15); } 45%, 85% { transform: scaleY(1); } 100% { transform: scaleY(0.15); } }
 
-  .uv-scan { animation: uv-scan 4s steps(5, jump-end) infinite; }
+  .uv-scan { animation: uv-scan 3.2s steps(5, jump-end) infinite; }
   @keyframes uv-scan { 0% { transform: none; } 75%, 100% { transform: translateX(var(--dx, 80px)); } }
 
-  .uv-shrink { animation: uv-shrink 4s ease-in-out infinite; }
+  .uv-shrink { animation: uv-shrink 3.2s var(--uv-snap) infinite; }
   @keyframes uv-shrink { 0%, 15% { transform: none; } 60%, 88% { transform: scaleX(var(--to, 0.35)); } 100% { transform: none; } }
 
-  .uv-blink { animation: uv-blink 1.1s steps(2, jump-none) infinite; }
+  .uv-blink { animation: uv-blink 0.88s steps(2, jump-none) infinite; }
   @keyframes uv-blink { 50% { opacity: 0; } }
 
-  .uv-cursor { transform-box: view-box; transform-origin: 0 0; transform: translate(var(--cx, 40px), var(--cy, 42px)); animation: uv-cursor 4s ease-in-out infinite; }
+  .uv-cursor { transform-box: view-box; transform-origin: 0 0; transform: translate(var(--cx, 40px), var(--cy, 42px)); animation: uv-cursor 3.2s var(--uv-snap) infinite; }
   @keyframes uv-cursor { 0%, 8% { transform: translate(100px, 60px); } 40% { transform: translate(var(--cx, 40px), var(--cy, 42px)); } 46% { transform: translate(var(--cx, 40px), var(--cy, 42px)) scale(0.85); } 52%, 85% { transform: translate(var(--cx, 40px), var(--cy, 42px)); } 100% { transform: translate(100px, 60px); } }
   /* Lights up as the pointer clicks, on the same 4 second loop */
-  .uv-hit { animation: uv-hit 4s ease-in-out infinite; }
+  .uv-hit { animation: uv-hit 3.2s var(--uv-snap) infinite; }
   @keyframes uv-hit { 0%, 44% { opacity: 0; } 50%, 85% { opacity: 1; } 100% { opacity: 0; } }
 
-  .uv-press { animation: uv-press 3s ease-in-out infinite; }
+  .uv-press { animation: uv-press 2.4s var(--uv-snap) infinite; }
   @keyframes uv-press { 0%, 55%, 100% { transform: scale(1); } 65% { transform: scale(0.9); } 78% { transform: scale(1.04); } }
-  .uv-open { transform-origin: top center; transform: scaleY(0.35); animation: uv-open 4.5s ease-in-out infinite; }
+  .uv-open { transform-origin: top center; transform: scaleY(0.35); animation: uv-open 3.6s var(--uv-snap) infinite; }
   @keyframes uv-open { 0%, 15% { transform: scaleY(0.35); } 40%, 85% { transform: none; } 100% { transform: scaleY(0.35); } }
-  .uv-scan-y { animation: uv-scan-y 4.5s steps(2, jump-end) infinite; }
+  .uv-scan-y { animation: uv-scan-y 3.6s steps(2, jump-end) infinite; }
   @keyframes uv-scan-y { 0% { transform: none; } 75%, 100% { transform: translateY(var(--dy, 24px)); } }
-  .uv-turn { opacity: 0; animation: uv-turn 4.5s ease-in-out infinite; animation-delay: calc(var(--k, 0) * 1.5s); }
+  .uv-turn { opacity: 0; animation: uv-turn 3.6s var(--uv-snap) infinite; animation-delay: calc(var(--k, 0) * 1.2s); }
   .uv-turn:not([style*='--k']) { opacity: 1; }
   @keyframes uv-turn { 0% { opacity: 0; } 6%, 30% { opacity: 1; } 36%, 100% { opacity: 0; } }
-  .uv-ping { animation: uv-ping 2.4s ease-out infinite; }
+  .uv-ping { animation: uv-ping 1.92s var(--uv-snap) infinite; }
   @keyframes uv-ping { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.18, 1.6); opacity: 0; } }
-  .uv-nudge { animation: uv-nudge 1.6s ease-in-out infinite; }
+  .uv-nudge { animation: uv-nudge 1.28s var(--uv-snap) infinite; }
   @keyframes uv-nudge { 0%, 100% { transform: translateX(-1px); } 50% { transform: translateX(3px); } }
-  .uv-blink-soft { animation: uv-blink-soft 2.4s ease-in-out infinite; }
+  .uv-blink-soft { animation: uv-blink-soft 1.92s var(--uv-snap) infinite; }
   @keyframes uv-blink-soft { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
-  .uv-wobble { animation: uv-wobble 3s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -1.5s); }
+  .uv-wobble { animation: uv-wobble 2.4s var(--uv-snap) infinite; animation-delay: calc(var(--k, 0) * -1.5s); }
   @keyframes uv-wobble { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateY(-1px); } }
 
-  .uv-spin { transform-origin: bottom center; animation: uv-spin 3s linear infinite; }
+  .uv-spin { transform-origin: bottom center; animation: uv-spin 2.4s linear infinite; }
   @keyframes uv-spin { to { transform: rotate(360deg); } }
 
   /* Reduced motion: the resting picture, with the status that ends each story shown */
@@ -125,11 +166,27 @@ const { name } = Astro.props;
 </style>
 
 <script>
-  // Scenes only move while they are on screen.
+  import { prefersReducedMotion } from './motion';
+
+  // Scenes only move while they are on screen. Timed scenes (data-rest) are
+  // paused off screen, and with reduced motion they hold their rest moment.
+  const scenes = document.querySelectorAll<HTMLElement>('[data-vignette]');
+  const timed = (scene: Element) => scene.querySelector('svg') as SVGSVGElement | null;
+  const reduced = prefersReducedMotion();
+  scenes.forEach((scene) => {
+    const svg = timed(scene);
+    if (!svg || !scene.hasAttribute('data-rest')) return;
+    svg.pauseAnimations();
+    if (reduced) svg.setCurrentTime(Number(scene.dataset.rest));
+  });
   const watcher = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => entry.target.classList.toggle('is-live', entry.isIntersecting));
+    entries.forEach((entry) => {
+      entry.target.classList.toggle('is-live', entry.isIntersecting);
+      const svg = timed(entry.target);
+      if (!svg || reduced || !entry.target.hasAttribute('data-rest')) return;
+      if (entry.isIntersecting) svg.unpauseAnimations(); else svg.pauseAnimations();
+    });
   }, { rootMargin: '60px' });
-  const scenes = document.querySelectorAll<SVGElement>('[data-vignette]');
   scenes.forEach((scene) => watcher.observe(scene));
 
   // A pill's label can be wider than drawn, since fonts differ by device. Once fonts
@@ -142,8 +199,11 @@ const { name } = Astro.props;
       const needed = label.getBBox().width + PILL_PADDING * 2;
       const width = pill.width.baseVal.value;
       if (needed <= width) return;
-      pill.setAttribute('x', String(pill.x.baseVal.value - (needed - width) / 2));
-      pill.setAttribute('width', String(needed));
+      const x = String(pill.x.baseVal.value - (needed - width) / 2);
+      // The shape drawn under the pill (a backing or an outline) grows with it, so the two stay aligned
+      const under = pill.previousElementSibling;
+      const base = under instanceof SVGRectElement && under.x.baseVal.value === pill.x.baseVal.value && under.width.baseVal.value === width ? under : null;
+      [pill, base].forEach((shape) => { shape?.setAttribute('x', x); shape?.setAttribute('width', String(needed)); });
     }));
   }
   document.fonts.ready.then(fitPills).catch((error) => console.warn('Spot illustration pills could not be sized', error));
